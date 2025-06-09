@@ -1,4 +1,4 @@
-# Corso Node.js: Dalla Teoria alla Pratica
+# Node.js by example
 
 ## Introduzione
 

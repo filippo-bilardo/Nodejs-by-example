@@ -1,0 +1,162 @@
+{
+	// Nome del container di sviluppo
+	"name": "Node.js Development with VNC",
+	
+	// Usa l'immagine ufficiale Node.js con Ubuntu
+	"image": "mcr.microsoft.com/devcontainers/javascript-node:1-20-bullseye",
+	
+	// Features per aggiungere funzionalità extra
+	"features": {
+		// Desktop environment con VNC
+		"ghcr.io/devcontainers/features/desktop-lite:1": {
+			"password": "vscode",
+			"webPort": "6080",
+			"vncPort": "5901"
+		},
+		// Git avanzato
+		"ghcr.io/devcontainers/features/git:1": {
+			"ppa": true,
+			"version": "latest"
+		},
+		// Docker in Docker per container development
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {
+			"version": "latest",
+			"enableNonRootDocker": "true"
+		},
+		// GitHub CLI
+		"ghcr.io/devcontainers/features/github-cli:1": {
+			"installDirectlyFromGitHubRelease": true,
+			"version": "latest"
+		}
+	},
+
+	// Configurazioni personalizzate del container
+	"customizations": {
+		"vscode": {
+			// Estensioni VS Code da installare
+			"extensions": [
+				// Node.js e JavaScript
+				"ms-vscode.vscode-node-azure-pack",
+				"ms-vscode.vscode-typescript-next",
+				"esbenp.prettier-vscode",
+				"dbaeumer.vscode-eslint",
+				"ms-vscode.vscode-json",
+				
+				// Debug e testing
+				"ms-vscode.js-debug",
+				"hbenl.vscode-test-explorer",
+				"orta.vscode-jest",
+				
+				// Git e GitHub
+				"github.vscode-pull-request-github",
+				"github.copilot",
+				"github.copilot-chat",
+				"eamodio.gitlens",
+				
+				// Utilities
+				"ms-vscode-remote.remote-containers",
+				"ms-azuretools.vscode-docker",
+				"ms-vscode.remote-explorer",
+				"bradlc.vscode-tailwindcss",
+				"formulahendry.auto-rename-tag",
+				"christian-kohler.path-intellisense",
+				
+				// Markdown e documentazione
+				"yzhang.markdown-all-in-one",
+				"shd101wyy.markdown-preview-enhanced",
+				
+				// Themes e UI
+				"pkief.material-icon-theme",
+				"github.github-vscode-theme"
+			],
+			
+			// Impostazioni VS Code
+			"settings": {
+				"terminal.integrated.defaultProfile.linux": "bash",
+				"terminal.integrated.fontSize": 14,
+				"editor.fontSize": 14,
+				"editor.tabSize": 2,
+				"editor.insertSpaces": true,
+				"editor.formatOnSave": true,
+				"editor.codeActionsOnSave": {
+					"source.fixAll.eslint": true
+				},
+				"javascript.format.enable": true,
+				"typescript.format.enable": true,
+				"npm.enableScriptExplorer": true,
+				"git.enableSmartCommit": true,
+				"git.confirmSync": false,
+				"workbench.colorTheme": "GitHub Dark",
+				"workbench.iconTheme": "material-icon-theme"
+			}
+		}
+	},
+
+	// Porte da esporre
+	"forwardPorts": [
+		3000,    // Applicazioni Node.js (default)
+		3001,    // API server
+		4200,    // Angular dev server
+		5000,    // React dev server
+		5173,    // Vite dev server
+		6080,    // noVNC web interface
+		5901,    // VNC direct port
+		8080,    // HTTP server generico
+		9229     // Node.js debug port
+	],
+
+	// Attributi delle porte
+	"portsAttributes": {
+		"6080": {
+			"label": "Desktop (noVNC)",
+			"onAutoForward": "openBrowser"
+		},
+		"3000": {
+			"label": "Node.js App",
+			"onAutoForward": "openPreview"
+		},
+		"5000": {
+			"label": "React App",
+			"onAutoForward": "openPreview"
+		}
+	},
+
+	// Comandi da eseguire dopo la creazione del container
+	"postCreateCommand": "bash .devcontainer/setup.sh",
+
+	// Configurazioni mount e bind
+	"mounts": [
+		// Mount per Docker socket (Docker in Docker)
+		"source=/var/run/docker.sock,target=/var/run/docker-host.sock,type=bind",
+		// Cache npm globale
+		"source=nodejs-npm-cache,target=/home/vscode/.npm,type=volume"
+	],
+
+	// Variabili d'ambiente
+	"containerEnv": {
+		"NODE_ENV": "development",
+		"DISPLAY": ":1",
+		"VNC_RESOLUTION": "1920x1080",
+		"VNC_DPI": "96",
+		"VNC_COL_DEPTH": "24"
+	},
+
+	// Utente non-root per sicurezza
+	"remoteUser": "vscode",
+
+	// Configurazioni specifiche per Codespaces
+	"codespaces": {
+		"openFiles": [
+			"README.md",
+			"package.json"
+		]
+	},
+
+	// Lifecycle hooks
+	"initializeCommand": "echo 'Inizializzazione dev container Node.js con VNC...'",
+	"onCreateCommand": "echo 'Container creato con successo!'",
+	
+	// Configurazioni aggiuntive per sviluppo
+	"capAdd": ["SYS_PTRACE"],
+	"securityOpt": ["seccomp=unconfined"]
+}
