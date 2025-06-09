@@ -11,7 +11,8 @@
 		"ghcr.io/devcontainers/features/desktop-lite:1": {
 			"password": "vscode",
 			"webPort": "6080",
-			"vncPort": "5901"
+			"vncPort": "5901",
+			"installWebApp": true
 		},
 		// Git avanzato
 		"ghcr.io/devcontainers/features/git:1": {
@@ -29,6 +30,10 @@
 			"version": "latest"
 		}
 	},
+
+	// Configurazioni per garantire la corretta creazione dell'utente
+	"containerUser": "vscode",
+	"updateRemoteUserUID": true,
 
 	// Configurazioni personalizzate del container
 	"customizations": {
@@ -127,7 +132,7 @@
 	},
 
 	// Comandi da eseguire dopo la creazione del container
-	"postCreateCommand": "bash .devcontainer/setup.sh",
+	"postCreateCommand": "bash .devcontainer/postCreateCommand.sh",
 
 	// Configurazioni mount e bind
 	"mounts": [
@@ -150,7 +155,7 @@
 	"remoteUser": "vscode",
 
 	// Lifecycle hooks
-	"initializeCommand": "echo 'Inizializzazione dev container Node.js con VNC...'",
+	"initializeCommand": ".devcontainer/init.sh || echo 'Inizializzazione dev container Node.js con VNC...'",
 	"onCreateCommand": "echo 'Container creato con successo!'",
 	
 	// Configurazioni aggiuntive per sviluppo

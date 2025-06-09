@@ -3,6 +3,26 @@ set -e
 
 echo "🚀 Configurazione ambiente di sviluppo Node.js con VNC..."
 
+# Verifica e configura utente vscode
+echo "👤 Verifica configurazione utente vscode..."
+if ! id vscode &>/dev/null; then
+    echo "⚠️  Utente vscode non trovato, creazione in corso..."
+    sudo useradd -m -s /bin/bash -G sudo vscode
+    echo "vscode:vscode" | sudo chpasswd
+else
+    echo "✅ Utente vscode già esistente"
+fi
+
+# Assicurati che vscode sia nel gruppo sudo
+sudo usermod -aG sudo vscode 2>/dev/null || true
+
+# Verifica permessi directory home
+sudo chown -R vscode:vscode /home/vscode 2>/dev/null || true
+
+echo "👤 Informazioni utente corrente:"
+whoami
+id
+
 # Aggiorna il sistema
 echo "📦 Aggiornamento sistema..."
 sudo apt-get update -y
