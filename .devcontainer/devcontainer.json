@@ -79,16 +79,21 @@
 				"editor.insertSpaces": true,
 				"editor.formatOnSave": true,
 				"editor.codeActionsOnSave": {
-					"source.fixAll.eslint": true
+					"source.fixAll.eslint": "explicit"
 				},
 				"javascript.format.enable": true,
 				"typescript.format.enable": true,
-				"npm.enableScriptExplorer": true,
 				"git.enableSmartCommit": true,
 				"git.confirmSync": false,
-				"workbench.colorTheme": "GitHub Dark",
-				"workbench.iconTheme": "material-icon-theme"
+				"workbench.colorTheme": "Default Dark+",
+				"workbench.iconTheme": "vs-seti"
 			}
+		},
+		"codespaces": {
+			"openFiles": [
+				"README.md",
+				"package.json"
+			]
 		}
 	},
 
@@ -143,14 +148,6 @@
 
 	// Utente non-root per sicurezza
 	"remoteUser": "vscode",
-
-	// Configurazioni specifiche per Codespaces
-	"codespaces": {
-		"openFiles": [
-			"README.md",
-			"package.json"
-		]
-	},
 
 	// Lifecycle hooks
 	"initializeCommand": "echo 'Inizializzazione dev container Node.js con VNC...'",
