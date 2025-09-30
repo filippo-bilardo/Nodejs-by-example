@@ -281,7 +281,140 @@ writeStream.on('finish', () => {
 });
 ```
 
+### Stream Transform e Pipeline
+
+```javascript
+const fs = require('fs');
+const { Transform, pipeline } = require('stream');
+const zlib = require('zlib');
+
+// Creare un Transform Stream personalizzato
+const upperCaseTransform = new Transform({
+  transform(chunk, encoding, callback) {
+    // Trasforma il testo in maiuscolo
+    this.push(chunk.toString().toUpperCase());
+    callback();
+  }
+});
+
+// Utilizzare pipeline per gestire automaticamente gli errori
+pipeline(
+  fs.createReadStream('input.txt'),
+  upperCaseTransform,
+  zlib.createGzip(), // Comprime il contenuto
+  fs.createWriteStream('output.txt.gz'),
+  (err) => {
+    if (err) {
+      console.error('Errore nella pipeline:', err);
+    } else {
+      console.log('Pipeline completata con successo');
+    }
+  }
+);
+```
+
+### Operazioni File Avanzate
+
+#### Controllo Esistenza File
+
+```javascript
+const fs = require('fs').promises;
+
+// Metodo moderno con fs.access()
+async function fileExists(filePath) {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// Utilizzo
+const exists = await fileExists('file.txt');
+console.log('File esiste:', exists);
+```
+
+#### Copia File con Controllo Integrità
+
+```javascript
+const fs = require('fs').promises;
+const crypto = require('crypto');
+
+async function copyFileWithChecksum(source, destination) {
+  try {
+    // Leggi e calcola checksum del file originale
+    const originalData = await fs.readFile(source);
+    const originalHash = crypto.createHash('sha256').update(originalData).digest('hex');
+    
+    // Copia il file
+    await fs.copyFile(source, destination);
+    
+    // Verifica l'integrità
+    const copiedData = await fs.readFile(destination);
+    const copiedHash = crypto.createHash('sha256').update(copiedData).digest('hex');
+    
+    if (originalHash === copiedHash) {
+      console.log('File copiato correttamente con integrità verificata');
+      return true;
+    } else {
+      console.error('Errore: integrità del file compromessa');
+      await fs.unlink(destination); // Rimuovi il file corrotto
+      return false;
+    }
+  } catch (error) {
+    console.error('Errore nella copia:', error.message);
+    return false;
+  }
+}
+```
+
+#### Backup e Rotazione File
+
+```javascript
+const fs = require('fs').promises;
+const path = require('path');
+
+async function rotateFile(filePath, maxBackups = 5) {
+  try {
+    const dir = path.dirname(filePath);
+    const name = path.basename(filePath, path.extname(filePath));
+    const ext = path.extname(filePath);
+    
+    // Sposta i backup esistenti
+    for (let i = maxBackups - 1; i >= 1; i--) {
+      const oldBackup = path.join(dir, `${name}.${i}${ext}`);
+      const newBackup = path.join(dir, `${name}.${i + 1}${ext}`);
+      
+      try {
+        await fs.access(oldBackup);
+        await fs.rename(oldBackup, newBackup);
+      } catch (err) {
+        // Il backup non esiste, continua
+      }
+    }
+    
+    // Sposta il file corrente come primo backup
+    const firstBackup = path.join(dir, `${name}.1${ext}`);
+    try {
+      await fs.rename(filePath, firstBackup);
+      console.log(`File ruotato: ${filePath} -> ${firstBackup}`);
+    } catch (err) {
+      console.log('File originale non esistente, creazione nuovo file');
+    }
+    
+  } catch (error) {
+    console.error('Errore nella rotazione:', error.message);
+  }
+}
+
+// Esempio di utilizzo
+await rotateFile('./app.log', 3);
+```
+
 ## Osservare i Cambiamenti nei File
+
+### File Watcher Base
 
 ```javascript
 const fs = require('fs');
@@ -292,6 +425,249 @@ fs.watch('file.txt', (eventType, filename) => {
     console.log(`File modificato: ${filename}`);
   }
 });
+```
+
+### File Watcher Avanzato
+
+```javascript
+const fs = require('fs');
+const path = require('path');
+
+class FileWatcher {
+  constructor(watchPath, options = {}) {
+    this.watchPath = watchPath;
+    this.options = {
+      recursive: options.recursive || false,
+      debounceTime: options.debounceTime || 100,
+      excludePatterns: options.excludePatterns || [],
+      ...options
+    };
+    this.watchers = new Map();
+    this.debounceTimeouts = new Map();
+  }
+
+  start() {
+    this.watchDirectory(this.watchPath);
+  }
+
+  watchDirectory(dirPath) {
+    const watcher = fs.watch(dirPath, { recursive: this.options.recursive }, 
+      (eventType, filename) => {
+        if (!filename) return;
+        
+        const fullPath = path.join(dirPath, filename);
+        
+        // Filtro pattern esclusi
+        if (this.shouldExclude(fullPath)) return;
+        
+        // Debounce per evitare eventi duplicati
+        this.debounceEvent(fullPath, eventType, () => {
+          this.handleFileEvent(fullPath, eventType);
+        });
+      }
+    );
+
+    this.watchers.set(dirPath, watcher);
+  }
+
+  shouldExclude(filePath) {
+    return this.options.excludePatterns.some(pattern => {
+      if (typeof pattern === 'string') {
+        return filePath.includes(pattern);
+      }
+      if (pattern instanceof RegExp) {
+        return pattern.test(filePath);
+      }
+      return false;
+    });
+  }
+
+  debounceEvent(filePath, eventType, callback) {
+    const key = `${filePath}-${eventType}`;
+    
+    if (this.debounceTimeouts.has(key)) {
+      clearTimeout(this.debounceTimeouts.get(key));
+    }
+    
+    const timeout = setTimeout(() => {
+      callback();
+      this.debounceTimeouts.delete(key);
+    }, this.options.debounceTime);
+    
+    this.debounceTimeouts.set(key, timeout);
+  }
+
+  async handleFileEvent(filePath, eventType) {
+    try {
+      const stats = await fs.promises.stat(filePath).catch(() => null);
+      
+      const event = {
+        path: filePath,
+        type: eventType,
+        isDirectory: stats ? stats.isDirectory() : false,
+        size: stats ? stats.size : 0,
+        timestamp: new Date()
+      };
+
+      console.log(`[${event.timestamp.toISOString()}] ${event.type}: ${event.path}`);
+      
+      // Emetti eventi personalizzati
+      if (eventType === 'rename' && !stats) {
+        this.onFileDeleted(event);
+      } else if (eventType === 'rename' && stats) {
+        this.onFileCreated(event);
+      } else if (eventType === 'change') {
+        this.onFileModified(event);
+      }
+    } catch (error) {
+      console.error('Errore nella gestione evento file:', error.message);
+    }
+  }
+
+  onFileCreated(event) {
+    console.log(`✅ File creato: ${event.path}`);
+  }
+
+  onFileModified(event) {
+    console.log(`📝 File modificato: ${event.path} (${event.size} byte)`);
+  }
+
+  onFileDeleted(event) {
+    console.log(`🗑️ File eliminato: ${event.path}`);
+  }
+
+  stop() {
+    for (const watcher of this.watchers.values()) {
+      watcher.close();
+    }
+    this.watchers.clear();
+    
+    for (const timeout of this.debounceTimeouts.values()) {
+      clearTimeout(timeout);
+    }
+    this.debounceTimeouts.clear();
+  }
+}
+
+// Utilizzo del File Watcher avanzato
+const watcher = new FileWatcher('./watched-folder', {
+  recursive: true,
+  debounceTime: 200,
+  excludePatterns: [
+    'node_modules',
+    '.git',
+    /\.tmp$/,
+    /~$/
+  ]
+});
+
+watcher.start();
+
+// Gestione shutdown graceful
+process.on('SIGINT', () => {
+  console.log('\nArresto del file watcher...');
+  watcher.stop();
+  process.exit(0);
+});
+```
+
+### File Lock (Blocco File)
+
+```javascript
+const fs = require('fs').promises;
+const path = require('path');
+
+class FileLock {
+  constructor(filePath, options = {}) {
+    this.filePath = filePath;
+    this.lockFilePath = `${filePath}.lock`;
+    this.options = {
+      timeout: options.timeout || 10000,
+      retryInterval: options.retryInterval || 100,
+      stale: options.stale || 60000, // Considera stale dopo 1 minuto
+      ...options
+    };
+  }
+
+  async acquire() {
+    const startTime = Date.now();
+    
+    while (Date.now() - startTime < this.options.timeout) {
+      try {
+        // Controlla se il lock è stale
+        if (await this.isLockStale()) {
+          await this.release();
+        }
+        
+        // Tenta di creare il file di lock
+        await fs.writeFile(this.lockFilePath, JSON.stringify({
+          pid: process.pid,
+          timestamp: Date.now(),
+          hostname: require('os').hostname()
+        }), { flag: 'wx' }); // Fallisce se il file esiste
+        
+        return true;
+      } catch (error) {
+        if (error.code !== 'EEXIST') {
+          throw error;
+        }
+        
+        // Il lock esiste, aspetta e riprova
+        await new Promise(resolve => 
+          setTimeout(resolve, this.options.retryInterval)
+        );
+      }
+    }
+    
+    throw new Error(`Impossibile acquisire il lock per ${this.filePath} entro ${this.options.timeout}ms`);
+  }
+
+  async isLockStale() {
+    try {
+      const lockData = await fs.readFile(this.lockFilePath, 'utf8');
+      const { timestamp } = JSON.parse(lockData);
+      return (Date.now() - timestamp) > this.options.stale;
+    } catch (error) {
+      return false; // Se non riusciamo a leggere il lock, assumiamo non sia stale
+    }
+  }
+
+  async release() {
+    try {
+      await fs.unlink(this.lockFilePath);
+    } catch (error) {
+      if (error.code !== 'ENOENT') {
+        throw error;
+      }
+    }
+  }
+
+  async withLock(callback) {
+    await this.acquire();
+    try {
+      return await callback();
+    } finally {
+      await this.release();
+    }
+  }
+}
+
+// Esempio di utilizzo del file lock
+async function safeFileOperation(filePath) {
+  const lock = new FileLock(filePath);
+  
+  return await lock.withLock(async () => {
+    console.log('Lock acquisito, eseguendo operazione...');
+    
+    // Operazione critica sul file
+    const data = await fs.readFile(filePath, 'utf8').catch(() => '');
+    const newData = data + '\nNuova riga aggiunta in modo sicuro';
+    await fs.writeFile(filePath, newData);
+    
+    console.log('Operazione completata');
+    return newData;
+  });
+}
 ```
 
 ## Conclusione

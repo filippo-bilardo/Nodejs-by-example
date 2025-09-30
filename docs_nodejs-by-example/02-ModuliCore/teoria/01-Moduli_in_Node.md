@@ -48,11 +48,49 @@ console.log(saluta('Mario')); // "Ciao Mario!"
 Ogni modulo in Node.js ha accesso ad un oggetto speciale chiamato `module`. Questo oggetto ha diverse proprietà, tra cui:
 
 - `module.exports`: oggetto che sarà restituito quando il modulo viene richiesto
-- `module.id`: identificatore del modulo
-- `module.filename`: percorso assoluto del file
-- `module.loaded`: indica se il modulo è stato caricato completamente
-- `module.parent`: riferimento al modulo che per primo ha richiesto questo modulo
+- `module.id`: identificatore del modulo (solitamente il percorso assoluto)
+- `module.filename`: percorso assoluto del file del modulo
+- `module.loaded`: booleano che indica se il modulo è stato caricato completamente
+- `module.parent`: riferimento al modulo che per primo ha richiesto questo modulo (deprecato in Node.js 14+)
 - `module.children`: array dei moduli richiesti da questo modulo
+- `module.paths`: array dei percorsi di ricerca per questo modulo
+
+**Esempio di utilizzo dell'oggetto module:**
+
+```javascript
+// debug-module.js
+console.log('Module ID:', module.id);
+console.log('Module filename:', module.filename);
+console.log('Module loaded:', module.loaded);
+console.log('Module paths:', module.paths);
+
+// Esportare informazioni del modulo
+module.exports = {
+  getModuleInfo: () => ({
+    id: module.id,
+    filename: module.filename,
+    loaded: module.loaded
+  })
+};
+
+// Dopo questo punto, module.loaded sarà true
+```
+
+### Variabili Globali nei Moduli
+
+Oltre all'oggetto `module`, ogni modulo ha accesso a diverse variabili globali:
+
+- `__dirname`: directory assoluta del file corrente
+- `__filename`: percorso assoluto del file corrente
+- `exports`: riferimento a `module.exports`
+- `require`: funzione per importare altri moduli
+- `global`: oggetto globale (equivalente a `window` nel browser)
+
+```javascript
+console.log('Directory corrente:', __dirname);
+console.log('File corrente:', __filename);
+console.log('Exports === module.exports:', exports === module.exports); // true
+```
 
 ## Moduli Core Principali
 
@@ -212,8 +250,55 @@ export default class Classe { /* ... */ }
 ### Utilizzo di ES Modules in Node.js:
 
 Per utilizzare ES Modules in Node.js, puoi:
-- Usare l'estensione `.mjs` per i file
-- Aggiungere `"type": "module"` al tuo `package.json`
+
+1. **Usare l'estensione `.mjs` per i file**
+2. **Aggiungere `"type": "module"` al tuo `package.json`**
+3. **Usare l'estensione `.cjs` per mantenere CommonJS in progetti ES Modules**
+
+**Esempio con package.json:**
+
+```json
+{
+  "name": "my-esm-project",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js"
+}
+```
+
+**Differenze Importanti:**
+
+| Caratteristica | CommonJS | ES Modules |
+|----------------|----------|------------|
+| Sintassi Import | `require()` | `import` |
+| Sintassi Export | `module.exports` | `export` |
+| Caricamento | Sincrono | Asincrono |
+| Top-level await | ❌ | ✅ |
+| Hoisting | ❌ | ✅ |
+| Conditional Imports | ✅ | ❌ (solo dinamiche) |
+| `__dirname` | ✅ | ❌ (usa `import.meta.url`) |
+| File Extension | Opzionale | Richiesta |
+
+**Interoperabilità tra i sistemi:**
+
+```javascript
+// ES Modules che importa CommonJS
+import fs from 'fs'; // Modulo CommonJS
+import { readFile } from 'fs/promises'; // Versione ESM
+
+// CommonJS che importa ES Modules (asincrono)
+const loadESModule = async () => {
+  const myESModule = await import('./my-es-module.mjs');
+  return myESModule;
+};
+
+// Alternativa per __dirname in ES Modules
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+```
 
 ## Creazione di Moduli Personalizzati
 
@@ -294,7 +379,116 @@ Le dipendenze circolari si verificano quando il modulo A richiede il modulo B, e
 ModuloA -> ModuloB -> ModuloA
 ```
 
-Node.js gestisce le dipendenze circolari restituendo un'esportazione "parziale" o "incompleta" quando si verifica una dipendenza circolare. È meglio evitarle rifattorizzando il codice, ma a volte sono inevitabili.
+**Esempio di dipendenza circolare:**
+
+```javascript
+// userService.js
+const orderService = require('./orderService');
+
+class UserService {
+  constructor() {
+    this.users = [];
+  }
+  
+  getUserOrders(userId) {
+    return orderService.getOrdersByUser(userId);
+  }
+  
+  addUser(user) {
+    this.users.push(user);
+  }
+}
+
+module.exports = new UserService();
+
+// orderService.js
+const userService = require('./userService'); // ← Dipendenza circolare!
+
+class OrderService {
+  constructor() {
+    this.orders = [];
+  }
+  
+  getOrdersByUser(userId) {
+    // userService potrebbe non essere completamente caricato qui
+    return this.orders.filter(order => order.userId === userId);
+  }
+  
+  createOrder(order) {
+    this.orders.push(order);
+    // Questo potrebbe non funzionare se userService non è completamente caricato
+    userService.addUser(order.user);
+  }
+}
+
+module.exports = new OrderService();
+```
+
+**Strategie per Risolvere le Dipendenze Circolari:**
+
+1. **Dependency Injection:**
+```javascript
+// services.js
+class UserService {
+  setOrderService(orderService) {
+    this.orderService = orderService;
+  }
+}
+
+class OrderService {
+  setUserService(userService) {
+    this.userService = userService;
+  }
+}
+
+const userService = new UserService();
+const orderService = new OrderService();
+
+// Configura le dipendenze dopo la creazione
+userService.setOrderService(orderService);
+orderService.setUserService(userService);
+
+module.exports = { userService, orderService };
+```
+
+2. **Modulo di Configurazione Centrale:**
+```javascript
+// config.js
+const userService = require('./userService');
+const orderService = require('./orderService');
+
+// Configura le dipendenze
+userService.configure(orderService);
+orderService.configure(userService);
+
+module.exports = { userService, orderService };
+```
+
+3. **Event Emitter per Disaccoppiamento:**
+```javascript
+// eventBus.js
+const EventEmitter = require('events');
+module.exports = new EventEmitter();
+
+// userService.js
+const eventBus = require('./eventBus');
+
+class UserService {
+  addUser(user) {
+    this.users.push(user);
+    eventBus.emit('user-added', user);
+  }
+}
+
+// orderService.js
+const eventBus = require('./eventBus');
+
+eventBus.on('user-added', (user) => {
+  // Gestisci l'aggiunta dell'utente
+});
+```
+
+Node.js gestisce le dipendenze circolari restituendo un'esportazione "parziale" o "incompleta" quando si verifica una dipendenza circolare. È sempre meglio evitarle rifattorizzando il codice quando possibile.
 
 ### Best Practices
 

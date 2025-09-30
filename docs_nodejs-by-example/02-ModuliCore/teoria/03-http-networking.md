@@ -338,6 +338,411 @@ wss.on('connection', (ws) => {
 });
 ```
 
+## Server HTTP Avanzato con Middleware
+
+### Sistema di Routing e Middleware
+
+```javascript
+const http = require('http');
+const url = require('url');
+
+class HTTPServer {
+  constructor() {
+    this.middlewares = [];
+    this.routes = new Map();
+    this.errorHandlers = [];
+  }
+
+  // Aggiungere middleware globale
+  use(middleware) {
+    this.middlewares.push(middleware);
+  }
+
+  // Definire route con middleware specifici
+  route(method, path, ...handlers) {
+    const key = `${method.toUpperCase()}:${path}`;
+    this.routes.set(key, handlers);
+  }
+
+  get(path, ...handlers) { this.route('GET', path, ...handlers); }
+  post(path, ...handlers) { this.route('POST', path, ...handlers); }
+  put(path, ...handlers) { this.route('PUT', path, ...handlers); }
+  delete(path, ...handlers) { this.route('DELETE', path, ...handlers); }
+
+  // Gestione errori
+  onError(handler) {
+    this.errorHandlers.push(handler);
+  }
+
+  // Eseguire middleware in sequenza
+  async executeMiddleware(req, res, middlewares, index = 0) {
+    if (index >= middlewares.length) return;
+
+    const middleware = middlewares[index];
+    let nextCalled = false;
+
+    const next = (error) => {
+      if (nextCalled) return;
+      nextCalled = true;
+      
+      if (error) {
+        this.handleError(error, req, res);
+      } else {
+        this.executeMiddleware(req, res, middlewares, index + 1);
+      }
+    };
+
+    try {
+      await middleware(req, res, next);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async handleRequest(req, res) {
+    const parsedUrl = url.parse(req.url, true);
+    req.query = parsedUrl.query;
+    req.pathname = parsedUrl.pathname;
+
+    // Aggiungi metodi helper alla response
+    res.json = (data) => {
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify(data));
+    };
+
+    res.status = (code) => {
+      res.statusCode = code;
+      return res;
+    };
+
+    try {
+      // Esegui middleware globali
+      await this.executeMiddleware(req, res, this.middlewares);
+
+      // Trova e esegui handler della route
+      const routeKey = `${req.method}:${req.pathname}`;
+      const handlers = this.routes.get(routeKey);
+
+      if (handlers) {
+        await this.executeMiddleware(req, res, handlers);
+      } else {
+        res.status(404).json({ error: 'Route not found' });
+      }
+    } catch (error) {
+      this.handleError(error, req, res);
+    }
+  }
+
+  handleError(error, req, res) {
+    console.error('Server error:', error);
+
+    // Esegui error handlers personalizzati
+    for (const handler of this.errorHandlers) {
+      try {
+        handler(error, req, res);
+        return;
+      } catch (handlerError) {
+        console.error('Error in error handler:', handlerError);
+      }
+    }
+
+    // Error handler di default
+    if (!res.headersSent) {
+      res.status(500).json({ 
+        error: 'Internal Server Error',
+        message: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  }
+
+  listen(port, callback) {
+    const server = http.createServer((req, res) => {
+      this.handleRequest(req, res);
+    });
+
+    server.listen(port, callback);
+    return server;
+  }
+}
+
+// Middleware comuni
+const cors = (options = {}) => (req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', options.origin || '*');
+  res.setHeader('Access-Control-Allow-Methods', options.methods || 'GET, POST, PUT, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', options.headers || 'Content-Type, Authorization');
+  
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+  } else {
+    next();
+  }
+};
+
+const logger = (req, res, next) => {
+  const start = Date.now();
+  const originalEnd = res.end;
+  
+  res.end = function(...args) {
+    const duration = Date.now() - start;
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url} - ${res.statusCode} - ${duration}ms`);
+    originalEnd.apply(this, args);
+  };
+  
+  next();
+};
+
+const bodyParser = async (req, res, next) => {
+  if (req.method === 'POST' || req.method === 'PUT') {
+    let body = '';
+    
+    req.on('data', chunk => {
+      body += chunk.toString();
+    });
+
+    req.on('end', () => {
+      try {
+        req.body = JSON.parse(body);
+        next();
+      } catch (error) {
+        res.status(400).json({ error: 'Invalid JSON' });
+      }
+    });
+  } else {
+    next();
+  }
+};
+
+const rateLimit = (options = {}) => {
+  const requests = new Map();
+  const windowMs = options.windowMs || 15 * 60 * 1000; // 15 minuti
+  const maxRequests = options.max || 100;
+
+  return (req, res, next) => {
+    const clientId = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    const now = Date.now();
+    
+    if (!requests.has(clientId)) {
+      requests.set(clientId, []);
+    }
+
+    const clientRequests = requests.get(clientId);
+    
+    // Rimuovi richieste vecchie
+    const validRequests = clientRequests.filter(timestamp => now - timestamp < windowMs);
+    
+    if (validRequests.length >= maxRequests) {
+      return res.status(429).json({ 
+        error: 'Too many requests',
+        retryAfter: Math.ceil(windowMs / 1000)
+      });
+    }
+
+    validRequests.push(now);
+    requests.set(clientId, validRequests);
+    next();
+  };
+};
+
+// Esempio di utilizzo
+const app = new HTTPServer();
+
+// Middleware globali
+app.use(cors());
+app.use(logger);
+app.use(rateLimit({ max: 50, windowMs: 60000 }));
+
+// Routes
+app.get('/', (req, res) => {
+  res.json({ message: 'Server HTTP Avanzato', timestamp: new Date() });
+});
+
+app.post('/api/users', bodyParser, (req, res) => {
+  const { name, email } = req.body;
+  
+  if (!name || !email) {
+    return res.status(400).json({ error: 'Name and email are required' });
+  }
+
+  const user = {
+    id: Date.now(),
+    name,
+    email,
+    createdAt: new Date()
+  };
+
+  res.status(201).json({ user, message: 'User created successfully' });
+});
+
+// Error handling
+app.onError((error, req, res) => {
+  console.error(`Custom error handler: ${error.message}`);
+});
+
+const server = app.listen(3000, () => {
+  console.log('🚀 Server HTTP avanzato avviato su http://localhost:3000');
+});
+```
+
+## Client HTTP Avanzato con Connection Pooling
+
+```javascript
+const http = require('http');
+const https = require('https');
+const { URL } = require('url');
+
+class HTTPClient {
+  constructor(options = {}) {
+    this.options = {
+      timeout: options.timeout || 30000,
+      maxSockets: options.maxSockets || 10,
+      keepAlive: options.keepAlive || true,
+      ...options
+    };
+
+    // Agenti per connection pooling
+    this.httpAgent = new http.Agent({
+      keepAlive: this.options.keepAlive,
+      maxSockets: this.options.maxSockets
+    });
+
+    this.httpsAgent = new https.Agent({
+      keepAlive: this.options.keepAlive,
+      maxSockets: this.options.maxSockets
+    });
+  }
+
+  async request(url, options = {}) {
+    return new Promise((resolve, reject) => {
+      const parsedUrl = new URL(url);
+      const isHttps = parsedUrl.protocol === 'https:';
+      
+      const requestOptions = {
+        hostname: parsedUrl.hostname,
+        port: parsedUrl.port || (isHttps ? 443 : 80),
+        path: parsedUrl.pathname + parsedUrl.search,
+        method: options.method || 'GET',
+        headers: {
+          'User-Agent': 'Node.js HTTP Client',
+          ...options.headers
+        },
+        agent: isHttps ? this.httpsAgent : this.httpAgent,
+        timeout: this.options.timeout
+      };
+
+      const client = isHttps ? https : http;
+      const req = client.request(requestOptions, (res) => {
+        let data = '';
+        
+        res.on('data', chunk => {
+          data += chunk;
+        });
+
+        res.on('end', () => {
+          const response = {
+            statusCode: res.statusCode,
+            headers: res.headers,
+            data: data
+          };
+
+          try {
+            if (res.headers['content-type']?.includes('application/json')) {
+              response.json = JSON.parse(data);
+            }
+          } catch (e) {
+            // Non è JSON valido, ignora
+          }
+
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            resolve(response);
+          } else {
+            reject(new Error(`HTTP ${res.statusCode}: ${data}`));
+          }
+        });
+      });
+
+      req.on('timeout', () => {
+        req.destroy();
+        reject(new Error(`Request timeout after ${this.options.timeout}ms`));
+      });
+
+      req.on('error', (error) => {
+        reject(error);
+      });
+
+      // Invia il body se presente
+      if (options.body) {
+        if (typeof options.body === 'object') {
+          req.write(JSON.stringify(options.body));
+        } else {
+          req.write(options.body);
+        }
+      }
+
+      req.end();
+    });
+  }
+
+  async get(url, options = {}) {
+    return this.request(url, { ...options, method: 'GET' });
+  }
+
+  async post(url, data, options = {}) {
+    return this.request(url, {
+      ...options,
+      method: 'POST',
+      body: data,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+      }
+    });
+  }
+
+  async put(url, data, options = {}) {
+    return this.request(url, {
+      ...options,
+      method: 'PUT',
+      body: data,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+      }
+    });
+  }
+
+  async delete(url, options = {}) {
+    return this.request(url, { ...options, method: 'DELETE' });
+  }
+}
+
+// Esempio di utilizzo del client HTTP
+const client = new HTTPClient({
+  timeout: 10000,
+  maxSockets: 5
+});
+
+async function testAPI() {
+  try {
+    // GET request
+    const response = await client.get('https://jsonplaceholder.typicode.com/posts/1');
+    console.log('GET Response:', response.json);
+
+    // POST request
+    const newPost = await client.post('https://jsonplaceholder.typicode.com/posts', {
+      title: 'Nuovo Post',
+      body: 'Contenuto del post',
+      userId: 1
+    });
+    console.log('POST Response:', newPost.json);
+
+  } catch (error) {
+    console.error('Errore API:', error.message);
+  }
+}
+
+// testAPI();
+```
+
 ## Conclusione
 
 Node.js offre un'ampia gamma di moduli per lo sviluppo di applicazioni di rete, dal semplice server HTTP a soluzioni più complesse come WebSockets. La sua architettura non bloccante lo rende particolarmente adatto per applicazioni che richiedono molte connessioni simultanee e operazioni di I/O di rete.
