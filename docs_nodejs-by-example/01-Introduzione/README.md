@@ -36,7 +36,7 @@ console.log('Hello, Node.js!');
 node hello.js
 ```
 
-### Esercizio 1.3: Utilizzo della REPL
+### Esercizio 1.3: Utilizzo della REPL (Read–Eval–Print Loop)
 1. Apri la REPL di Node.js digitando `node` nel terminale
 2. Sperimenta con alcune espressioni JavaScript:
 
