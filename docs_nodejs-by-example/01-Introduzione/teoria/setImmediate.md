@@ -1089,4 +1089,865 @@ class CooperativeScheduler {
     constructor(timeSlice = 10) {
         this.timeSlice = timeSlice; // ms
         this.tasks = [];
+        this.running = false;
+    }
+    
+    addTask(generatorFn) {
+        const generator = generatorFn();
+        this.tasks.push(generator);
         
+        if (!this.running) {
+            this.run();
+        }
+    }
+    
+    run() {
+        this.running = true;
+        this.executeSlice();
+    }
+    
+    executeSlice() {
+        if (this.tasks.length === 0) {
+            this.running = false;
+            return;
+        }
+        
+        const startTime = Date.now();
+        
+        // Esegui task finché non scade il time slice
+        while (this.tasks.length > 0 && Date.now() - startTime < this.timeSlice) {
+            const task = this.tasks.shift();
+            const { done, value } = task.next();
+            
+            if (!done) {
+                // Task non completato, rimetti in coda
+                this.tasks.push(task);
+            } else if (value) {
+                console.log('Task completato:', value);
+            }
+        }
+        
+        // Schedula prossimo slice
+        if (this.tasks.length > 0) {
+            setImmediate(() => this.executeSlice());
+        } else {
+            this.running = false;
+        }
+    }
+}
+
+// Uso
+const scheduler = new CooperativeScheduler(5);
+
+// Task 1: Conta fino a 1000
+scheduler.addTask(function* () {
+    for (let i = 1; i <= 1000; i++) {
+        if (i % 100 === 0) {
+            console.log(`Task 1: ${i}`);
+        }
+        yield;
+    }
+    return 'Task 1 completato';
+});
+
+// Task 2: Conta fino a 500
+scheduler.addTask(function* () {
+    for (let i = 1; i <= 500; i++) {
+        if (i % 50 === 0) {
+            console.log(`Task 2: ${i}`);
+        }
+        yield;
+    }
+    return 'Task 2 completato';
+});
+
+/* Output (i task si alternano):
+Task 1: 100
+Task 2: 50
+Task 1: 200
+Task 2: 100
+Task 1: 300
+...
+*/
+```
+
+### Pattern 4: Async Iterator con setImmediate
+
+```javascript
+class AsyncQueue {
+    constructor() {
+        this.queue = [];
+        this.waiting = [];
+        this.closed = false;
+    }
+    
+    push(value) {
+        if (this.closed) {
+            throw new Error('Queue is closed');
+        }
+        
+        if (this.waiting.length > 0) {
+            const { resolve } = this.waiting.shift();
+            setImmediate(() => resolve({ value, done: false }));
+        } else {
+            this.queue.push(value);
+        }
+    }
+    
+    close() {
+        this.closed = true;
+        // Risolvi tutti i waiting con done: true
+        while (this.waiting.length > 0) {
+            const { resolve } = this.waiting.shift();
+            setImmediate(() => resolve({ done: true }));
+        }
+    }
+    
+    [Symbol.asyncIterator]() {
+        return {
+            next: () => {
+                if (this.queue.length > 0) {
+                    const value = this.queue.shift();
+                    return Promise.resolve({ value, done: false });
+                }
+                
+                if (this.closed) {
+                    return Promise.resolve({ done: true });
+                }
+                
+                return new Promise((resolve) => {
+                    this.waiting.push({ resolve });
+                });
+            }
+        };
+    }
+}
+
+// Uso
+async function consumer() {
+    const queue = new AsyncQueue();
+    
+    // Producer
+    let count = 0;
+    const producer = setInterval(() => {
+        queue.push(`Item ${++count}`);
+        
+        if (count >= 5) {
+            clearInterval(producer);
+            queue.close();
+        }
+    }, 100);
+    
+    // Consumer usa for await
+    console.log('Inizio consumo...');
+    for await (const item of queue) {
+        console.log('Ricevuto:', item);
+    }
+    console.log('Fine consumo');
+}
+
+consumer();
+
+/* Output:
+Inizio consumo...
+Ricevuto: Item 1
+Ricevuto: Item 2
+Ricevuto: Item 3
+Ricevuto: Item 4
+Ricevuto: Item 5
+Fine consumo
+*/
+```
+
+## Debugging e Troubleshooting
+
+### Tracciare setImmediate Calls
+
+```javascript
+// Wrapper per debugging
+const originalSetImmediate = setImmediate;
+const immediateCalls = new Map();
+let immediateId = 0;
+
+global.setImmediate = function(callback, ...args) {
+    const id = immediateId++;
+    const stack = new Error().stack;
+    
+    immediateCalls.set(id, {
+        callback: callback.name || 'anonymous',
+        stack,
+        timestamp: Date.now()
+    });
+    
+    const wrappedCallback = function(...callbackArgs) {
+        const info = immediateCalls.get(id);
+        const latency = Date.now() - info.timestamp;
+        
+        console.log(`[setImmediate #${id}] Executing ${info.callback} (latency: ${latency}ms)`);
+        immediateCalls.delete(id);
+        
+        return callback.apply(this, callbackArgs);
+    };
+    
+    return originalSetImmediate(wrappedCallback, ...args);
+};
+
+// Test
+setImmediate(function taskA() {
+    console.log('Task A executed');
+});
+
+setImmediate(function taskB() {
+    console.log('Task B executed');
+});
+
+setTimeout(() => {
+    console.log('\n📊 Pending immediates:', immediateCalls.size);
+}, 100);
+
+/* Output:
+[setImmediate #0] Executing taskA (latency: 1ms)
+Task A executed
+[setImmediate #1] Executing taskB (latency: 1ms)
+Task B executed
+
+📊 Pending immediates: 0
+*/
+```
+
+### Rilevare Memory Leaks con setImmediate
+
+```javascript
+class ImmediateLeakDetector {
+    constructor(threshold = 100) {
+        this.threshold = threshold;
+        this.immediates = new WeakMap();
+        this.count = 0;
+        
+        this.wrapSetImmediate();
+        this.startMonitoring();
+    }
+    
+    wrapSetImmediate() {
+        const original = setImmediate;
+        const self = this;
+        
+        global.setImmediate = function(callback, ...args) {
+            self.count++;
+            
+            const wrapped = function() {
+                self.count--;
+                return callback.apply(this, arguments);
+            };
+            
+            return original(wrapped, ...args);
+        };
+    }
+    
+    startMonitoring() {
+        setInterval(() => {
+            if (this.count > this.threshold) {
+                console.warn(`⚠️ Potential memory leak: ${this.count} pending setImmediate calls`);
+            }
+        }, 1000);
+    }
+}
+
+// Attiva detector
+const detector = new ImmediateLeakDetector(50);
+
+// Simula leak
+function createLeak() {
+    setImmediate(createLeak); // Ricorsione infinita!
+}
+
+createLeak();
+
+// Output dopo 1 secondo:
+// ⚠️ Potential memory leak: 1523 pending setImmediate calls
+```
+
+### Profiling Performance di setImmediate
+
+```javascript
+const { performance, PerformanceObserver } = require('perf_hooks');
+
+class ImmediateProfiler {
+    constructor() {
+        this.measurements = [];
+        this.setupObserver();
+    }
+    
+    setupObserver() {
+        const obs = new PerformanceObserver((items) => {
+            items.getEntries().forEach((entry) => {
+                if (entry.name.startsWith('immediate-')) {
+                    this.measurements.push({
+                        name: entry.name,
+                        duration: entry.duration
+                    });
+                }
+            });
+        });
+        
+        obs.observe({ entryTypes: ['measure'] });
+    }
+    
+    profileImmediate(name, callback) {
+        const markStart = `immediate-${name}-start`;
+        const markEnd = `immediate-${name}-end`;
+        
+        performance.mark(markStart);
+        
+        setImmediate(() => {
+            performance.mark(markEnd);
+            performance.measure(`immediate-${name}`, markStart, markEnd);
+            callback();
+        });
+    }
+    
+    getStats() {
+        if (this.measurements.length === 0) {
+            return { count: 0, avg: 0, min: 0, max: 0 };
+        }
+        
+        const durations = this.measurements.map(m => m.duration);
+        const sum = durations.reduce((a, b) => a + b, 0);
+        
+        return {
+            count: this.measurements.length,
+            avg: (sum / this.measurements.length).toFixed(3) + 'ms',
+            min: Math.min(...durations).toFixed(3) + 'ms',
+            max: Math.max(...durations).toFixed(3) + 'ms',
+            total: sum.toFixed(3) + 'ms'
+        };
+    }
+}
+
+// Uso
+const profiler = new ImmediateProfiler();
+
+for (let i = 0; i < 10; i++) {
+    profiler.profileImmediate(`task-${i}`, () => {
+        // Simula lavoro
+        const end = Date.now() + Math.random() * 10;
+        while (Date.now() < end) {}
+    });
+}
+
+setTimeout(() => {
+    console.log('📊 Statistics:', profiler.getStats());
+}, 200);
+
+/* Output:
+📊 Statistics: {
+  count: 10,
+  avg: '2.341ms',
+  min: '0.523ms',
+  max: '5.123ms',
+  total: '23.410ms'
+}
+*/
+```
+
+## Best Practices
+
+### ✅ DO: Usa setImmediate per operazioni dopo I/O
+
+```javascript
+const fs = require('fs');
+
+// ✅ BENE
+fs.readFile('data.txt', (err, data) => {
+    if (err) return handleError(err);
+    
+    // Processa in chunk per non bloccare
+    const chunks = splitIntoChunks(data);
+    
+    function processNext(index) {
+        if (index >= chunks.length) return;
+        
+        processChunk(chunks[index]);
+        
+        // Usa setImmediate per permettere altre operazioni I/O
+        setImmediate(() => processNext(index + 1));
+    }
+    
+    processNext(0);
+});
+```
+
+### ✅ DO: Usa setImmediate per operazioni ricorsive
+
+```javascript
+// ✅ BENE: Non blocca l'Event Loop
+function processArray(arr, index = 0) {
+    if (index >= arr.length) {
+        console.log('Completato!');
+        return;
+    }
+    
+    // Processa elemento
+    processItem(arr[index]);
+    
+    // Permetti altre operazioni
+    setImmediate(() => processArray(arr, index + 1));
+}
+
+processArray(largeArray);
+```
+
+### ✅ DO: Usa setImmediate per defer non-critical code
+
+```javascript
+// ✅ BENE: Logging asincrono
+function criticalOperation() {
+    const result = doImportantWork();
+    
+    // Defer logging per non rallentare operazione critica
+    setImmediate(() => {
+        logger.log('Operation completed', result);
+        updateMetrics(result);
+    });
+    
+    return result;
+}
+```
+
+### ❌ DON'T: Non usare setImmediate per operazioni time-critical
+
+```javascript
+// ❌ MALE: setImmediate per operazioni sensibili al tempo
+function schedulePayment(amount) {
+    setImmediate(() => {
+        // Troppo impreciso per operazioni finanziarie!
+        processPayment(amount);
+    });
+}
+
+// ✅ BENE: Usa operazioni sincrone o con timing preciso
+function schedulePayment(amount) {
+    // Esegui immediatamente o usa setTimeout con delay preciso
+    processPayment(amount);
+}
+```
+
+### ❌ DON'T: Non mischiare setImmediate e process.nextTick senza motivo
+
+```javascript
+// ❌ MALE: Comportamento confuso
+function confusingFunction(callback) {
+    if (someCondition) {
+        process.nextTick(callback); // Alta priorità
+    } else {
+        setImmediate(callback); // Bassa priorità
+    }
+}
+
+// ✅ BENE: Comportamento consistente
+function consistentFunction(callback) {
+    // Usa sempre lo stesso meccanismo
+    setImmediate(callback);
+}
+```
+
+### ❌ DON'T: Non creare infinite loop senza controllo
+
+```javascript
+// ❌ MALE: Loop infinito
+function infiniteLoop() {
+    console.log('Iterazione');
+    setImmediate(infiniteLoop);
+}
+
+infiniteLoop(); // Non si ferma mai!
+
+// ✅ BENE: Loop controllato
+function controlledLoop(maxIterations = 1000) {
+    let count = 0;
+    
+    function iterate() {
+        console.log('Iterazione', count);
+        count++;
+        
+        if (count < maxIterations) {
+            setImmediate(iterate);
+        } else {
+            console.log('Loop completato');
+        }
+    }
+    
+    iterate();
+}
+
+controlledLoop();
+```
+
+## Esercizi Pratici
+
+### Esercizio 1: Implementare un Task Scheduler
+
+Creare uno scheduler che esegue task con rate limiting:
+
+```javascript
+class TaskScheduler {
+    constructor(tasksPerSecond) {
+        // TODO: Implementare
+        // - Limitare esecuzione a tasksPerSecond
+        // - Usare setImmediate per scheduling
+        // - Gestire coda di task
+    }
+    
+    schedule(task) {
+        // TODO: Implementare
+        // Ritorna Promise che si risolve quando task è completato
+    }
+}
+
+// Test
+const scheduler = new TaskScheduler(5); // Max 5 task/secondo
+
+for (let i = 0; i < 20; i++) {
+    scheduler.schedule(() => {
+        console.log('Task', i, new Date().toISOString());
+    });
+}
+```
+
+### Esercizio 2: Implementare Cancellable Promise
+
+Creare una Promise che può essere cancellata usando clearImmediate:
+
+```javascript
+function cancellableImmediate(fn) {
+    // TODO: Implementare
+    // - Ritorna { promise, cancel }
+    // - promise esegue fn con setImmediate
+    // - cancel() annulla l'esecuzione
+}
+
+// Test
+const { promise, cancel } = cancellableImmediate(() => {
+    console.log('Questo non dovrebbe essere eseguito');
+    return 42;
+});
+
+cancel(); // Annulla prima dell'esecuzione
+
+promise
+    .then(result => console.log('Result:', result))
+    .catch(err => console.log('Cancelled:', err.message));
+```
+
+### Esercizio 3: Implementare Work-Stealing Queue
+
+Creare una coda che distribuisce il lavoro tra worker:
+
+```javascript
+class WorkStealingQueue {
+    constructor(numWorkers) {
+        // TODO: Implementare
+        // - Creare numWorkers code separate
+        // - Distribuire lavoro bilanciato
+        // - Implementare work stealing
+    }
+    
+    submit(task) {
+        // TODO: Implementare
+        // Ritorna Promise con risultato
+    }
+}
+
+// Test
+const queue = new WorkStealingQueue(4);
+
+for (let i = 0; i < 100; i++) {
+    queue.submit(() => {
+        // Simula lavoro
+        return i * 2;
+    });
+}
+```
+
+### Esercizio 4: Implementare Debounced setImmediate
+
+Creare una versione debounced di setImmediate:
+
+```javascript
+function debouncedImmediate(callback, groupingTime = 10) {
+    // TODO: Implementare
+    // - Raggruppare chiamate multiple nello stesso immediate
+    // - Se chiamato più volte in groupingTime ms, eseguire una volta sola
+}
+
+// Test
+const debounced = debouncedImmediate(() => {
+    console.log('Eseguito una volta sola');
+});
+
+for (let i = 0; i < 1000; i++) {
+    debounced();
+}
+```
+
+### Esercizio 5: Implementare Fair Scheduler
+
+Creare uno scheduler che garantisce fairness tra task:
+
+```javascript
+class FairScheduler {
+    constructor() {
+        // TODO: Implementare
+        // - Ogni task ottiene lo stesso tempo di CPU
+        // - Usare round-robin scheduling
+        // - Usare setImmediate per switching
+    }
+    
+    addTask(taskFn, priority = 'normal') {
+        // TODO: Implementare
+    }
+}
+
+// Test
+const scheduler = new FairScheduler();
+
+scheduler.addTask(function* heavyTask() {
+    for (let i = 0; i < 10000; i++) {
+        yield;
+    }
+});
+
+scheduler.addTask(function* lightTask() {
+    for (let i = 0; i < 10; i++) {
+        console.log('Light task iteration', i);
+        yield;
+    }
+});
+```
+
+## Domande di Autovalutazione
+
+### Domanda 1
+In quale fase dell'Event Loop viene eseguito setImmediate()?
+
+A) timers  
+B) poll  
+C) check  
+D) close callbacks
+
+### Domanda 2
+Quale codice garantisce che setImmediate venga eseguito prima di setTimeout?
+
+A)
+```javascript
+setTimeout(() => console.log('timeout'), 0);
+setImmediate(() => console.log('immediate'));
+```
+
+B)
+```javascript
+fs.readFile('file.txt', () => {
+    setTimeout(() => console.log('timeout'), 0);
+    setImmediate(() => console.log('immediate'));
+});
+```
+
+C) Entrambi garantiscono l'ordine  
+D) Nessuno dei due garantisce l'ordine
+
+### Domanda 3
+Qual è la differenza principale tra setImmediate() e process.nextTick()?
+
+A) setImmediate è più veloce  
+B) process.nextTick ha priorità più alta  
+C) setImmediate è sincrono  
+D) Non c'è differenza
+
+### Domanda 4
+Quale rischio c'è nell'usare setImmediate ricorsivamente?
+
+A) Memory leak garantito  
+B) Blocco dell'Event Loop  
+C) Nessun rischio particolare (è sicuro)  
+D) Crash dell'applicazione
+
+### Domanda 5
+setImmediate è disponibile nei browser?
+
+A) Sì, in tutti i browser moderni  
+B) Solo in Chrome  
+C) No, è specifico di Node.js  
+D) Sì, ma con nome diverso
+
+### Domanda 6
+Quale è l'uso corretto di clearImmediate()?
+
+A)
+```javascript
+const id = setImmediate(() => {});
+clearImmediate(id);
+```
+
+B)
+```javascript
+setImmediate(() => {
+    clearImmediate();
+});
+```
+
+C)
+```javascript
+const fn = () => {};
+setImmediate(fn);
+clearImmediate(fn);
+```
+
+D) clearImmediate non esiste
+
+### Domanda 7
+Quando è preferibile usare setImmediate invece di setTimeout(fn, 0)?
+
+A) Mai, sono equivalenti  
+B) Sempre, è più veloce  
+C) Dopo operazioni I/O in Node.js  
+D) Solo per operazioni sincrone
+
+### Domanda 8
+Cosa stampa questo codice?
+
+```javascript
+console.log('1');
+setImmediate(() => console.log('2'));
+Promise.resolve().then(() => console.log('3'));
+console.log('4');
+```
+
+A) 1, 2, 3, 4  
+B) 1, 4, 2, 3  
+C) 1, 4, 3, 2  
+D) 1, 3, 4, 2
+
+### Domanda 9
+Qual è il vantaggio principale di usare setImmediate per operazioni ricorsive?
+
+A) Più veloce di altri metodi  
+B) Permette all'Event Loop di processare altre operazioni  
+C) Usa meno memoria  
+D) È più semplice da debuggare
+
+### Domanda 10
+Come si può limitare il numero di setImmediate pendenti?
+
+A) Non è possibile  
+B) Usando un contatore e una coda  
+C) Node.js lo fa automaticamente  
+D) Usando clearImmediate() su tutti
+
+---
+
+## Risposte alle Domande di Autovalutazione
+
+**Domanda 1: C**  
+`setImmediate()` viene eseguito nella fase **check** dell'Event Loop, che si trova immediatamente dopo la fase poll. Questa è una delle caratteristiche distintive di setImmediate che lo differenzia da setTimeout.
+
+**Domanda 2: B**  
+Solo il codice B garantisce l'ordine. Quando `setImmediate()` e `setTimeout()` sono chiamati dentro un callback I/O (come fs.readFile), setImmediate viene SEMPRE eseguito prima perché la fase check viene immediatamente dopo poll, mentre timers viene nel prossimo ciclo.
+
+**Domanda 3: B**  
+`process.nextTick()` ha priorità molto più alta di `setImmediate()`. nextTick viene eseguito alla fine della fase corrente (prima delle Promise microtask), mentre setImmediate viene eseguito nella fase check dell'Event Loop.
+
+**Domanda 4: C**  
+Usare `setImmediate()` ricorsivamente è **sicuro** perché permette all'Event Loop di processare altre operazioni tra le iterazioni. A differenza di `process.nextTick()` ricorsivo (che può causare starvation), setImmediate non blocca l'Event Loop.
+
+**Domanda 5: C**  
+`setImmediate()` è **specifico di Node.js** e non è disponibile nei browser. Nei browser si possono usare alternative come setTimeout, MessageChannel, o requestAnimationFrame.
+
+**Domanda 6: A**  
+La sintassi corretta è salvare l'ID ritornato da setImmediate e passarlo a clearImmediate. L'opzione A è l'unico modo corretto. clearImmediate accetta l'oggetto Immediate ritornato da setImmediate, non la funzione callback.
+
+**Domanda 7: C**  
+`setImmediate()` è preferibile dopo operazioni I/O in Node.js perché garantisce esecuzione nella fase check, immediatamente dopo poll. Questo lo rende ideale per codice che deve essere eseguito dopo I/O ma prima del prossimo ciclo di timer.
+
+**Domanda 8: C**  
+L'ordine è: 1, 4 (codice sincrono), 3 (Promise microtask ha priorità su Event Loop phases), 2 (setImmediate nella fase check). Le microtask (Promise) vengono sempre eseguite prima delle fasi dell'Event Loop.
+
+**Domanda 9: B**  
+Il vantaggio principale è che `setImmediate()` permette all'Event Loop di processare altre operazioni (I/O, timer, ecc.) tra le iterazioni ricorsive, evitando di bloccare completamente l'applicazione e mantenendola reattiva.
+
+**Domanda 10: B**  
+Si può limitare usando un contatore che traccia i setImmediate attivi e una coda per quelli in attesa. Quando il contatore scende sotto il limite, si schedulano nuovi immediate dalla coda. Node.js non limita automaticamente i setImmediate.
+
+---
+
+## Conclusioni
+
+`setImmediate()` è uno strumento potente e specifico di Node.js per la gestione asincrona. Ecco i punti chiave da ricordare:
+
+### 🎯 Quando Usare setImmediate()
+
+✅ **Dopo operazioni I/O** - Garantisce esecuzione dopo la fase poll  
+✅ **Operazioni ricorsive** - Permette all'Event Loop di respirare  
+✅ **Spezzare task lunghi** - Mantiene l'applicazione reattiva  
+✅ **Defer non-critical code** - Logging, metrics, cleanup  
+✅ **Scheduling cooperativo** - Implementare multi-tasking
+
+### ⚠️ Quando NON Usare setImmediate()
+
+❌ **Operazioni time-critical** - Non garantisce timing preciso  
+❌ **Codice cross-platform** - Non disponibile nei browser  
+❌ **Operazioni ultra-prioritarie** - Usa process.nextTick() invece  
+❌ **Sincronizzazione precisa** - Non garantisce ordine nel main module
+
+### 📊 Confronto Rapido
+
+```javascript
+// Priorità (dal più alto al più basso)
+process.nextTick()    // Massima priorità
+Promise.then()        // Microtask
+setTimeout(fn, 0)     // Fase timers
+setImmediate()        // Fase check (dopo I/O)
+```
+
+### 🚀 Pattern Comuni
+
+1. **Chunking**: Spezzare operazioni lunghe
+2. **Cooperative Scheduling**: Multi-tasking cooperativo
+3. **Deferred Execution**: Rinviare codice non critico
+4. **Fair Scheduling**: Garantire fairness tra task
+5. **Async Iteration**: Implementare async iterators
+
+### 💡 Best Practices
+
+- Usa `setImmediate()` per codice dopo I/O
+- Preferisci `setImmediate()` a `setTimeout(fn, 0)` in Node.js
+- Usa `clearImmediate()` per cancellare execution
+- Non mischiare `setImmediate()` e `process.nextTick()` senza motivo
+- Traccia setImmediate pendenti per evitare memory leaks
+
+---
+
+## Risorse Aggiuntive
+
+### Documentazione Ufficiale
+- [Node.js Timers Documentation](https://nodejs.org/api/timers.html#timers_setimmediate_callback_args)
+- [Event Loop Documentation](https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/)
+
+### Approfondimenti
+- [Understanding setImmediate()](https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/#setimmediate-vs-settimeout)
+- [Phase Overview - Event Loop](https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/#phases-overview)
+
+### Tools
+- Node.js `--trace-warnings` flag
+- Performance hooks per profiling
+- async_hooks per tracciare operazioni asincrone
+
+---
+
+**Versione documento**: 1.0  
+**Ultimo aggiornamento**: Ottobre 2025  
+**Compatibilità**: Node.js tutte le versioni  
+**Livello**: Intermedio/Avanzato
+
+---
+
+*"setImmediate() is the cooperative scheduler's best friend - use it to keep your Event Loop healthy and responsive."*

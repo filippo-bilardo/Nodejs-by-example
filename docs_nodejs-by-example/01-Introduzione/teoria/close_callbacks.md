@@ -995,4 +995,953 @@ class RobustStreamHandler {
             console.log(`🔒 ${this.name} chiuso (close callbacks phase)`);
             
             if (this.errors.length > 0) {
-                console.log(`   ⚠️ Chiuso con
+                console.log(`   ⚠️ Chiuso con ${this.errors.length} errore(i)`);
+                this.errors.forEach(({ error, timestamp }) => {
+                    console.log(`      - ${error.message} at ${new Date(timestamp).toISOString()}`);
+                });
+            } else {
+                console.log(`   ✓ Chiuso senza errori`);
+            }
+            
+            this.performCleanup();
+        });
+    }
+    
+    performCleanup() {
+        console.log(`🧹 Cleanup per ${this.name}...`);
+        // Rilascia risorse, aggiorna metriche, ecc.
+    }
+    
+    getStatus() {
+        return {
+            name: this.name,
+            closed: this.closed,
+            errorCount: this.errors.length,
+            hasErrors: this.errors.length > 0
+        };
+    }
+}
+
+// Test con errori
+function testErrorHandling() {
+    // Stream che fallirà
+    const stream = fs.createReadStream('file-non-esistente.txt');
+    const handler = new RobustStreamHandler(stream, 'FileStream');
+    
+    setTimeout(() => {
+        console.log('\n📊 Status finale:', handler.getStatus());
+    }, 100);
+}
+
+testErrorHandling();
+
+/* Output:
+❌ Errore in FileStream: ENOENT: no such file or directory, open 'file-non-esistente.txt'
+🔒 FileStream chiuso (close callbacks phase)
+   ⚠️ Chiuso con 1 errore(i)
+      - ENOENT: no such file or directory at [timestamp]
+🧹 Cleanup per FileStream...
+
+📊 Status finale: {
+  name: 'FileStream',
+  closed: true,
+  errorCount: 1,
+  hasErrors: true
+}
+*/
+```
+
+### Pattern: Error Recovery
+
+```javascript
+const net = require('net');
+
+class ResilientConnection {
+    constructor(host, port, options = {}) {
+        this.host = host;
+        this.port = port;
+        this.maxRetries = options.maxRetries || 3;
+        this.retryDelay = options.retryDelay || 1000;
+        this.socket = null;
+        this.retries = 0;
+        this.connected = false;
+    }
+    
+    connect() {
+        return new Promise((resolve, reject) => {
+            this.socket = net.connect(this.port, this.host);
+            
+            this.socket.on('connect', () => {
+                console.log('✓ Connessione stabilita');
+                this.connected = true;
+                this.retries = 0;
+                resolve();
+            });
+            
+            this.socket.on('error', (err) => {
+                console.error('❌ Errore connessione:', err.message);
+            });
+            
+            this.socket.on('close', (hadError) => {
+                console.log('🔌 Socket chiuso (close callbacks phase)');
+                console.log(`   Had error: ${hadError}`);
+                this.connected = false;
+                
+                // Auto-reconnect se configurato
+                if (hadError && this.retries < this.maxRetries) {
+                    this.retries++;
+                    console.log(`🔄 Tentativo di riconnessione ${this.retries}/${this.maxRetries}...`);
+                    
+                    setTimeout(() => {
+                        this.connect().catch(err => {
+                            console.error('Riconnessione fallita:', err.message);
+                        });
+                    }, this.retryDelay);
+                } else if (this.retries >= this.maxRetries) {
+                    console.error('❌ Numero massimo di tentativi raggiunto');
+                    reject(new Error('Max retries reached'));
+                }
+            });
+        });
+    }
+    
+    send(data) {
+        if (!this.connected || !this.socket) {
+            throw new Error('Not connected');
+        }
+        
+        this.socket.write(data);
+    }
+    
+    disconnect() {
+        if (this.socket) {
+            this.socket.end();
+        }
+    }
+}
+
+// Uso
+async function testResilientConnection() {
+    const conn = new ResilientConnection('localhost', 9999, {
+        maxRetries: 3,
+        retryDelay: 2000
+    });
+    
+    try {
+        await conn.connect();
+        conn.send('Hello!');
+    } catch (err) {
+        console.error('Connessione fallita definitivamente');
+    }
+}
+
+// testResilientConnection();
+```
+
+## Memory Leaks e Close Callbacks
+
+### Problema: Listener Non Rimossi
+
+```javascript
+const EventEmitter = require('events');
+const net = require('net');
+
+// ❌ MALE: Memory leak
+class LeakyServer {
+    constructor() {
+        this.server = net.createServer();
+        this.connections = [];
+        
+        this.server.on('connection', (socket) => {
+            this.connections.push(socket);
+            
+            // PROBLEMA: listener non viene mai rimosso
+            socket.on('data', (data) => {
+                console.log('Data:', data);
+            });
+            
+            // Socket viene chiuso ma listener rimangono
+        });
+    }
+}
+
+// ✅ BENE: Cleanup appropriato
+class CleanServer {
+    constructor() {
+        this.server = net.createServer();
+        this.connections = new Set();
+        
+        this.server.on('connection', (socket) => {
+            this.connections.add(socket);
+            
+            const dataHandler = (data) => {
+                console.log('Data:', data);
+            };
+            
+            socket.on('data', dataHandler);
+            
+            // Cleanup quando socket viene chiuso
+            socket.on('close', () => {
+                console.log('🧹 Cleanup socket (close callbacks phase)');
+                
+                // Rimuovi listener
+                socket.removeListener('data', dataHandler);
+                
+                // Rimuovi dal set
+                this.connections.delete(socket);
+                
+                console.log(`📊 Connessioni attive: ${this.connections.size}`);
+            });
+        });
+    }
+    
+    shutdown() {
+        console.log('🛑 Shutdown server...');
+        
+        // Chiudi tutte le connessioni
+        this.connections.forEach(socket => {
+            socket.destroy();
+        });
+        
+        this.server.close(() => {
+            console.log('✓ Server chiuso (close callbacks phase)');
+        });
+    }
+}
+
+// Uso
+const server = new CleanServer();
+server.server.listen(3000);
+
+// Simula connessioni
+setTimeout(() => {
+    const clients = [];
+    for (let i = 0; i < 5; i++) {
+        clients.push(net.connect(3000));
+    }
+    
+    // Chiudi dopo 2 secondi
+    setTimeout(() => {
+        clients.forEach(c => c.end());
+    }, 2000);
+}, 100);
+
+/* Output:
+🧹 Cleanup socket (close callbacks phase)
+📊 Connessioni attive: 4
+🧹 Cleanup socket (close callbacks phase)
+📊 Connessioni attive: 3
+🧹 Cleanup socket (close callbacks phase)
+📊 Connessioni attive: 2
+🧹 Cleanup socket (close callbacks phase)
+📊 Connessioni attive: 1
+🧹 Cleanup socket (close callbacks phase)
+📊 Connessioni attive: 0
+*/
+```
+
+### Rilevare Memory Leaks
+
+```javascript
+const net = require('net');
+
+class LeakDetector {
+    constructor(checkInterval = 5000) {
+        this.checkInterval = checkInterval;
+        this.handles = new WeakSet();
+        this.handleCount = 0;
+        this.monitoring = false;
+    }
+    
+    track(handle, name) {
+        this.handles.add(handle);
+        this.handleCount++;
+        
+        handle.on('close', () => {
+            this.handleCount--;
+            console.log(`📉 Handle '${name}' chiuso. Rimanenti: ${this.handleCount}`);
+        });
+    }
+    
+    startMonitoring() {
+        if (this.monitoring) return;
+        this.monitoring = true;
+        
+        this.interval = setInterval(() => {
+            console.log(`\n📊 Leak Detector Report:`);
+            console.log(`   Active handles: ${this.handleCount}`);
+            console.log(`   Process memory: ${Math.round(process.memoryUsage().heapUsed / 1024 / 1024)}MB`);
+            
+            if (this.handleCount > 100) {
+                console.warn('⚠️ WARNING: Possibile memory leak rilevato!');
+            }
+        }, this.checkInterval);
+    }
+    
+    stopMonitoring() {
+        if (this.interval) {
+            clearInterval(this.interval);
+            this.monitoring = false;
+        }
+    }
+}
+
+// Uso
+const detector = new LeakDetector(2000);
+detector.startMonitoring();
+
+// Simula leak
+const server = net.createServer((socket) => {
+    detector.track(socket, 'client-socket');
+    
+    // Socket non viene mai chiuso esplicitamente
+    // Ma il detector lo traccia tramite 'close' event
+});
+
+server.listen(3000);
+
+// Genera traffico
+setInterval(() => {
+    const socket = net.connect(3000);
+    detector.track(socket, 'server-socket');
+    
+    // Chiudi dopo un po'
+    setTimeout(() => socket.destroy(), Math.random() * 3000);
+}, 500);
+
+// Stop dopo 15 secondi
+setTimeout(() => {
+    detector.stopMonitoring();
+    server.close();
+}, 15000);
+```
+
+## Best Practices
+
+### ✅ DO: Ascolta sempre l'evento 'close'
+
+```javascript
+const fs = require('fs');
+
+// ✅ BENE
+function readFileCorrect(filename, callback) {
+    const stream = fs.createReadStream(filename);
+    let data = '';
+    
+    stream.on('data', (chunk) => {
+        data += chunk;
+    });
+    
+    stream.on('error', (err) => {
+        callback(err);
+    });
+    
+    // IMPORTANTE: Ascolta 'close' per cleanup
+    stream.on('close', () => {
+        console.log('Stream chiuso, cleanup completato');
+        if (data) {
+            callback(null, data);
+        }
+    });
+}
+
+// ❌ MALE: Ignora 'close'
+function readFileWrong(filename, callback) {
+    const stream = fs.createReadStream(filename);
+    let data = '';
+    
+    stream.on('data', (chunk) => {
+        data += chunk;
+    });
+    
+    stream.on('end', () => {
+        // Problema: potrebbe esserci errore dopo 'end'
+        callback(null, data);
+    });
+    
+    // Manca gestione 'close' e 'error'!
+}
+```
+
+### ✅ DO: Pulisci risorse in 'close'
+
+```javascript
+class ResourceHandler {
+    constructor() {
+        this.resources = new Map();
+        this.timers = new Map();
+    }
+    
+    addResource(id, resource) {
+        this.resources.set(id, resource);
+        
+        // Setup timer per timeout
+        const timer = setTimeout(() => {
+            console.log(`⏱️ Timeout per risorsa ${id}`);
+            resource.destroy();
+        }, 30000);
+        
+        this.timers.set(id, timer);
+        
+        // ✅ Cleanup in 'close'
+        resource.on('close', () => {
+            console.log(`🧹 Cleanup risorsa ${id} (close callbacks phase)`);
+            
+            // Cancella timer
+            const timer = this.timers.get(id);
+            if (timer) {
+                clearTimeout(timer);
+                this.timers.delete(id);
+            }
+            
+            // Rimuovi risorsa
+            this.resources.delete(id);
+            
+            console.log(`📊 Risorse rimanenti: ${this.resources.size}`);
+        });
+    }
+    
+    closeAll() {
+        for (const [id, resource] of this.resources) {
+            if (resource.destroy) {
+                resource.destroy();
+            }
+        }
+    }
+}
+```
+
+### ✅ DO: Gestisci 'close' con errori
+
+```javascript
+const net = require('net');
+
+function handleSocketProperly(socket) {
+    let errorOccurred = false;
+    
+    socket.on('error', (err) => {
+        console.error('❌ Errore:', err.message);
+        errorOccurred = true;
+    });
+    
+    socket.on('close', (hadError) => {
+        console.log('🔌 Socket chiuso (close callbacks phase)');
+        
+        if (hadError || errorOccurred) {
+            console.log('   ⚠️ Chiuso a causa di errore');
+            // Logica di recovery
+            attemptReconnect();
+        } else {
+            console.log('   ✓ Chiuso normalmente');
+            // Cleanup normale
+        }
+    });
+}
+```
+
+### ❌ DON'T: Non fare operazioni async in 'close'
+
+```javascript
+const fs = require('fs');
+
+// ❌ MALE: Operazioni async in 'close'
+const stream = fs.createReadStream('file.txt');
+stream.on('close', () => {
+    // PROBLEMA: 'close' è sincono, non aspetta async
+    saveMetrics().then(() => {
+        console.log('Metrics salvate');
+    });
+});
+
+// ✅ BENE: Usa setImmediate o defer
+const stream2 = fs.createReadStream('file.txt');
+stream2.on('close', () => {
+    setImmediate(() => {
+        saveMetrics().then(() => {
+            console.log('Metrics salvate');
+        });
+    });
+});
+```
+
+### ❌ DON'T: Non confondere 'end' con 'close'
+
+```javascript
+const net = require('net');
+
+// ❌ MALE: Usa 'end' per cleanup
+const socket = net.connect(3000);
+socket.on('end', () => {
+    // PROBLEMA: 'end' non garantisce che il socket sia chiuso
+    cleanupResources(); // Potrebbe essere prematuro!
+});
+
+// ✅ BENE: Usa 'close' per cleanup
+const socket2 = net.connect(3000);
+socket2.on('end', () => {
+    console.log('Connessione terminata dalla parte remota');
+});
+
+socket2.on('close', () => {
+    // Sicuro: il socket è definitivamente chiuso
+    cleanupResources();
+});
+```
+
+### ❌ DON'T: Non ignorare il parametro 'hadError'
+
+```javascript
+const net = require('net');
+
+// ❌ MALE: Ignora hadError
+const socket = net.connect(3000);
+socket.on('close', () => {
+    // Non sappiamo se ci sono stati errori
+    reconnect(); // Potrebbe causare loop infinito
+});
+
+// ✅ BENE: Controlla hadError
+const socket2 = net.connect(3000);
+socket2.on('close', (hadError) => {
+    if (hadError) {
+        console.log('⚠️ Chiuso con errori, attendo prima di riconnettere');
+        setTimeout(() => reconnect(), 5000);
+    } else {
+        console.log('✓ Chiuso normalmente, riconnetto subito');
+        reconnect();
+    }
+});
+```
+
+## Debugging Close Callbacks
+
+### Tracciare Close Events
+
+```javascript
+const originalEmit = require('events').EventEmitter.prototype.emit;
+
+// Wrapper per tracciare tutti i 'close' events
+require('events').EventEmitter.prototype.emit = function(event, ...args) {
+    if (event === 'close') {
+        const stack = new Error().stack;
+        console.log('\n🔍 CLOSE EVENT DETECTED');
+        console.log(`   Emitter: ${this.constructor.name}`);
+        console.log(`   Had Error: ${args[0]}`);
+        console.log(`   Stack trace:\n${stack}`);
+    }
+    
+    return originalEmit.call(this, event, ...args);
+};
+
+// Test
+const net = require('net');
+const socket = new net.Socket();
+socket.destroy();
+
+/* Output:
+🔍 CLOSE EVENT DETECTED
+   Emitter: Socket
+   Had Error: false
+   Stack trace:
+Error
+    at Socket.emit (events.js:...)
+    at TCP.<anonymous> (net.js:...)
+    ...
+*/
+```
+
+### Profiling Close Callbacks
+
+```javascript
+const { performance } = require('perf_hooks');
+
+class CloseProfiler {
+    constructor() {
+        this.measurements = [];
+        this.setupTracking();
+    }
+    
+    setupTracking() {
+        const EventEmitter = require('events');
+        const originalOn = EventEmitter.prototype.on;
+        const self = this;
+        
+        EventEmitter.prototype.on = function(event, listener) {
+            if (event === 'close') {
+                const wrappedListener = function(...args) {
+                    const start = performance.now();
+                    
+                    const result = listener.apply(this, args);
+                    
+                    const duration = performance.now() - start;
+                    self.measurements.push({
+                        emitter: this.constructor.name,
+                        duration,
+                        timestamp: Date.now()
+                    });
+                    
+                    if (duration > 10) {
+                        console.warn(`⚠️ Slow close callback: ${duration.toFixed(2)}ms in ${this.constructor.name}`);
+                    }
+                    
+                    return result;
+                };
+                
+                return originalOn.call(this, event, wrappedListener);
+            }
+            
+            return originalOn.call(this, event, listener);
+        };
+    }
+    
+    getStats() {
+        if (this.measurements.length === 0) {
+            return { count: 0 };
+        }
+        
+        const durations = this.measurements.map(m => m.duration);
+        const sum = durations.reduce((a, b) => a + b, 0);
+        
+        return {
+            count: this.measurements.length,
+            totalTime: sum.toFixed(2) + 'ms',
+            avgTime: (sum / this.measurements.length).toFixed(2) + 'ms',
+            maxTime: Math.max(...durations).toFixed(2) + 'ms',
+            minTime: Math.min(...durations).toFixed(2) + 'ms'
+        };
+    }
+    
+    getSlowCallbacks(threshold = 5) {
+        return this.measurements
+            .filter(m => m.duration > threshold)
+            .sort((a, b) => b.duration - a.duration);
+    }
+}
+
+// Uso
+const profiler = new CloseProfiler();
+
+// Simula vari close events
+const net = require('net');
+const sockets = [];
+
+for (let i = 0; i < 10; i++) {
+    const socket = new net.Socket();
+    
+    socket.on('close', () => {
+        // Simula lavoro
+        const end = Date.now() + Math.random() * 20;
+        while (Date.now() < end) {}
+    });
+    
+    sockets.push(socket);
+}
+
+// Chiudi tutti
+sockets.forEach(s => s.destroy());
+
+setTimeout(() => {
+    console.log('\n📊 Close Callbacks Statistics:');
+    console.log(profiler.getStats());
+    
+    const slow = profiler.getSlowCallbacks(10);
+    if (slow.length > 0) {
+        console.log('\n🐌 Slow callbacks (>10ms):');
+        slow.forEach(m => {
+            console.log(`   ${m.emitter}: ${m.duration.toFixed(2)}ms`);
+        });
+    }
+}, 100);
+```
+
+## Esercizi Pratici
+
+### Esercizio 1: Connection Pool con Timeout
+
+Implementare un connection pool che automaticamente chiude connessioni inattive:
+
+```javascript
+class TimedConnectionPool {
+    constructor(host, port, options = {}) {
+        this.host = host;
+        this.port = port;
+        this.maxConnections = options.maxConnections || 10;
+        this.idleTimeout = options.idleTimeout || 30000;
+        // TODO: Implementare
+        // - Tracciare ultima attività di ogni connessione
+        // - Chiudere connessioni inattive in 'close' callback
+        // - Gestire pool size dinamicamente
+    }
+    
+    acquire() {
+        // TODO: Implementare
+    }
+    
+    release(connection) {
+        // TODO: Implementare
+    }
+}
+```
+
+### Esercizio 2: Graceful Shutdown Handler
+
+Creare un gestore per graceful shutdown che aspetta tutti i close callbacks:
+
+```javascript
+class GracefulShutdownHandler {
+    constructor() {
+        // TODO: Implementare
+        // - Tracciare tutti gli handle attivi
+        // - Aspettare che tutti emettano 'close'
+        // - Timeout se impiega troppo tempo
+    }
+    
+    register(handle, name) {
+        // TODO: Implementare
+    }
+    
+    shutdown(timeout = 10000) {
+        // TODO: Implementare
+        // Ritorna Promise che si risolve quando tutto è chiuso
+    }
+}
+```
+
+### Esercizio 3: Resource Leak Detector
+
+Implementare un detector che identifica risorse non chiuse:
+
+```javascript
+class ResourceLeakDetector {
+    constructor(options = {}) {
+        this.checkInterval = options.checkInterval || 5000;
+        this.leakThreshold = options.leakThreshold || 50;
+        // TODO: Implementare
+        // - Tracciare aperture e chiusure
+        // - Identificare risorse che non vengono chiuse
+        // - Report periodico
+    }
+    
+    trackOpen(resource, metadata) {
+        // TODO: Implementare
+    }
+    
+    startMonitoring() {
+        // TODO: Implementare
+    }
+}
+```
+
+### Esercizio 4: Stream Cleanup Manager
+
+Creare un manager che garantisce cleanup di pipeline complesse:
+
+```javascript
+class StreamCleanupManager {
+    constructor() {
+        // TODO: Implementare
+        // - Gestire pipeline di stream
+        // - Garantire che tutti gli stream vengano chiusi
+        // - Gestire errori in qualsiasi punto della pipeline
+    }
+    
+    createPipeline(streams) {
+        // TODO: Implementare
+        // Ritorna Promise
+    }
+}
+```
+
+### Esercizio 5: Connection Health Monitor
+
+Implementare un monitor che traccia la salute delle connessioni:
+
+```javascript
+class ConnectionHealthMonitor {
+    constructor() {
+        // TODO: Implementare
+        // - Tracciare connessioni attive/chiuse
+        // - Calcolare metriche (uptime, error rate, ecc.)
+        // - Identificare pattern di errori
+    }
+    
+    monitor(connection, metadata) {
+        // TODO: Implementare
+    }
+    
+    getMetrics() {
+        // TODO: Implementare
+    }
+}
+```
+
+## Domande di Autovalutazione
+
+### Domanda 1
+In quale fase dell'Event Loop vengono eseguiti i close callbacks?
+
+A) timers  
+B) poll  
+C) check  
+D) close callbacks (ultima fase)
+
+### Domanda 2
+Qual è la differenza tra 'end' e 'close' events?
+
+A) Sono equivalenti  
+B) 'end' indica fine dati, 'close' indica risorsa completamente chiusa  
+C) 'close' viene prima di 'end'  
+D) 'end' è solo per file, 'close' per network
+
+### Domanda 3
+Quando viene emesso l'evento 'close' con hadError=true?
+
+A) Sempre  
+B) Mai  
+C) Quando la risorsa viene chiusa a causa di un errore  
+D) Solo per socket TCP
+
+### Domanda 4
+Qual è il modo corretto per fare cleanup di risorse?
+
+A) Nell'evento 'end'  
+B) Nell'evento 'close'  
+C) Nel costruttore  
+D) Con setTimeout
+
+### Domanda 5
+Cosa succede se un listener 'close' lancia un'eccezione?
+
+A) Il programma crasha  
+B) L'eccezione viene ignorata  
+C) Altri listener 'close' non vengono eseguiti  
+D) Viene emesso un evento 'error'
+
+### Domanda 6
+Quale codice garantisce che tutte le connessioni siano chiuse?
+
+A)
+```javascript
+server.close();
+```
+
+B)
+```javascript
+connections.forEach(c => c.end());
+```
+
+C)
+```javascript
+connections.forEach(c => c.destroy());
+server.close();
+```
+
+D) A e C sono corretti
+
+### Domanda 7
+I close callbacks possono bloccare l'Event Loop?
+
+A) No, mai  
+B) Sì, se contengono codice sincrono pesante  
+C) Solo su Windows  
+D) Solo per file streams
+
+### Domanda 8
+Qual è l'ordine corretto degli eventi per un socket?
+
+A) close → end → error  
+B) end → close → error  
+C) error → end → close  
+D) L'ordine varia
+
+### Domanda 9
+Come si può rilevare un memory leak legato a close callbacks?
+
+A) Non è possibile  
+B) Tracciando handle che non emettono 'close'  
+C) Usando console.log  
+D) Con setTimeout
+
+### Domanda 10
+Quale è il pattern corretto per graceful shutdown?
+
+A) Chiamare process.exit() immediatamente  
+B) Aspettare tutti i 'close' events con timeout  
+C) Usare solo setTimeout  
+D) Non fare nulla
+
+---
+
+## Risposte alle Domande di Autovalutazione
+
+**Domanda 1: D**  
+I close callbacks vengono eseguiti nella fase **close callbacks**, che è l'ultima fase dell'Event Loop prima che il ciclo ricominci. Questa fase è dedicata specificamente alla gestione della chiusura di handle.
+
+**Domanda 2: B**  
+L'evento **'end'** indica che non ci sono più dati da leggere/scrivere (fine del flusso), mentre **'close'** indica che la risorsa sottostante (file descriptor, socket) è stata completamente chiusa e rilasciata. 'close' viene sempre dopo 'end'.
+
+**Domanda 3: C**  
+L'evento 'close' viene emesso con `hadError=true` quando la risorsa è stata chiusa a causa di un errore (ad esempio, errore di rete, errore I/O). Questo parametro permette di distinguere tra chiusure normali e chiusure dovute a errori.
+
+**Domanda 4: B**  
+Il cleanup di risorse deve essere fatto nell'evento **'close'** perché questo garantisce che la risorsa sia completamente chiusa e che non ci saranno più eventi. 'end' non garantisce che la risorsa sia effettivamente chiusa.
+
+**Domanda 5: C**  
+Se un listener 'close' lancia un'eccezione non gestita, Node.js interrompe l'esecuzione degli altri listener 'close' per quel particolare emitter e propaga l'errore. È importante gestire sempre le eccezioni nei listener.
+
+**Domanda 6: C**  
+Per garantire la chiusura, bisogna chiamare `.destroy()` su tutte le connessioni (che le chiude immediatamente) e poi `server.close()`. Solo chiamare `.end()` potrebbe lasciare connessioni aperte se il client non chiude la sua parte.
+
+**Domanda 7: B**  
+Sì, i close callbacks possono bloccare l'Event Loop se contengono operazioni sincrone pesanti. Sono callback normali eseguiti nella fase close dell'Event Loop, quindi il codice sincrono al loro interno blocca l'esecuzione come qualsiasi altro callback.
+
+**Domanda 8: D**  
+L'ordine varia in base a come viene chiusa la risorsa. Tipicamente: error (se c'è) → end (se chiusura graceful) → close (sempre). Ma con `.destroy()` può essere solo: error (opzionale) → close.
+
+**Domanda 9: B**  
+Si rilevano memory leak tracciando handle che vengono aperti ma non emettono mai 'close'. Se il numero di handle aperti cresce costantemente senza 'close' corrispondenti, c'è un leak.
+
+**Domanda 10: B**  
+Il pattern corretto per graceful shutdown è interrompere l'accettazione di nuove richieste, aspettare che tutte le richieste attive completino e che tutti gli handle emettano 'close', con un timeout per evitare di aspettare indefinitamente.
+
+---
+
+## Conclusioni
+
+La fase **close callbacks** è l'ultima fase dell'Event Loop e gioca un ruolo cruciale nella gestione delle risorse in Node.js.
+
+### 🎯 Punti Chiave
+
+✅ **Cleanup delle risorse** - 'close' è il momento giusto per cleanup  
+✅ **Ultima fase** - Eseguita dopo tutte le altre fasi dell'Event Loop  
+✅ **Sempre emesso** - A differenza di 'end', 'close' viene quasi sempre emesso  
+✅ **hadError parameter** - Permette di distinguere chiusure normali da errori  
+✅ **Memory leak prevention** - Fondamentale per evitare leak di risorse  
+
+### ⚠️ Best Practices Riassuntive
+
+1. **Ascolta sempre 'close'** per cleanup delle risorse
+2. **Non confondere 'end' e 'close'** - hanno scopi diversi
+3. **Controlla hadError** per gestire errori appropriatamente
+4. **Rimuovi listener** in 'close' per evitare memory leaks
+5. **Non fare operazioni pesanti** in close callbacks
+6. **Usa 'close' per graceful shutdown** aspettando tutti i close events
+
+### 🚀 Quando Usare Close Callbacks
+
+✅ Rilascio di risorse (file descriptor, socket, timer)  
+✅ Aggiornamento metriche e statistiche  
+✅ Graceful shutdown di server  
+✅ Cleanup di listener e references  
+✅ Logging di chiusure e diagnostica  
+
+---
+
+**Versione documento**: 1.0  
+**Ultimo aggiornamento**: Ottobre 2025  
+**Compatibilità**: Node.js tutte le versioni  
+**Livello**: Intermedio/Avanzato
+
+---
+
+*"The close callbacks phase is the final frontier of resource management in Node.js, ensuring that every handle is properly closed and cleaned up before the event loop starts anew."*
