@@ -20,15 +20,15 @@ Immagina l'Event Loop come un cameriere in un ristorante:
 ```
 🏪 RISTORANTE NODE.JS
 ┌─────────────────────────────────────┐
-│  👨‍🍳 Cucina (Thread Pool)           │ ← Operazioni I/O pesanti
+│  👨‍🍳 Cucina (Thread Pool)             ← Operazioni I/O pesanti
 ├─────────────────────────────────────┤
-│  🚶 Cameriere (Event Loop)          │ ← Thread principale
+│  🚶 Cameriere (Event Loop)            ← Thread principale
 │    - Prende ordini (riceve richieste)
 │    - Porta ordini in cucina (delega I/O)
 │    - Serve piatti pronti (esegue callback)
 │    - NON cucina (non blocca)
 ├─────────────────────────────────────┤
-│  🪑 Tavoli (Code di callback)       │
+│  🪑 Tavoli (Code di callback)        
 │    - Tavolo 1: Timers
 │    - Tavolo 2: I/O callbacks
 │    - Tavolo 3: Immediate
