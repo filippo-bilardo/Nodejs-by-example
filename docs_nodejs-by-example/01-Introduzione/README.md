@@ -10,6 +10,29 @@ Questa prima esercitazione ti introdurrà a Node.js, spiegandone le caratteristi
 - Esplorare il modello di programmazione asincrona
 - Utilizzare la console di Node.js (REPL)
 
+## Argomenti Teorici Collegati
+
+- [1. Storia di Node.js](./teoria/01-storia.md)
+- [2. Architettura di Node.js](./teoria/02-architettura.md)
+- [3. JavaScript Runtime](./teoria/03-javascript-runtime.md)
+- [4. Programmazione Asincrona](./teoria/04-programmazione-asincrona.md)
+- [5. Event Loop](./teoria/05-event-loop.md)
+- [6. REPL di Node.js](./teoria/repl.md)
+**Approfondimenti:**
+- [async/await](./teoria/async_await.md)
+- [callback](./teoria/callback.md)
+- [callback concetti avanzati](./teoria/callback_concetti_avanzati.md)
+- [close_callbacks](./teoria/close_callbacks.md)
+- [event-loop concetti avanzati](./teoria/event-loop_concetti_avanzati.md)
+- [libuv](./teoria/libuv.md)
+- [microtask](./teoria/microtask.md)
+- [pending_callbacks](./teoria/pending_callbacks.md)
+- [process.nextTick](./teoria/process.nextTick.md)
+- [Promises](./teoria/Promises.md)
+- [setImmediate](./teoria/setImmediate.md)
+- [setTimeout e setInterval](./teoria/setTimeout_setInterval.md)
+- [Worker Threads](./teoria/Worker_Threads.md)
+
 ## Esercizi Pratici
 
 ### Esercizio 1.1: Installazione di Node.js
@@ -93,13 +116,6 @@ console.log('I primi 10 numeri della sequenza di Fibonacci:');
 console.log(result);
 ```
 
-## Argomenti Teorici Collegati
-
-- [1. Storia di Node.js](./teoria/01-storia.md)
-- [2. Architettura di Node.js](./teoria/02-architettura.md)
-- [3. Event Loop](./teoria/03-event-loop.md)
-- [4. JavaScript Runtime](./teoria/04-javascript-runtime.md)
-- [5. Programmazione Asincrona](./teoria/05-programmazione-asincrona.md)
 
 ## Risorse Aggiuntive
 

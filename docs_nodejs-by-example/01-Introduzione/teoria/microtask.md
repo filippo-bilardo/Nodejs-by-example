@@ -1,6 +1,6 @@
 # Microtask Queue in Node.js
 
-## Cos'è la Microtask Queue?
+## Cos'è la Microtask Queue? 
 
 La **Microtask Queue** (o Microtask Queue) è una coda speciale ad **altissima priorità** che contiene callback che devono essere eseguiti **immediatamente dopo** il completamento del codice sincrono corrente, ma **prima** di qualsiasi fase dell'Event Loop.
 
@@ -14,7 +14,7 @@ Le microtask hanno priorità assoluta su tutte le altre operazioni asincrone in 
 └──────────────┬──────────────────────┘
                │
 ┌──────────────▼──────────────────────┐
-│  2. MICROTASK QUEUE ⭐⭐⭐           │ ← Priorità MASSIMA
+│  2. MICROTASK QUEUE ⭐⭐⭐         │ ← Priorità MASSIMA
 │     a. process.nextTick() queue     │   (eseguita PRIMA dell'Event Loop)
 │     b. Promise callbacks queue      │
 └──────────────┬──────────────────────┘
@@ -1100,1333 +1100,790 @@ function controlledLoop(maxIterations) {
     function iterate() {
         if (count < maxIterations) {
             count++;
-            process.nextTick(iterate);
+            setImmediate(iterate); // Usa setImmediate invece!
         }
     }
     iterate();
 }
-
-controlledLoop(100); // Si ferma dopo 100 iterazioni
 ```
 
-### ❌ DON'T: Non Bloccare con Operazioni Lunghe
+### ❌ DON'T: Non Bloccare con Operazioni Pesanti
 
 ```javascript
-// ❌ MALE: Blocca l'Event Loop
+// ❌ MALE: Blocca microtask queue
 process.nextTick(() => {
-    for (let i = 0; i < 1e9; i++) {
-        // Operazione CPU-intensive
+    for (let i = 0; i < 1000000000; i++) {
+        // Calcolo pesante
     }
 });
 
-// ✅ BENE: Suddividi il lavoro
-function processLargeArray(array, chunkSize = 1000) {
-    let index = 0;
-    
-    function processChunk() {
-        const end = Math.min(index + chunkSize, array.length);
-        
-        for (let i = index; i < end; i++) {
-            // Processa elemento
-        }
-        
-        index = end;
-        
-        if (index < array.length) {
-            setImmediate(processChunk); // Usa setImmediate per chunk grandi
-        }
-    }
-    
-    processChunk();
-}
-```
-
-### ✅ DO: Gestisci Sempre gli Errori
-
-```javascript
-// ❌ MALE: Errore non gestito
-Promise.resolve()
-    .then(() => {
-        throw new Error('Oops!');
-    });
-
-// ✅ BENE: Con .catch()
-Promise.resolve()
-    .then(() => {
-        throw new Error('Oops!');
-    })
-    .catch(err => {
-        console.error('Errore gestito:', err);
-    });
-
-// ✅ BENE: Con try/catch in async/await
-async function safeOperation() {
-    try {
-        await riskyOperation();
-    } catch (err) {
-        console.error('Errore gestito:', err);
-    }
-}
-```
-
-### ✅ DO: Usa queueMicrotask per Compatibilità
-
-```javascript
-// ✅ BENE: Funziona anche nei browser
-queueMicrotask(() => {
-    console.log('Microtask eseguita');
-});
-
-// Invece di (solo Node.js)
-process.nextTick(() => {
-    console.log('Solo Node.js');
-});
-```
-
----
-
-## 🎯 Decision Matrix: Quale API Usare?
-
-| Scenario | API Consigliata | Ragione |
-|----------|----------------|---------|
-| **Garantire ordine esecuzione dopo sync** | `process.nextTick()` | Priorità massima |
-| **Async operation con Promise** | `Promise.then()` / `async-await` | Pattern moderno e chiaro |
-| **Compatibilità browser + Node** | `queueMicrotask()` | Standard Web API |
-| **Defer dopo I/O** | `setImmediate()` | Non blocca microtask queue |
-| **Delay temporale** | `setTimeout()` | Controllo temporale |
-| **Rendere callback consistente** | `process.nextTick()` | Evita comportamento sinc/asinc |
-| **Operazione CPU-intensive** | `setImmediate()` + chunking | Non starva Event Loop |
-| **Batch processing** | `Promise.all()` | Parallelo con Promise |
-| **Sequenza operazioni async** | `async/await` | Leggibilità codice |
-| **Event emission** | `process.nextTick()` | Garantisci listener pronti |
-
-### Flow Chart Decisionale
-
-```
-Devo eseguire codice asincrono...
-│
-├─ È URGENTE dopo il codice sync?
-│  └─ Sì → process.nextTick()
-│
-├─ È una Promise chain?
-│  └─ Sì → .then() / async-await
-│
-├─ Deve funzionare anche nel browser?
-│  └─ Sì → queueMicrotask()
-│
-├─ Deve aspettare I/O completion?
-│  └─ Sì → setImmediate()
-│
-└─ Deve aspettare un tempo specifico?
-   └─ Sì → setTimeout(fn, ms)
-```
-
----
-
-## 📊 Microtask nei Framework Popolari
-
-### Express.js
-
-```javascript
-const express = require('express');
-const app = express();
-
-// Middleware che usa microtask per logging asincrono
-app.use((req, res, next) => {
-    const start = Date.now();
-    
-    // Continua immediatamente
-    next();
-    
-    // Log asincrono dopo la risposta
-    res.on('finish', () => {
-        process.nextTick(() => {
-            const duration = Date.now() - start;
-            console.log(`${req.method} ${req.url} - ${duration}ms`);
-        });
-    });
-});
-
-app.get('/api/users', async (req, res) => {
-    try {
-        const users = await db.users.findAll();
-        res.json(users);
-    } catch (err) {
-        // Error handling con microtask
-        process.nextTick(() => {
-            logger.error('Database error', err);
-        });
-        res.status(500).json({ error: 'Internal error' });
-    }
-});
-```
-
-### Next.js
-
-```javascript
-// pages/api/data.js
-export default async function handler(req, res) {
-    try {
-        const data = await fetchData();
-        
-        // Risposta immediata
-        res.status(200).json(data);
-        
-        // Analytics asincrono (non blocca risposta)
-        queueMicrotask(() => {
-            trackPageView(req);
-            updateCache(data);
-        });
-        
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-}
-```
-
-### Fastify
-
-```javascript
-const fastify = require('fastify')();
-
-// Hook che usa microtask
-fastify.addHook('onRequest', async (request, reply) => {
-    request.startTime = Date.now();
-});
-
-fastify.addHook('onResponse', async (request, reply) => {
-    // Defer logging
-    process.nextTick(() => {
-        const duration = Date.now() - request.startTime;
-        fastify.log.info({ 
-            url: request.url, 
-            duration 
-        });
-    });
-});
-
-fastify.get('/users', async (request, reply) => {
-    const users = await db.users.findAll();
-    return users;
-});
-```
-
----
-
-## 🧪 Testing delle Microtask
-
-### Test con Jest
-
-```javascript
-// userService.test.js
-describe('UserService', () => {
-    test('should process user data asynchronously', async () => {
-        const userId = 1;
-        
-        // Mock database
-        const mockUser = { id: 1, name: 'Mario' };
-        jest.spyOn(db, 'getUser').mockResolvedValue(mockUser);
-        
-        // Testa microtask
-        const promise = userService.getUser(userId);
-        
-        // Ancora pending
-        expect(db.getUser).toHaveBeenCalledWith(userId);
-        
-        // Flush microtask
-        await promise;
-        
-        // Ora completato
-        const result = await promise;
-        expect(result).toEqual(mockUser);
-    });
-    
-    test('should handle nextTick callbacks', (done) => {
-        let executed = false;
-        
-        process.nextTick(() => {
-            executed = true;
-            expect(executed).toBe(true);
-            done();
-        });
-        
-        // Non ancora eseguito
-        expect(executed).toBe(false);
-    });
-});
-```
-
-### Test Ordine di Esecuzione
-
-```javascript
-test('execution order', async () => {
-    const order = [];
-    
-    order.push('1-sync-start');
-    
-    setTimeout(() => order.push('5-timeout'), 0);
-    
-    Promise.resolve().then(() => order.push('3-promise'));
-    
-    process.nextTick(() => order.push('2-nextTick'));
-    
-    setImmediate(() => order.push('6-immediate'));
-    
-    queueMicrotask(() => order.push('4-queueMicrotask'));
-    
-    order.push('1-sync-end');
-    
-    // Aspetta che tutto sia completato
-    await new Promise(resolve => setTimeout(resolve, 100));
-    
-    expect(order).toEqual([
-        '1-sync-start',
-        '1-sync-end',
-        '2-nextTick',
-        '3-promise',
-        '4-queueMicrotask',
-        '5-timeout',
-        '6-immediate'
-    ]);
-});
-```
-
-### Mock di process.nextTick
-
-```javascript
-describe('with mocked nextTick', () => {
-    let originalNextTick;
-    let nextTickCallbacks = [];
-    
-    beforeEach(() => {
-        originalNextTick = process.nextTick;
-        nextTickCallbacks = [];
-        
-        // Mock nextTick
-        process.nextTick = jest.fn((callback) => {
-            nextTickCallbacks.push(callback);
-        });
-    });
-    
-    afterEach(() => {
-        process.nextTick = originalNextTick;
-    });
-    
-    test('should defer execution', () => {
-        let executed = false;
-        
-        process.nextTick(() => {
-            executed = true;
-        });
-        
-        expect(executed).toBe(false);
-        expect(nextTickCallbacks).toHaveLength(1);
-        
-        // Esegui manualmente
-        nextTickCallbacks[0]();
-        expect(executed).toBe(true);
-    });
-});
-```
-
----
-
-## 🧠 Quiz di Autovalutazione
-
-### Domanda 1: Ordine di Esecuzione
-
-```javascript
-console.log('A');
-
-setTimeout(() => console.log('B'), 0);
-
-Promise.resolve().then(() => console.log('C'));
-
-process.nextTick(() => console.log('D'));
-
-queueMicrotask(() => console.log('E'));
-
-console.log('F');
-```
-
-**Qual è l'output?**
-
-<details>
-<summary>Mostra risposta</summary>
-
-```
-A
-F
-D
-C
-E
-B
-```
-
-**Spiegazione:**
-1. `A`, `F` - codice sincrono
-2. `D` - `process.nextTick()` (priorità massima)
-3. `C` - Promise microtask
-4. `E` - `queueMicrotask()`
-5. `B` - `setTimeout()` (macrotask)
-
-</details>
-
-### Domanda 2: nextTick vs Promise
-
-```javascript
-process.nextTick(() => {
-    console.log('nextTick 1');
-    
-    process.nextTick(() => {
-        console.log('nextTick 2');
-    });
-});
-
-Promise.resolve().then(() => {
-    console.log('Promise 1');
-    
-    return Promise.resolve();
-}).then(() => {
-    console.log('Promise 2');
-});
-```
-
-**Qual è l'ordine?**
-
-<details>
-<summary>Mostra risposta</summary>
-
-```
-nextTick 1
-nextTick 2
-Promise 1
-Promise 2
-```
-
-**Spiegazione:** 
-- `process.nextTick()` svuota TUTTA la nextTick queue prima di passare alle Promise
-- Le Promise annidate vengono aggiunte alla coda Promise
-
-</details>
-
-### Domanda 3: Microtask Starvation
-
-```javascript
-function recursiveNextTick(count = 0) {
-    console.log('Iteration:', count);
-    
-    if (count < 1000) {
-        process.nextTick(() => recursiveNextTick(count + 1));
-    }
-}
-
-setTimeout(() => console.log('Timer!'), 0);
-
-recursiveNextTick();
-```
-
-**Cosa succede al setTimeout?**
-
-<details>
-<summary>Mostra risposta</summary>
-
-Il `setTimeout()` **NON viene mai eseguito** finché `recursiveNextTick()` non completa tutte le 1000 iterazioni!
-
-**Motivo:** La microtask queue viene svuotata completamente prima di passare all'Event Loop (timers). Questo è chiamato **microtask starvation**.
-
-**Soluzione:**
-```javascript
-function recursiveNextTick(count = 0) {
-    console.log('Iteration:', count);
-    
-    if (count < 1000) {
-        setImmediate(() => recursiveNextTick(count + 1)); // ✅ Meglio
-    }
-}
-```
-
-</details>
-
-### Domanda 4: Quale API Usare?
-
-Per ogni scenario, scegli l'API corretta:
-
-**A) Voglio garantire che tutti gli event listener siano registrati prima di emettere un evento**
-
-<details>
-<summary>Risposta</summary>
-
-✅ `process.nextTick()`
-
-```javascript
-class EventEmitter {
-    emit(event, data) {
-        process.nextTick(() => {
-            // Garantisce che tutti i listener siano pronti
-            this.listeners[event].forEach(cb => cb(data));
-        });
-    }
-}
-```
-</details>
-
-**B) Sto scrivendo una libreria che deve funzionare sia in Node che nel browser**
-
-<details>
-<summary>Risposta</summary>
-
-✅ `queueMicrotask()`
-
-```javascript
-function deferExecution(callback) {
-    queueMicrotask(callback); // Funziona ovunque
-}
-```
-</details>
-
-**C) Ho un'operazione CPU-intensive da 5 secondi che non voglio blocchi l'Event Loop**
-
-<details>
-<summary>Risposta</summary>
-
-✅ `setImmediate()` con chunking
-
-```javascript
-function heavyWork(data, chunkSize = 1000) {
+// ✅ BENE: Spezza in chunk
+function heavyComputation(data) {
+    const chunkSize = 1000;
     let index = 0;
     
     function processChunk() {
         const end = Math.min(index + chunkSize, data.length);
         
         for (let i = index; i < end; i++) {
-            // Lavoro pesante
+            // Processa item
         }
         
         index = end;
         
         if (index < data.length) {
-            setImmediate(processChunk);
+            setImmediate(processChunk); // Permetti altre operazioni
         }
     }
     
     processChunk();
 }
 ```
-</details>
 
-### Domanda 5: Async/Await e Microtask
+### ❌ DON'T: Non Mischiare Sync e Async
 
 ```javascript
-async function test() {
-    console.log('1');
-    
-    await Promise.resolve();
-    
+// ❌ MALE: Comportamento imprevedibile
+function getData(callback) {
+    if (cache) {
+        callback(cache); // Sincrono
+    } else {
+        fetchData().then(callback); // Asincrono
+    }
+}
+
+// ✅ BENE: Sempre asincrono
+function getData(callback) {
+    if (cache) {
+        process.nextTick(() => callback(cache));
+    } else {
+        fetchData().then(callback);
+    }
+}
+```
+
+### ❌ DON'T: Non Abusare di nextTick
+
+```javascript
+// ❌ MALE: Troppi nextTick inutili
+function processArray(arr) {
+    arr.forEach(item => {
+        process.nextTick(() => processItem(item));
+    });
+}
+
+// ✅ BENE: Usa Promise.all o batch processing
+async function processArray(arr) {
+    await Promise.all(arr.map(item => processItem(item)));
+}
+```
+
+## Differenze Browser vs Node.js
+
+### Microtask nei Browser
+
+```javascript
+// Nel browser:
+console.log('1');
+
+// Microtask (standard Web API)
+queueMicrotask(() => {
     console.log('2');
-}
-
-console.log('A');
-test();
-console.log('B');
-```
-
-**Qual è l'output?**
-
-<details>
-<summary>Mostra risposta</summary>
-
-```
-A
-1
-B
-2
-```
-
-**Spiegazione:**
-1. `A` - sincrono
-2. `1` - sincrono dentro async (prima di await)
-3. `B` - sincrono (test() ritorna Promise pending)
-4. `2` - microtask (dopo await)
-
-`await` trasforma tutto il codice successivo in un `.then()` callback!
-
-</details>
-
-### Domanda 6: Error Handling
-
-```javascript
-process.nextTick(() => {
-    throw new Error('Errore!');
 });
 
-Promise.resolve()
-    .then(() => {
-        throw new Error('Errore Promise!');
-    });
-
-console.log('Fine');
-```
-
-**Quali errori vengono catturati?**
-
-<details>
-<summary>Mostra risposta</summary>
-
-**Nessuno dei due!** Entrambi causano un **unhandled error**.
-
-**Correzione:**
-
-```javascript
-// nextTick - wrap in try/catch
-process.nextTick(() => {
-    try {
-        throw new Error('Errore!');
-    } catch (err) {
-        console.error('Catturato:', err);
-    }
+// Promise (microtask)
+Promise.resolve().then(() => {
+    console.log('3');
 });
 
-// Promise - usa .catch()
-Promise.resolve()
-    .then(() => {
-        throw new Error('Errore Promise!');
-    })
-    .catch(err => {
-        console.error('Catturato:', err);
-    });
+// Macrotask
+setTimeout(() => {
+    console.log('4');
+}, 0);
 
-// O global handler
-process.on('uncaughtException', err => {
-    console.error('Uncaught Exception:', err);
-});
+console.log('1');
 
-process.on('unhandledRejection', (reason, promise) => {
-    console.error('Unhandled Rejection:', reason);
-});
+// Output browser: 1, 1, 2, 3, 4
 ```
 
-</details>
+### Tabella Comparativa
 
----
+| Caratteristica | Node.js | Browser |
+|----------------|---------|---------|
+| **process.nextTick()** | ✅ Sì (priorità massima) | ❌ No |
+| **Promise microtask** | ✅ Sì | ✅ Sì |
+| **queueMicrotask()** | ✅ Sì | ✅ Sì |
+| **Priorità nextTick** | Più alta di Promise | N/A |
+| **Fasi Event Loop** | 6 fasi + microtask | Task/Microtask |
+| **Svuotamento** | Dopo ogni fase | Dopo ogni task |
+| **MutationObserver** | ❌ No | ✅ Sì (microtask) |
 
-## 💪 Esercizi Pratici
-
-### Esercizio 1: Implementa un Debouncer con Microtask
-
-Crea una funzione `debounce()` che usa microtask per ritardare l'esecuzione:
-
-```javascript
-const debounced = debounce(() => {
-    console.log('Eseguito!');
-}, 100);
-
-debounced();
-debounced();
-debounced();
-// Dovrebbe eseguire console.log solo 1 volta dopo 100ms
-```
-
-<details>
-<parameter name="newString">(summary>Soluzione</summary>
+### Codice Cross-Platform
 
 ```javascript
-function debounce(fn, delay) {
-    let timeoutId = null;
-    let pendingArgs = null;
-    
-    return function(...args) {
-        pendingArgs = args;
-        
-        // Cancella timeout precedente
-        if (timeoutId) {
-            clearTimeout(timeoutId);
-        }
-        
-        // Nuovo timeout
-        timeoutId = setTimeout(() => {
-            // Usa microtask per esecuzione immediata dopo delay
-            queueMicrotask(() => {
-                fn.apply(this, pendingArgs);
-                timeoutId = null;
-                pendingArgs = null;
-            });
-        }, delay);
-    };
-}
-
-// Test
-const debounced = debounce((msg) => {
-    console.log('Eseguito:', msg);
-}, 100);
-
-debounced('chiamata 1');
-debounced('chiamata 2');
-debounced('chiamata 3');
-
-// Output (dopo 100ms): "Eseguito: chiamata 3"
-```
-
-**Variante con Promise:**
-
-```javascript
-function debounceAsync(fn, delay) {
-    let timeoutId = null;
-    let pendingResolve = null;
-    
-    return function(...args) {
-        // Cancella timeout precedente
-        if (timeoutId) {
-            clearTimeout(timeoutId);
-        }
-        
-        return new Promise((resolve) => {
-            pendingResolve = resolve;
-            
-            timeoutId = setTimeout(async () => {
-                const result = await fn.apply(this, args);
-                queueMicrotask(() => {
-                    pendingResolve(result);
-                });
-            }, delay);
-        });
-    };
-}
-
-// Test
-const debouncedAsync = debounceAsync(async (query) => {
-    console.log('Searching for:', query);
-    return `Results for ${query}`;
-}, 300);
-
-debouncedAsync('a');
-debouncedAsync('ab');
-const result = await debouncedAsync('abc');
-console.log(result); // "Results for abc"
-```
-
-</details>
-
-### Esercizio 2: Task Scheduler con Priorità
-
-Implementa uno scheduler che esegue task con priorità diverse:
-
-```javascript
-const scheduler = new PriorityScheduler();
-
-scheduler.add('low', () => console.log('Low priority'));
-scheduler.add('high', () => console.log('High priority'));
-scheduler.add('normal', () => console.log('Normal priority'));
-
-scheduler.run();
-
-// Output atteso:
-// High priority
-// Normal priority
-// Low priority
-```
-
-<details>
-<summary>Soluzione</summary>
-
-```javascript
-class PriorityScheduler {
-    constructor() {
-        this.queues = {
-            high: [],
-            normal: [],
-            low: []
-        };
-    }
-    
-    add(priority, task) {
-        if (!this.queues[priority]) {
-            throw new Error(`Invalid priority: ${priority}`);
-        }
-        
-        this.queues[priority].push(task);
-    }
-    
-    run() {
-        // High priority - nextTick
-        this.queues.high.forEach(task => {
-            process.nextTick(task);
-        });
-        
-        // Normal priority - Promise microtask
-        this.queues.normal.forEach(task => {
-            queueMicrotask(task);
-        });
-        
-        // Low priority - setImmediate
-        this.queues.low.forEach(task => {
-            setImmediate(task);
-        });
-        
-        // Clear queues
-        this.queues.high = [];
-        this.queues.normal = [];
-        this.queues.low = [];
+// Funzione che funziona ovunque
+function defer(callback) {
+    if (typeof process !== 'undefined' && process.nextTick) {
+        // Node.js
+        process.nextTick(callback);
+    } else if (typeof queueMicrotask !== 'undefined') {
+        // Browser moderni
+        queueMicrotask(callback);
+    } else {
+        // Fallback
+        Promise.resolve().then(callback);
     }
 }
 
-// Test completo
-const scheduler = new PriorityScheduler();
-
-console.log('Start');
-
-scheduler.add('low', () => console.log('4. Low priority'));
-scheduler.add('high', () => console.log('2. High priority'));
-scheduler.add('normal', () => console.log('3. Normal priority'));
-scheduler.add('high', () => console.log('2. Another high'));
-
-console.log('1. Sync code');
-
-scheduler.run();
-
-console.log('1. End sync');
-
-/* Output:
-Start
-1. Sync code
-1. End sync
-2. High priority
-2. Another high
-3. Normal priority
-4. Low priority
-*/
-```
-
-**Variante con async/await:**
-
-```javascript
-class AsyncPriorityScheduler {
-    constructor() {
-        this.queues = {
-            high: [],
-            normal: [],
-            low: []
-        };
-    }
-    
-    add(priority, task) {
-        this.queues[priority].push(task);
-    }
-    
-    async run() {
-        // Esegui high priority
-        for (const task of this.queues.high) {
-            await new Promise(resolve => {
-                process.nextTick(async () => {
-                    await task();
-                    resolve();
-                });
-            });
-        }
-        
-        // Esegui normal priority
-        for (const task of this.queues.normal) {
-            await new Promise(resolve => {
-                queueMicrotask(async () => {
-                    await task();
-                    resolve();
-                });
-            });
-        }
-        
-        // Esegui low priority
-        for (const task of this.queues.low) {
-            await new Promise(resolve => {
-                setImmediate(async () => {
-                    await task();
-                    resolve();
-                });
-            });
-        }
-    }
-}
-```
-
-</details>
-
-### Esercizio 3: Async Queue Processor
-
-Crea una coda che processa task asincroni uno alla volta:
-
-```javascript
-const queue = new AsyncQueue();
-
-queue.enqueue(async () => {
-    await delay(100);
-    console.log('Task 1');
+// Uso
+defer(() => {
+    console.log('Deferred callback');
 });
-
-queue.enqueue(async () => {
-    await delay(50);
-    console.log('Task 2');
-});
-
-queue.process();
 ```
 
-<details>
-<summary>Soluzione</summary>
+## Pattern Avanzati
+
+### Pattern 1: Microtask Scheduler
 
 ```javascript
-class AsyncQueue {
+class MicrotaskScheduler {
     constructor() {
         this.queue = [];
-        this.processing = false;
+        this.scheduled = false;
     }
     
-    enqueue(task) {
-        return new Promise((resolve, reject) => {
-            this.queue.push({ task, resolve, reject });
-            
-            if (!this.processing) {
-                this.process();
-            }
+    schedule(task, priority = 'normal') {
+        this.queue.push({ task, priority });
+        this.queue.sort((a, b) => {
+            const priorities = { high: 0, normal: 1, low: 2 };
+            return priorities[a.priority] - priorities[b.priority];
         });
+        
+        if (!this.scheduled) {
+            this.scheduled = true;
+            process.nextTick(() => this.flush());
+        }
     }
     
-    async process() {
-        if (this.processing || this.queue.length === 0) {
-            return;
-        }
-        
-        this.processing = true;
+    flush() {
+        this.scheduled = false;
         
         while (this.queue.length > 0) {
-            const { task, resolve, reject } = this.queue.shift();
+            const { task } = this.queue.shift();
             
             try {
-                // Usa microtask per gestione asincrona
-                const result = await new Promise((res, rej) => {
-                    queueMicrotask(async () => {
-                        try {
-                            const value = await task();
-                            res(value);
-                        } catch (err) {
-                            rej(err);
-                        }
-                    });
-                });
-                
-                resolve(result);
+                task();
             } catch (err) {
-                reject(err);
+                console.error('Task error:', err);
             }
         }
-        
-        this.processing = false;
+    }
+    
+    scheduleHigh(task) {
+        this.schedule(task, 'high');
+    }
+    
+    scheduleNormal(task) {
+        this.schedule(task, 'normal');
+    }
+    
+    scheduleLow(task) {
+        this.schedule(task, 'low');
     }
 }
 
-// Utility function
-function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
+// Uso
+const scheduler = new MicrotaskScheduler();
 
-// Test completo
-async function testQueue() {
-    const queue = new AsyncQueue();
-    
-    console.log('Start');
-    
-    const promise1 = queue.enqueue(async () => {
-        console.log('Task 1 started');
-        await delay(100);
-        console.log('Task 1 completed');
-        return 'Result 1';
-    });
-    
-    const promise2 = queue.enqueue(async () => {
-        console.log('Task 2 started');
-        await delay(50);
-        console.log('Task 2 completed');
-        return 'Result 2';
-    });
-    
-    const promise3 = queue.enqueue(async () => {
-        console.log('Task 3 started');
-        await delay(75);
-        console.log('Task 3 completed');
-        return 'Result 3';
-    });
-    
-    const results = await Promise.all([promise1, promise2, promise3]);
-    console.log('All done:', results);
-}
-
-testQueue();
+scheduler.scheduleLow(() => console.log('Low priority'));
+scheduler.scheduleHigh(() => console.log('High priority'));
+scheduler.scheduleNormal(() => console.log('Normal priority'));
 
 /* Output:
-Start
-Task 1 started
-Task 1 completed
-Task 2 started
-Task 2 completed
-Task 3 started
-Task 3 completed
-All done: [ 'Result 1', 'Result 2', 'Result 3' ]
+High priority
+Normal priority
+Low priority
 */
 ```
 
-**Con limiteultaneous:**
+### Pattern 2: Debounced Microtask
 
 ```javascript
-class ConcurrentAsyncQueue {
-    constructor(concurrency = 2) {
-        this.concurrency = concurrency;
-        this.queue = [];
-        this.running = 0;
+class DebouncedMicrotask {
+    constructor(fn, wait = 0) {
+        this.fn = fn;
+        this.wait = wait;
+        this.timeoutId = null;
+        this.pending = [];
     }
     
-    enqueue(task) {
+    call(...args) {
         return new Promise((resolve, reject) => {
-            this.queue.push({ task, resolve, reject });
-            this.process();
+            this.pending.push({ args, resolve, reject });
+            
+            if (this.timeoutId) {
+                clearTimeout(this.timeoutId);
+            }
+            
+            this.timeoutId = setTimeout(() => {
+                this.execute();
+            }, this.wait);
         });
     }
     
-    async process() {
-        while (this.running < this.concurrency && this.queue.length > 0) {
-            const { task, resolve, reject } = this.queue.shift();
-            this.running++;
+    execute() {
+        const pending = this.pending.splice(0);
+        
+        // Usa microtask per esecuzione
+        process.nextTick(() => {
+            const lastCall = pending[pending.length - 1];
             
-            queueMicrotask(async () => {
-                try {
-                    const result = await task();
-                    resolve(result);
-                } catch (err) {
-                    reject(err);
-                } finally {
-                    this.running--;
-                    this.process();
-                }
-            });
+            try {
+                const result = this.fn(...lastCall.args);
+                
+                // Risolvi tutte le promise pendenti
+                pending.forEach(({ resolve }) => resolve(result));
+            } catch (err) {
+                pending.forEach(({ reject }) => reject(err));
+            }
+        });
+    }
+    
+    flush() {
+        if (this.timeoutId) {
+            clearTimeout(this.timeoutId);
+            this.execute();
         }
     }
 }
+
+// Uso
+const debouncedLog = new DebouncedMicrotask(
+    (msg) => {
+        console.log('Debounced:', msg);
+        return msg.toUpperCase();
+    },
+    100
+);
+
+// Chiamate multiple
+debouncedLog.call('first');
+debouncedLog.call('second');
+debouncedLog.call('third').then(result => {
+    console.log('Result:', result);
+});
+
+/* Output (dopo 100ms):
+Debounced: third
+Result: THIRD
+*/
 ```
 
-</details>
-
-### Esercizio 4: Event Loop Monitor
-
-Implementa un monitor che rileva quando le microtask bloccano troppo a lungo:
-
-<details>
-<summary>Soluzione</summary>
+### Pattern 3: Microtask Pool
 
 ```javascript
-class EventLoopMonitor {
-    constructor(options = {}) {
-        this.threshold = options.threshold || 50; // ms
-        this.interval = options.interval || 1000; // ms
-        this.onWarning = options.onWarning || console.warn;
-        this.monitoring = false;
-        this.stats = {
-            microtaskLag: 0,
-            macrotaskLag: 0,
-            warnings: 0
+class MicrotaskPool {
+    constructor(concurrency = 5) {
+        this.concurrency = concurrency;
+        this.running = 0;
+        this.queue = [];
+    }
+    
+    async run(task) {
+        // Attendi se pool è pieno
+        while (this.running >= this.concurrency) {
+            await new Promise(resolve => {
+                this.queue.push(resolve);
+            });
+        }
+        
+        this.running++;
+        
+        try {
+            // Esegui task come microtask
+            return await new Promise((resolve, reject) => {
+                process.nextTick(async () => {
+                    try {
+                        const result = await task();
+                        resolve(result);
+                    } catch (err) {
+                        reject(err);
+                    }
+                });
+            });
+        } finally {
+            this.running--;
+            
+            // Sveglia prossimo in attesa
+            if (this.queue.length > 0) {
+                const resolve = this.queue.shift();
+                process.nextTick(resolve);
+            }
+        }
+    }
+    
+    async all(tasks) {
+        return Promise.all(tasks.map(task => this.run(task)));
+    }
+}
+
+// Uso
+const pool = new MicrotaskPool(3);
+
+const tasks = Array.from({ length: 10 }, (_, i) => 
+    () => new Promise(resolve => {
+        console.log(`Task ${i} executing`);
+        setTimeout(() => resolve(i), Math.random() * 100);
+    })
+);
+
+pool.all(tasks).then(results => {
+    console.log('All completed:', results);
+});
+```
+
+### Pattern 4: Microtask Queue Observer
+
+```javascript
+class MicrotaskQueueObserver {
+    constructor() {
+        this.observers = [];
+        this.queueSize = 0;
+        this.maxQueueSize = 0;
+        
+        this.wrapNextTick();
+    }
+    
+    wrapNextTick() {
+        const original = process.nextTick;
+        const self = this;
+        
+        process.nextTick = function(callback, ...args) {
+            self.queueSize++;
+            self.maxQueueSize = Math.max(self.maxQueueSize, self.queueSize);
+            
+            self.notifyObservers('enqueue', self.queueSize);
+            
+            const wrapped = function() {
+                try {
+                    return callback.apply(this, arguments);
+                } finally {
+                    self.queueSize--;
+                    self.notifyObservers('dequeue', self.queueSize);
+                }
+            };
+            
+            return original.call(this, wrapped, ...args);
         };
     }
     
-    start() {
-        if (this.monitoring) return;
-        
-        this.monitoring = true;
-        this.monitor();
+    observe(callback) {
+        this.observers.push(callback);
+        return () => {
+            const index = this.observers.indexOf(callback);
+            if (index !== -1) {
+                this.observers.splice(index, 1);
+            }
+        };
     }
     
-    stop() {
-        this.monitoring = false;
-    }
-    
-    monitor() {
-        if (!this.monitoring) return;
-        
-        const startMicro = process.hrtime.bigint();
-        
-        // Misura microtask lag
-        queueMicrotask(() => {
-            const endMicro = process.hrtime.bigint();
-            const microLag = Number(endMicro - startMicro) / 1e6; // ms
-            
-            this.stats.microtaskLag = microLag;
-            
-            if (microLag > this.threshold) {
-                this.stats.warnings++;
-                this.onWarning({
-                    type: 'microtask',
-                    lag: microLag,
-                    threshold: this.threshold,
-                    timestamp: new Date()
-                });
+    notifyObservers(event, size) {
+        this.observers.forEach(observer => {
+            try {
+                observer(event, size);
+            } catch (err) {
+                console.error('Observer error:', err);
             }
         });
-        
-        // Misura macrotask lag
-        const startMacro = process.hrtime.bigint();
-        
-        setImmediate(() => {
-            const endMacro = process.hrtime.bigint();
-            const macroLag = Number(endMacro - startMacro) / 1e6;
-            
-            this.stats.macrotaskLag = macroLag;
-            
-            if (macroLag > this.threshold * 2) {
-                this.stats.warnings++;
-                this.onWarning({
-                    type: 'macrotask',
-                    lag: macroLag,
-                    threshold: this.threshold * 2,
-                    timestamp: new Date()
-                });
-            }
-        });
-        
-        // Continua monitoring
-        setTimeout(() => this.monitor(), this.interval);
     }
     
     getStats() {
-        return { ...this.stats };
+        return {
+            currentSize: this.queueSize,
+            maxSize: this.maxQueueSize
+        };
+    }
+}
+
+// Uso
+const observer = new MicrotaskQueueObserver();
+
+observer.observe((event, size) => {
+    if (size > 10) {
+        console.warn(`⚠️ Large microtask queue: ${size} items`);
+    }
+});
+
+// Genera molte microtask
+for (let i = 0; i < 20; i++) {
+    process.nextTick(() => {
+        console.log(`Task ${i}`);
+    });
+}
+
+setTimeout(() => {
+    console.log('Stats:', observer.getStats());
+}, 100);
+```
+
+### Pattern 5: Cooperative Async Iterator
+
+```javascript
+class CooperativeAsyncIterator {
+    constructor(iterable) {
+        this.iterator = iterable[Symbol.iterator]();
     }
     
-    reset() {
-        this.stats = {
-            microtaskLag: 0,
-            macrotaskLag: 0,
-            warnings: 0
-        };
+    async *[Symbol.asyncIterator]() {
+        let result;
+        let count = 0;
+        const yieldEvery = 100;
+        
+        while (!(result = this.iterator.next()).done) {
+            yield result.value;
+            
+            count++;
+            
+            // Ogni 100 iterazioni, permetti altre operazioni
+            if (count % yieldEvery === 0) {
+                await new Promise(resolve => setImmediate(resolve));
+            }
+        }
+    }
+}
+
+// Uso
+async function processLargeArray() {
+    const largeArray = Array.from({ length: 10000 }, (_, i) => i);
+    const iterator = new CooperativeAsyncIterator(largeArray);
+    
+    let sum = 0;
+    for await (const value of iterator) {
+        sum += value;
+    }
+    
+    console.log('Sum:', sum);
+}
+
+processLargeArray();
+```
+
+## Esercizi Pratici
+
+### Esercizio 1: Implementare Microtask Batcher
+
+Creare un batcher che raggruppa operazioni sincrone in microtask:
+
+```javascript
+class MicrotaskBatcher {
+    constructor(processFn) {
+        this.processFn = processFn;
+        // TODO: Implementare
+        // - Accumula items fino a nextTick
+        // - Processa batch in una volta
+        // - Ritorna Promise per ogni item
+    }
+    
+    add(item) {
+        // TODO: Implementare
     }
 }
 
 // Test
-const monitor = new EventLoopMonitor({
-    threshold: 10, // 10ms
-    interval: 100,
-    onWarning: (warning) => {
-        console.warn(`⚠️  ${warning.type} lag: ${warning.lag.toFixed(2)}ms`);
-    }
+const batcher = new MicrotaskBatcher((items) => {
+    console.log(`Processing ${items.length} items`);
+    return items.map(x => x * 2);
 });
 
-monitor.start();
-
-// Simula lavoro bloccante
-function blockingWork(ms) {
-    const start = Date.now();
-    while (Date.now() - start < ms) {
-        // Blocca
-    }
+for (let i = 0; i < 100; i++) {
+    batcher.add(i).then(result => {
+        if (i % 10 === 0) console.log(`Item ${i}: ${result}`);
+    });
 }
-
-// Dopo 500ms, fai lavoro bloccante
-setTimeout(() => {
-    console.log('Starting blocking work...');
-    
-    // Blocca con microtask
-    process.nextTick(() => {
-        blockingWork(30); // 30ms di blocco
-    });
-    
-    // Blocca con macrotask
-    setImmediate(() => {
-        blockingWork(50); // 50ms di blocco
-    });
-}, 500);
-
-// Stop dopo 3 secondi
-setTimeout(() => {
-    monitor.stop();
-    console.log('Final stats:', monitor.getStats());
-}, 3000);
 ```
 
-**Versione avanzata con histogram:**
+### Esercizio 2: Priority Microtask Queue
+
+Implementare una coda con priorità usando microtask:
 
 ```javascript
-class AdvancedEventLoopMonitor extends EventLoopMonitor {
-    constructor(options) {
-        super(options);
-        this.histogram = {
-            microtask: [],
-            macrotask: []
-        };
+class PriorityMicrotaskQueue {
+    constructor() {
+        // TODO: Implementare
+        // - 3 livelli di priorità (high, normal, low)
+        // - High priority usa nextTick
+        // - Normal usa Promise
+        // - Low usa queueMicrotask
     }
     
-    monitor() {
-        // ... codice precedente ...
-        
-        queueMicrotask(() => {
-            const endMicro = process.hrtime.bigint();
-            const microLag = Number(endMicro - startMicro) / 1e6;
-            
-            // Aggiungi al histogram
-            this.histogram.microtask.push(microLag);
-            if (this.histogram.microtask.length > 100) {
-                this.histogram.microtask.shift();
-            }
-            
-            // ... resto del codice
-        });
-    }
-    
-    getPercentile(type, percentile) {
-        const sorted = [...this.histogram[type]].sort((a, b) => a - b);
-        const index = Math.floor(sorted.length * percentile / 100);
-        return sorted[index] || 0;
-    }
-    
-    getReport() {
-        return {
-            microtask: {
-                p50: this.getPercentile('microtask', 50),
-                p95: this.getPercentile('microtask', 95),
-                p99: this.getPercentile('microtask', 99),
-                max: Math.max(...this.histogram.microtask)
-            },
-            macrotask: {
-                p50: this.getPercentile('macrotask', 50),
-                p95: this.getPercentile('macrotask', 95),
-                p99: this.getPercentile('macrotask', 99),
-                max: Math.max(...this.histogram.macrotask)
-            }
-        };
+    enqueue(task, priority = 'normal') {
+        // TODO: Implementare
     }
 }
 ```
 
-</details>
+### Esercizio 3: Microtask Timeout
+
+Creare un timeout per microtask che troppo lente:
+
+```javascript
+class MicrotaskWithTimeout {
+    constructor(timeoutMs = 10) {
+        this.timeoutMs = timeoutMs;
+        // TODO: Implementare
+    }
+    
+    execute(task) {
+        // TODO: Implementare
+        // - Esegue task come microtask
+        // - Se impiega più di timeoutMs, emette warning
+        // - Ritorna Promise con risultato o timeout error
+    }
+}
+```
+
+### Esercizio 4: Microtask Starvation Detector
+
+Implementare un detector che rileva starvation:
+
+```javascript
+class StarvationDetector {
+    constructor(threshold = 100) {
+        this.threshold = threshold;
+        // TODO: Implementare
+        // - Monitora Event Loop lag
+        // - Rileva quando microtask bloccano troppo a lungo
+        // - Emette eventi quando rileva problemi
+    }
+    
+    start() {
+        // TODO: Implementare
+    }
+    
+    stop() {
+        // TODO: Implementare
+    }
+}
+```
+
+### Esercizio 5: Adaptive Microtask Scheduler
+
+Creare uno scheduler che si adatta al carico:
+
+```javascript
+class AdaptiveMicrotaskScheduler {
+    constructor() {
+        // TODO: Implementare
+        // - Monitora velocità di esecuzione
+        // - Switch tra nextTick e setImmediate
+        // - Ottimizza basandosi su metriche
+    }
+    
+    schedule(task) {
+        // TODO: Implementare
+    }
+    
+    getMetrics() {
+        // TODO: Implementare
+    }
+}
+```
+
+## Domande di Autovalutazione
+
+### Domanda 1
+Cosa sono le microtask?
+
+A) Operazioni I/O veloci  
+B) Callback ad alta priorità eseguiti prima dell'Event Loop  
+C) setTimeout con delay 0  
+D) Thread separati
+
+### Domanda 2
+Qual è l'ordine di priorità corretto?
+
+A) Promise → nextTick → setTimeout  
+B) nextTick → Promise → setTimeout  
+C) setTimeout → nextTick → Promise  
+D) nextTick → setTimeout → Promise
+
+### Domanda 3
+Quando vengono svuotate le microtask?
+
+A) All'inizio di ogni ciclo Event Loop  
+B) Alla fine di ogni ciclo Event Loop  
+C) Dopo ogni fase dell'Event Loop  
+D) Solo dopo il codice sincrono
+
+### Domanda 4
+Cosa causa "microtask starvation"?
+
+A) Troppe Promise  
+B) Ricorsione infinita con nextTick  
+C) setTimeout troppo frequenti  
+D) Troppi file I/O
+
+### Domanda 5
+process.nextTick() è disponibile nei browser?
+
+A) Sì, in tutti i browser moderni  
+B) Solo in Chrome  
+C) No, è specifico di Node.js  
+D) Sì, ma con nome diverso
+
+### Domanda 6
+Quale codice esegue callback consistentemente in modo asincrono?
+
+A) 
+```javascript
+if (cache) callback(data);
+else fetch().then(callback);
+```
+
+B)
+```javascript
+if (cache) process.nextTick(() => callback(data));
+else fetch().then(callback);
+```
+
+C) Entrambi  
+D) Nessuno
+
+### Domanda 7
+Qual è la differenza tra nextTick e queueMicrotask?
+
+A) Sono identici  
+B) nextTick ha priorità più alta  
+C) queueMicrotask è più veloce  
+D) nextTick è deprecato
+
+### Domanda 8
+Le microtask possono bloccare l'Event Loop?
+
+A) No, mai  
+B) Sì, se contengono codice sincrono pesante o ricorsione  
+C) Solo in Node.js  
+D) Solo nei browser
+
+### Domanda 9
+Qual è il modo migliore per evitare microtask starvation?
+
+A) Non usare mai nextTick  
+B) Usare setImmediate per operazioni ricorsive  
+C) Limitare a 10 nextTick  
+D) Usare setTimeout
+
+### Domanda 10
+async/await usa le microtask?
+
+A) No, usa setTimeout  
+B) Sì, ogni await crea una microtask Promise  
+C) Solo in Node.js  
+D) Solo per errori
 
 ---
 
-## 📚 Risorse Aggiuntive
+## Risposte alle Domande di Autovalutazione
 
-### 📖 Documentazione Ufficiale
+**Domanda 1: B**  
+Le microtask sono **callback ad alta priorità** che vengono eseguiti immediatamente dopo il codice sincrono corrente, ma **prima** che l'Event Loop inizi le sue fasi. Hanno priorità assoluta su tutte le operazioni asincrone.
 
-- [Node.js Process](https://nodejs.org/api/process.html#process_process_nexttick_callback_args)
-- [MDN - queueMicrotask](https://developer.mozilla.org/en-US/docs/Web/API/queueMicrotask)
-- [HTML Standard - Microtask Queue](https://html.spec.whatwg.org/multipage/webappapis.html#microtask-queue)
-- [V8 Blog - Faster async functions](https://v8.dev/blog/fast-async)
+**Domanda 2: B**  
+L'ordine corretto è: **nextTick → Promise → setTimeout**. `process.nextTick()` ha la priorità più alta, seguito da Promise microtask, e infine setTimeout che è nella fase timers dell'Event Loop.
 
-### 📹 Video Consigliati
+**Domanda 3: C**  
+Le microtask vengono completamente svuotate **dopo ogni fase dell'Event Loop**. Questo significa che se una microtask crea altre microtask, queste vengono tutte eseguite prima di passare alla fase successiva.
 
-- [Jake Archibald on the Event Loop](https://www.youtube.com/watch?v=cCOL7MC4Pl0) - Eccellente spiegazione visuale
-- [Philip Roberts: What the heck is the event loop anyway?](https://www.youtube.com/watch?v=8aGhZQkoFbQ)
-- [Node.js Internals Deep Dive](https://www.youtube.com/watch?v=sGTRmPiXD4Y)
+**Domanda 4: B**  
+La "microtask starvation" è causata da **ricorsione infinita con nextTick** (o Promise), che impedisce all'Event Loop di progredire alle altre fasi perché la microtask queue non si svuota mai.
 
-### 📖 Articoli Tecnici
+**Domanda 5: C**  
+**No**, `process.nextTick()` è **specifico di Node.js** e non è disponibile nei browser. Nei browser si usa `queueMicrotask()` o Promise per funzionalità simili.
 
-- [Understanding process.nextTick()](https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/)
-- [Microtasks and Macrotasks](https://javascript.info/event-loop)
-- [Don't Block the Event Loop](https://nodejs.org/en/docs/guides/dont-block-the-event-loop/)
-- [Node.js Event Loop Best Practices](https://blog.risingstack.com/node-js-at-scale-understanding-node-js-event-loop/)
+**Domanda 6: B**  
+Solo B garantisce comportamento **consistentemente asincrono**. L'opzione A esegue il callback sincronamente se c'è cache, il che può causare comportamenti imprevedibili.
 
-### 🛠️ Tool Utili
+**Domanda 7: B**  
+`process.nextTick()` ha **priorità più alta** di `queueMicrotask()`. nextTick usa una coda separata che viene svuotata prima della coda Promise/queueMicrotask.
 
-- [Clinic.js](https://clinicjs.org/) - Performance profiling
-- [0x](https://github.com/davidmarkclements/0x) - Flamegraph profiler  
-- [node --prof](https://nodejs.org/en/docs/guides/simple-profiling/) - Built-in profiler
-- [async_hooks](https://nodejs.org/api/async_hooks.html) - Track async operations
+**Domanda 8: B**  
+Sì, le microtask possono bloccare l'Event Loop se contengono **codice sincrono pesante** o **ricorsione infinita**. Sono callback normali, quindi il codice al loro interno può bloccare l'esecuzione.
+
+**Domanda 9: B**  
+Il modo migliore per evitare starvation è usare **setImmediate per operazioni ricorsive** invece di nextTick, perché setImmediate permette all'Event Loop di progredire tra le iterazioni.
+
+**Domanda 10: B**  
+Sì, **ogni await crea una microtask Promise**. Quando si usa `await`, il codice dopo l'await viene accodato come Promise microtask e eseguito quando la Promise si risolve.
 
 ---
 
-## 🎯 Riepilogo Chiave
+## Conclusioni
 
-### ✅ Concetti Fondamentali
+Le **microtask** sono uno dei meccanismi più potenti e delicati di Node.js, fornendo controllo granulare sull'ordine di esecuzione del codice asincrono.
 
-1. **Microtask Queue = Priorità Assoluta**
-   - Eseguita PRIMA di qualsiasi fase dell'Event Loop
-   - Svuotata completamente prima di continuare
+### 🎯 Punti Chiave
 
-2. **Gerarchia di Priorità**
-   ```
-   1. Codice sincrono
-   2. process.nextTick() ⭐⭐⭐
-   3. Promise callbacks ⭐⭐
-   4. queueMicrotask() ⭐⭐
-   ────────────────────────────
-   5. Event Loop phases (timers, I/O, setImmediate...)
-   ```
+✅ **Priorità massima** - Eseguite prima dell'Event Loop  
+✅ **Due code** - nextTick queue (priorità più alta) e Promise queue  
+✅ **Svuotamento completo** - Dopo codice sincrono e dopo ogni fase  
+✅ **Rischio starvation** - Ricorsione infinita può bloccare Event Loop  
+✅ **Node.js specifico** - process.nextTick() non esiste nei browser  
 
-3. **process.nextTick() vs Promise**
-   - `nextTick()` = priorità più alta
-   - Promise = microtask standard
-   - Entrambi eseguiti prima dell'Event Loop
+### ⚠️ Rischi e Precauzioni
 
-4. **Microtask Starvation**
-   - Troppi nextTick ricorsivi bloccano l'Event Loop
-   - Soluzione: usa `setImmediate()` per operazioni lunghe
+1. **Microtask Starvation** - Ricorsione infinita blocca tutto
+2. **Performance** - Troppe microtask rallentano l'applicazione
+3. **Debugging difficile** - Ordine di esecuzione complesso
+4. **Memory pressure** - Accumulo di microtask usa memoria
+5. **Comportamento diverso browser/Node** - Attenzione al codice cross-platform
 
-### 🚀 Best Practices
+### 🚀 Best Practices Finali
 
-| ✅ DO | ❌ DON'T |
-|-------|----------|
-| Usa `process.nextTick()` per garantire ordine | Non creare ricorsione infinita con nextTick |
-| Usa `Promise` per operazioni async moderne | Non ignorare errori nelle Promise |
-| Usa `queueMicrotask()` per compatibilità browser | Non bloccare con operazioni CPU-intensive |
-| Gestisci sempre gli errori con `.catch()` | Non mixare callback sync/async |
-| Suddividi lavoro pesante con `setImmediate()` | Non abusare di microtask per tutto |
-| Monitora Event Loop lag in produzione | Non assumere ordine tra setTimeout e setImmediate |
+✅ Usa `nextTick` per defer operazioni non critiche  
+✅ Preferisci Promise per async operations  
+✅ Evita ricorsione infinita con nextTick  
+✅ Usa `setImmediate` per operazioni ricorsive  
+✅ Mantieni microtask callback veloci  
+✅ Monitora Event Loop lag  
+✅ Testa performance con carico reale  
 
 ### 📊 Quando Usare Cosa
 
-```javascript
-// 🎯 Garantire ordine dopo sync
-process.nextTick(() => {});
+**process.nextTick():**
+- Defer operazioni non critiche
+- Garantire callback consistentemente asincroni
+- Operazioni che devono essere eseguite ASAP
 
-// 🎯 Operazioni async moderne
-async function() {
-    await promise;
-}
+**Promise/async-await:**
+- Operazioni asincrone normali
+- Gestione errori pulita
+- Codice leggibile e manutenibile
 
-// 🎯 Compatibilità browser
-queueMicrotask(() => {});
-
-// 🎯 Defer dopo I/O
-setImmediate(() => {});
-
-// 🎯 Delay temporale
-setTimeout(() => {}, ms);
-```
-
-### 🔄 Pattern Comuni
-
-**1. Rendere callback consistente:**
-```javascript
-function getData(useCache, callback) {
-    if (useCache) {
-        process.nextTick(() => callback(null, cache));
-    } else {
-        db.query(callback);
-    }
-}
-```
-
-**2. Garantire listener pronti:**
-```javascript
-class Emitter {
-    emit(event, data) {
-        process.nextTick(() => {
-            this._listeners[event].forEach(cb => cb(data));
-        });
-    }
-}
-```
-
-**3. Batch processing:**
-```javascript
-async function processBatch(items) {
-    for (let i = 0; i < items.length; i += BATCH_SIZE) {
-        const batch = items.slice(i, i + BATCH_SIZE);
-        await Promise.all(batch.map(process));
-        await new Promise(resolve => setImmediate(resolve));
-    }
-}
-```
+**setImmediate():**
+- Operazioni ricorsive
+- Spezzare task lunghi
+- Dopo operazioni I/O
 
 ---
 
+## Risorse Aggiuntive
+
+### Documentazione Ufficiale
+- [Node.js process.nextTick](https://nodejs.org/api/process.html#process_process_nexttick_callback_args)
+- [Event Loop e Microtask](https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/)
+- [MDN queueMicrotask](https://developer.mozilla.org/en-US/docs/Web/API/queueMicrotask)
+
+### Approfondimenti
+- [Jake Archibald's Event Loop Talk](https://www.youtube.com/watch?v=cCOL7MC4Pl0)
+- [Understanding the Event Loop](https://blog.insiderattack.net/event-loop-and-the-big-picture-nodejs-event-loop-part-1-1cb67a182810)
+
+---
+
+**Versione documento**: 1.0  
+**Ultimo aggiornamento**: Ottobre 2025  
+**Compatibilità**: Node.js tutte le versioni  
+**Livello**: Intermedio/Avanzato
+
+---
+
+*"Microtasks are the express lane of Node.js async execution - powerful but dangerous if misused."*
