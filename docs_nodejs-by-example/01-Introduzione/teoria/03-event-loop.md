@@ -77,6 +77,18 @@ setTimeout(() => {
 - **NON garantisce** esecuzione esatta al tempo specificato
 - Esempio: `setTimeout(fn, 100)` esegue fn dopo *almeno* 100ms
 
+Esempio con setInterval:
+```javascript
+setInterval(() => {
+    console.log('Timer ripetuto!');
+}, 1000);
+```
+
+- Esegue i callback ripetuti ogni secondo
+- Se il callback impiega più di 1 secondo, le chiamate successive si accumulano
+- Usare con cautela per evitare sovraccarichi
+- Per cancellare: `clearInterval(intervalId)`, dove `intervalId` è l'ID restituito da `setInterval()`
+
 #### 📋 **Pending Callbacks Phase**
 ```javascript
 // Callback I/O differiti (es: errori TCP)
@@ -131,22 +143,22 @@ socket.on('close', () => {
 ### 2. Ciclo di Vita di un'Operazione
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│ 1. CODICE SINCRONO                                      │
-│    console.log('Inizio');                               │
-│    ↓                                                     │
-│ 2. OPERAZIONE ASINCRONA DELEGATA                        │
-│    fs.readFile('file.txt', callback);                   │
-│    ↓                                                     │
-│ 3. EVENT LOOP CONTINUA                                  │
-│    (esegue altro codice, non blocca)                    │
-│    ↓                                                     │
-│ 4. OPERAZIONE COMPLETATA → CALLBACK IN CODA            │
-│    (callback inserito nella poll queue)                 │
-│    ↓                                                     │
-│ 5. EVENT LOOP ESEGUE CALLBACK                           │
-│    (quando arriva alla fase appropriata)                │
-└─────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────┐
+│ 1. CODICE SINCRONO                              │
+│    console.log('Inizio');                       │
+│      ↓                                          │
+│ 2. OPERAZIONE ASINCRONA DELEGATA                │
+│    fs.readFile('file.txt', callback);           │
+│      ↓                                          │
+│ 3. EVENT LOOP CONTINUA                          │
+│    (esegue altro codice, non blocca)            │
+│      ↓                                          │
+│ 4. OPERAZIONE COMPLETATA → CALLBACK IN CODA     │
+│    (callback inserito nella poll queue)         │
+│      ↓                                          │
+│ 5. EVENT LOOP ESEGUE CALLBACK                   │
+│    (quando arriva alla fase appropriata)        │
+└─────────────────────────────────────────────────┘
 ```
 
 ### 💡 Esempio Pratico Completo
