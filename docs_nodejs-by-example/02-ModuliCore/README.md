@@ -3,13 +3,13 @@
 In questa esercitazione esploreremo i moduli core di Node.js, imparando come utilizzare le funzionalità native senza dipendenze esterne.
 
 ## Obiettivi di Apprendimento
-- ✅ Comprendere il sistema di moduli di Node.js (CommonJS vs ES Modules)
-- ✅ Padroneggiare l'uso dei moduli core fondamentali (fs, path, http, events, os, util)
-- ✅ Implementare server HTTP di base e gestire richieste
-- ✅ Manipolare il file system in modo sincrono e asincrono
-- ✅ Creare sistemi di eventi personalizzati con EventEmitter
-- ✅ Gestire percorsi di file cross-platform
-- ✅ Ottenere informazioni sul sistema operativo
+- Comprendere il sistema di moduli di Node.js (CommonJS vs ES Modules)
+- Padroneggiare l'uso dei moduli core fondamentali (fs, path, http, events, os, util)
+- Implementare server HTTP di base e gestire richieste
+- Manipolare il file system in modo sincrono e asincrono
+- Creare sistemi di eventi personalizzati con EventEmitter
+- Gestire percorsi di file cross-platform
+- Ottenere informazioni sul sistema operativo
 
 ## Argomenti Teorici Collegati
 - [Moduli in Node.js](./teoria/01-Moduli_in_Node.md)
