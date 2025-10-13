@@ -18,7 +18,7 @@ Questa prima esercitazione ti introdurrà a Node.js, spiegandone le caratteristi
 - [4. Event Loop](./teoria/04-event-loop.md)
 - [5. Programmazione Asincrona](./teoria/05-programmazione-asincrona.md)
 - [6. REPL di Node.js](./teoria/06-repl.md)
-</br>**Approfondimenti:**
+</br></br>**Approfondimenti:**
 - [async/await](./teoria/async_await.md)
 - [callback](./teoria/callback.md)
 - [callback concetti avanzati](./teoria/callback_concetti_avanzati.md)
