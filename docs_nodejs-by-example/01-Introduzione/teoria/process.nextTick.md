@@ -3,12 +3,12 @@
 ## 📚 Obiettivi di Apprendimento
 
 Al termine di questa guida saprai:
-- ✅ Cos'è `process.nextTick()` e come funziona
-- ✅ La differenza tra nextTick, Promise, setImmediate e setTimeout
-- ✅ Quando usare (e quando NON usare) process.nextTick()
-- ✅ Come evitare il "nextTick recursion" e il blocco dell'Event Loop
-- ✅ Pattern comuni e best practices
-- ✅ Debugging e troubleshooting
+- Cos'è `process.nextTick()` e come funziona
+- La differenza tra nextTick, Promise, setImmediate e setTimeout
+- Quando usare (e quando NON usare) process.nextTick()
+- Come evitare il "nextTick recursion" e il blocco dell'Event Loop
+- Pattern comuni e best practices
+- Debugging e troubleshooting
 
 ---
 
