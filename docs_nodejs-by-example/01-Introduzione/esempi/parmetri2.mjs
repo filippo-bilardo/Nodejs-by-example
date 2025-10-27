@@ -5,11 +5,11 @@ argv.forEach((val, index) => {
   console.log(`${index}: ${val}`);
 });
 
-// node process-args.js one two=three four
+// node parametri2.mjs one two=three four
 
 // Output:
 // 0: /path/to/node
-// 1: /path/to/process-args.js
+// 1: /path/to/parametri2.mjs
 // 2: one
 // 3: two=three
 // 4: four

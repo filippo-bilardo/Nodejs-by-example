@@ -110,11 +110,11 @@ async function sequenziale() {
 }
 ```
 
-### 2. Esecuzione Parallela
+### 2. Esecuzione Concorrente
 
 ```javascript
 // Con Promise
-function parallela() {
+function concorrente() {
   return Promise.all([
     primaOperazione(),
     secondaOperazione(),
@@ -123,7 +123,7 @@ function parallela() {
 }
 
 // Con Async/Await
-async function parallela() {
+async function concorrente() {
   const [risultato1, risultato2, risultato3] = await Promise.all([
     primaOperazione(),
     secondaOperazione(),
@@ -216,17 +216,11 @@ const readFilePromise = promisify(fs.readFile);
 ## Best Practices
 
 1. **Evitare il Callback Hell**: Utilizzare Promise o async/await per codice più leggibile
-
 2. **Gestire Sempre gli Errori**: Non lasciare Promise non gestite o operazioni asincrone senza gestione degli errori
-
 3. **Non Mixare Stili**: Scegliere un approccio (callbacks, Promise o async/await) e mantenerlo coerente
-
 4. **Utilizzare util.promisify**: Per convertire API basate su callback in Promise
-
 5. **Attenzione alle Race Condition**: Essere consapevoli dell'ordine non deterministico delle operazioni asincrone
-
 6. **Non Bloccare l'Event Loop**: Suddividere operazioni CPU-intensive in parti più piccole
-
 7. **Utilizzare async/await con Moderazione**: Non abusare di await quando le operazioni possono essere eseguite in parallelo
 
 ## Strumenti e Librerie Utili
