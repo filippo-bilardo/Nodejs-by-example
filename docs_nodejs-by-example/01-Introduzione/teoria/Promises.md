@@ -87,9 +87,9 @@ Una Promise può trovarsi in **3 stati**:
 ┌─────────────────────────────────────────────────┐
 │                                                 │
 │  PENDING (In attesa)                            │
-│  ↓                                              │
+│     ↓                                           │
 │  Operazione asincrona in corso...               │
-│  ↓                                              │
+│     ↓                                           │
 │  ┌─────────────────────┐  ┌──────────────────┐  │
 │  │  ✅ FULFILLED       │ │  ❌ REJECTED     │  │
 │  │  (Completata)       │  │  (Fallita)       │  │

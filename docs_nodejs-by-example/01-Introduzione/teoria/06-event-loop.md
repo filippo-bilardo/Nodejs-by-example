@@ -516,8 +516,8 @@ console.log('1. 🟢 Sync end');
 // 2. 🚀 NextTick 1
 // 3. 🚀 NextTick 2 (nested)
 // 4. 💎 Promise
-// 5. ⏱️  Timer 0ms      ← Ordine può variare
-// 6. ⚡ Immediate       ← con Immediate
+// 5. ⏱️ Timer 0ms      ← Ordine può variare
+// 6. ⚡ Immediate      ← con Immediate
 ```
 
 ### 🤔 setTimeout vs setImmediate: Chi Vince?

@@ -41,7 +41,7 @@ console.log('Questa riga viene eseguita prima della lettura del file');
 
 ### 2. Promises
 
-Oggetti che rappresentano il completamento (o il fallimento) futuro di un'operazione asincrona:
+Le Promises sono oggetti che rappresentano il completamento (o il fallimento) futuro di un'operazione asincrona. Sono state introdotte in ES6 nel 2015.
 
 ```javascript
 fs.promises.readFile('file.txt', 'utf8')
@@ -64,7 +64,7 @@ console.log('Questa riga viene eseguita prima della lettura del file');
 - Debugging più difficile rispetto al codice sincrono
 
 ### 3. Async/Await
-
+Async/await è una sintassi introdotta in ECMAScript 2017 (ES2017) che permette di scrivere codice asincrono in modo più leggibile e simile al codice sincrono, utilizzando le parole chiave `async` e `await`.
 Sintassi che permette di scrivere codice asincrono che appare sincrono:
 
 ```javascript

@@ -8,7 +8,7 @@
 
 const fs = require('fs');
 
-console.log('Inizio');
+console.log('Inizio', __filename);
 
 // Lettura file (operazione I/O asincrona)
 fs.readFile(__filename, () => {

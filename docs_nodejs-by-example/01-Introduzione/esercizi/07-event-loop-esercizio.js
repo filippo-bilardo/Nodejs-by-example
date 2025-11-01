@@ -27,6 +27,7 @@ Promise.resolve()
     .then(() => {
         console.log('Promise 2');
         setTimeout(() => console.log('Timer in Promise 2'), 0);
+        process.nextTick(() => console.log('NextTick in Promise 2'));
     });
 
 process.nextTick(() => {
@@ -36,6 +37,7 @@ process.nextTick(() => {
 
 setImmediate(() => {
     console.log('Immediate 1');
+    Promise.resolve().then(() => console.log('Promise in Immediate 1'));
     process.nextTick(() => console.log('NextTick in Immediate 1'));
 });
 
@@ -59,16 +61,17 @@ console.log('End');
  * NextTick 2
  * Promise 1
  * Promise in NextTick 1
- * NextTick in Promise 1
  * Promise 2
+ * NextTick in Promise 1
+ * NextTick in Promise 2
  * Timer 1
- * Timer 2
  * NextTick in Timer 1
  * Promise in Timer 1
- * Timer in Promise 2
- * Immediate in Timer 2
- * Immediate 1
+ * Timer 2 (l'ordine con Immediate può variare)
+ * Timer in Promise 2 (l'ordine con Immediate può variare)
+ * Immediate 1 (l'ordine con Timer può variare)
  * NextTick in Immediate 1
+ * Immediate in Timer 2
  * 
  * ANALISI:
  * - Il codice sincrono viene eseguito per primo (Start, End)

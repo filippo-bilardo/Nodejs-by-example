@@ -33,6 +33,19 @@ Codice Sincrono Tradizionale:
 │ 6. Prendi cornetto             │
 └────────────────────────────────┘
 
+Callback Hell:
+┌────────────────────────────────┐
+│ ordinaCaffè((caffe) => {       │
+│   prendi(caffe, () => {        │
+│     ordinaCornetto((cornetto) => { │
+│       prendi(cornetto, () => { │
+│         // finito              │
+│       });                      │
+│     });                        │
+│   });                          │
+│ });                            │
+└────────────────────────────────┘
+
 Promise con .then():
 ┌────────────────────────────────┐
 │ ordina().then(caffe => {       │
