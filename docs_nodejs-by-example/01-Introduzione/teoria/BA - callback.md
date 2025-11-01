@@ -136,7 +136,7 @@ console.log('Fine');
 ### Anatomia di un Callback asincrono
 
 ```javascript
-// Funzione che accetta un callback
+// Funzione che accetta una callback
 function operazioneAsincrona(parametro, callback) {
     // 1. Esegue operazione
     setTimeout(() => {
@@ -520,6 +520,8 @@ fs.readFile(..., function(err, data) {
 
 ### Soluzione 1: Named Functions (Funzioni Nominate)
 
+Questo metodo risolve il problema del "callback hell" definendo funzioni nominate separate per ogni passaggio dell'operazione asincrona. Invece di annidare callback anonimi, ogni funzione gestisce una singola lettura di file o scrittura, passando i dati alla funzione successiva. Questo migliora la leggibilità, riduce l'indentazione eccessiva e facilita il debugging, poiché ogni funzione ha un nome chiaro e può essere riutilizzata o testata indipendentemente. Ad esempio, nel primo snippet, `leggiFile1` inizia la catena, mentre nel secondo, `leggiPosts` elabora i dati dell'utente prima di passare a `leggiCommenti`. È ideale per flussi sequenziali di operazioni I/O in Node.js.
+
 ```javascript
 const fs = require('fs');
 
@@ -597,6 +599,8 @@ fs.readFile('utente.json', 'utf8', function(err, data) {
 ```
 
 ### Soluzione 2: Modularizzazione
+
+La modularizzazione è una tecnica che consiste nel dividere il codice in moduli indipendenti e riutilizzabili, migliorando la leggibilità, la manutenzione e la scalabilità. Negli esempi forniti, le funzioni per operazioni sui file (lettura, scrittura, concatenazione) o sui JSON sono incapsulate in moduli separati (come file-utils.js o fileUtils.js), esportati con module.exports e importati in main.js. Questo evita la ripetizione del codice, facilita il testing e permette di gestire errori in modo centralizzato attraverso callback asincroni. Ad esempio, concatenaFile gestisce iterativamente la lettura di più file senza annidare troppi callback, rendendo il flusso più lineare e meno soggetto a errori.
 
 ```javascript
 // file-utils.js
