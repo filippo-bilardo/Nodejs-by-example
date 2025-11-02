@@ -1,0 +1,19 @@
+{
+  "name": "01-tcp-base",
+  "version": "1.0.0",
+  "description": "TCP Base example with statistics and timeout management",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "client": "node client.js"
+  },
+  "keywords": [
+    "tcp",
+    "echo",
+    "server",
+    "socket",
+    "networking"
+  ],
+  "author": "",
+  "license": "MIT"
+}

@@ -429,7 +429,7 @@ const dgram = require('dgram');
 
 ### Architettura Event-Driven
 
-Socket in Node.js sono **Event Emitters**:
+Socket in Node.js sono **Event Emitters**: I socket non funzionano in modo sincrono (dove aspetteresti il completamento di un'operazione), ma in modo asincrono basato su eventi. Invece di bloccare l'esecuzione aspettando dati, registri dei listener che reagiscono quando succede qualcosa.
 
 ```javascript
 const net = require('net');

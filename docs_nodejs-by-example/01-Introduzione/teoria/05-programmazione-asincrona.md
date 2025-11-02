@@ -135,6 +135,8 @@ async function concorrente() {
 
 ### 3. Race Condition (Prima Operazione Completata)
 
+Promise.race è un metodo che prende un array di promesse e restituisce una nuova promessa che si risolve (o rifiuta) non appena la prima promessa nell'array si risolve o rifiuta. È utile per "gareggiare" tra operazioni asincrone, dove vuoi ottenere il risultato della più veloce.
+
 ```javascript
 function race() {
   return Promise.race([
@@ -160,6 +162,15 @@ fs.readFile('file.txt', (err, data) => {
   // Gestione del successo
 });
 ```
+**Rischi della Gestione degli Errori con Callback Annidate:**
+
+Quando si utilizzano callback annidate, la gestione degli errori diventa particolarmente complessa e soggetta a rischi:
+
+- **Propagazione degli Errori**: Gli errori possono non essere propagati correttamente attraverso i livelli di annidamento, portando a comportamenti imprevisti o a errori non gestiti che causano il crash dell'applicazione.
+- **Perdita di Errori**: È facile dimenticare di controllare il parametro `err` in alcuni callback interni, lasciando errori non gestiti che possono rimanere silenti fino a quando non causano problemi critici.
+- **Debugging Difficile**: Il flusso di esecuzione non lineare rende difficile tracciare l'origine di un errore, specialmente in callback profondamente annidate, aumentando il tempo necessario per identificare e correggere bug.
+- **Codice Fragile**: Modifiche al codice possono introdurre nuovi punti di fallimento, e la mancanza di una gestione centralizzata degli errori aumenta il rischio di omissioni accidentali.
+- **Callback Hell Amplificato**: L'annidamento eccessivo non solo rende il codice illeggibile, ma anche la gestione degli errori più incline a errori umani, come la mancata chiamata di `return` dopo un errore, che permette l'esecuzione di codice successivo indesiderato.
 
 ### 2. Con Promises
 
