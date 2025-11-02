@@ -1,7 +1,5 @@
 # Gestione delle Dipendenze
 
-## Introduzione alla Gestione delle Dipendenze
-
 La gestione delle dipendenze è uno degli aspetti più importanti dello sviluppo di applicazioni Node.js. Un'applicazione moderna può dipendere da decine o centinaia di pacchetti esterni, ciascuno con le proprie dipendenze. NPM semplifica questo processo complesso, permettendo agli sviluppatori di concentrarsi sulla logica dell'applicazione anziché sulla gestione manuale delle librerie.
 
 ## Tipi di Dipendenze

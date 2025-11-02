@@ -1,0 +1,18 @@
+{
+  "name": "08-heartbeat",
+  "version": "1.0.0",
+  "description": "Heartbeat mechanism for connection health monitoring",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "client": "node client.js"
+  },
+  "keywords": [
+    "tcp",
+    "heartbeat",
+    "keepalive",
+    "monitoring"
+  ],
+  "author": "",
+  "license": "MIT"
+}

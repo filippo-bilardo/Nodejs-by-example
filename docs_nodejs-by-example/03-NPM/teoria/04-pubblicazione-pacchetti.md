@@ -1,7 +1,5 @@
 # Pubblicazione di Pacchetti su NPM
 
-## Introduzione alla Pubblicazione di Pacchetti
-
 Uno degli aspetti più potenti dell'ecosistema Node.js è la possibilità di condividere il proprio codice con la comunità attraverso NPM. Pubblicare un pacchetto su NPM permette ad altri sviluppatori di utilizzare facilmente le tue librerie, componenti o strumenti, contribuendo alla crescita dell'ecosistema JavaScript.
 
 ## Preparazione di un Pacchetto per la Pubblicazione

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Socket.io - Hello World</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin-bottom: 10px;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        
+        .status.connected {
+            background: #27ae60;
+        }
+        
+        .status.disconnected {
+            background: #e74c3c;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+        }
+        
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #5568d3;
+        }
+        
+        button:active {
+            transform: scale(0.98);
+        }
+        
+        #messages {
+            background: #f8f9fa;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        
+        .message {
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 4px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .message.system {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+        
+        .message.sent {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .message.received {
+            background: #fff3e0;
+            color: #e65100;
+        }
+        
+        .message.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .timestamp {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-left: 10px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            border: 2px solid #ddd;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+        }
+        
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Socket.io Hello World</h1>
+            <div id="connectionStatus" class="status disconnected">Disconnesso</div>
+            <div style="margin-top: 10px; font-size: 14px;">
+                Socket ID: <span id="socketId">-</span>
+            </div>
+        </div>
+        
+        <div class="content">
+            <!-- Invia Messaggio -->
+            <div class="section">
+                <h2>📩 Invia Messaggio</h2>
+                <div class="input-group">
+                    <input type="text" id="messageInput" placeholder="Scrivi un messaggio...">
+                    <button onclick="sendMessage()">Invia</button>
+                </div>
+            </div>
+            
+            <!-- Test Buttons -->
+            <div class="section">
+                <h2>🧪 Test Funzioni</h2>
+                <div class="button-group">
+                    <button onclick="testEcho()">Echo Test</button>
+                    <button onclick="testPing()">Ping Test</button>
+                    <button onclick="getStats()">Get Stats</button>
+                    <button onclick="testBroadcast()">Broadcast</button>
+                </div>
+            </div>
+            
+            <!-- Messaggi -->
+            <div class="section">
+                <h2>💬 Messaggi</h2>
+                <div id="messages"></div>
+                <button onclick="clearMessages()" style="margin-top: 10px; width: 100%;">Pulisci Messaggi</button>
+            </div>
+            
+            <!-- Statistiche -->
+            <div class="section">
+                <h2>📊 Statistiche</h2>
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalConnections">-</div>
+                        <div class="stat-label">Totale Connessioni</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="activeConnections">-</div>
+                        <div class="stat-label">Connessioni Attive</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalMessages">-</div>
+                        <div class="stat-label">Messaggi Totali</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="uptime">-</div>
+                        <div class="stat-label">Uptime (s)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Socket.io client library -->
+    <script src="/socket.io/socket.io.js"></script>
+    
+    <script src="client.js"></script>
+</body>
+</html>

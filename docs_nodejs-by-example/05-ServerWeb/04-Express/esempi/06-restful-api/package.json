@@ -1,0 +1,12 @@
+{
+  "name": "06-restful-api",
+  "version": "1.0.0",
+  "description": "API REST completa con Express",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

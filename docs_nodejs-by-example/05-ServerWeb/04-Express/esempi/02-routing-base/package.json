@@ -1,0 +1,12 @@
+{
+  "name": "02-routing-base",
+  "version": "1.0.0",
+  "description": "Esempi di routing in Express",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

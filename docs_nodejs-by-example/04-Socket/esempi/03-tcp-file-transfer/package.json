@@ -1,0 +1,19 @@
+{
+  "name": "03-tcp-file-transfer",
+  "version": "1.0.0",
+  "description": "TCP file transfer with upload/download and progress tracking",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "client": "node client.js"
+  },
+  "keywords": [
+    "tcp",
+    "file-transfer",
+    "upload",
+    "download",
+    "socket"
+  ],
+  "author": "",
+  "license": "MIT"
+}

@@ -19,103 +19,24 @@ Questa prima esercitazione ti introdurrà a Node.js, spiegandone le caratteristi
 - [5. Programmazione Asincrona](./teoria/05-programmazione-asincrona.md)
 - [6. Event Loop](./teoria/06-event-loop.md)
 </br></br>**Approfondimenti:**
-- [async/await](./teoria/async_await.md)
-- [callback](./teoria/callback.md)
+- [microtask](<teoria/AB - microtask.md>) 
+- [process.nextTick](<teoria/AB - process.nextTick.md>) 
+- [setTimeout e setInterval](<teoria/AC - setTimeout_setInterval.md>) 
+- [setImmediate](<teoria/AD - setImmediate.md>) 
+- [close_callbacks](<teoria/AE - close_callbacks.md>) 
+- [pending_callbacks](<teoria/AE - pending_callbacks.md>) 
+- [libuv](<teoria/AF - libuv.md>) 
+- [callback](<teoria/BA - callback.md>) 
+- [Promises](<teoria/BB - Promises.md>) 
+- [Async-Await](<teoria/BC - codice asincrono con Async-Await.md>)
 - [callback concetti avanzati](./teoria/callback_concetti_avanzati.md)
-- [close_callbacks](./teoria/close_callbacks.md)
 - [event-loop concetti avanzati](./teoria/event-loop_concetti_avanzati.md)
-- [libuv](./teoria/libuv.md)
-- [microtask](./teoria/microtask.md)
-- [pending_callbacks](./teoria/pending_callbacks.md)
-- [process.nextTick](./teoria/process.nextTick.md)
-- [Promises](./teoria/Promises.md)
-- [setImmediate](./teoria/setImmediate.md)
-- [setTimeout e setInterval](./teoria/setTimeout_setInterval.md)
 - [Worker Threads](./teoria/Worker_Threads.md)
 
-## Esercizi Pratici
+## Esercitazioni Pratiche
 
-### Esercizio 1.1: Installazione di Node.js
-1. Visita [nodejs.org](https://nodejs.org/)
-2. Scarica la versione LTS (Long Term Support) per il tuo sistema operativo
-3. Installa Node.js seguendo le istruzioni
-4. Verifica l'installazione con i comandi:
-
-```bash
-node -v
-npm -v
-```
-
-### Esercizio 1.2: Hello World
-1. Crea un file chiamato `hello.js` con il seguente contenuto:
-
-```javascript
-console.log('Hello, Node.js!');
-```
-
-2. Esegui il file con Node.js:
-
-```bash
-node hello.js
-```
-
-### Esercizio 1.3: Utilizzo della REPL (Read–Eval–Print Loop)
-1. Apri la REPL di Node.js digitando `node` nel terminale
-2. Sperimenta con alcune espressioni JavaScript:
-
-```javascript
-1 + 1
-"Node.js".toUpperCase()
-const saluto = "Ciao"
-saluto + " mondo!"
-```
-
-3. Premi Ctrl+D (o Ctrl+C due volte) per uscire dalla REPL
-
-### Esercizio 1.4: Informazioni sul Sistema
-1. Crea un file chiamato `node-info.js` con il seguente contenuto:
-
-```javascript
-console.log('Versione Node.js:', process.version);
-console.log('Sistema operativo:', process.platform);
-console.log('Architettura CPU:', process.arch);
-console.log('Directory corrente:', process.cwd());
-console.log('Tempo di esecuzione (secondi):', process.uptime());
-```
-
-2. Esegui il file e osserva le informazioni sul tuo ambiente
-
-### Esercizio 1.5: Primo Script Asincrono
-   - Crea un file `async.js` con il seguente contenuto:
-     ```javascript
-     console.log('Inizio');
-     
-     setTimeout(() => {
-       console.log('Operazione asincrona completata');
-     }, 2000);
-     
-     console.log('Fine');
-     ```
-   - Eseguilo e osserva l'ordine di esecuzione
-
-## Sfida Aggiuntiva
-Crea uno script chiamato `fibonacci.js` che calcoli e visualizzi i primi 10 numeri della sequenza di Fibonacci:
-
-```javascript
-// Soluzione di esempio (da implementare autonomamente)
-function fibonacci(n) {
-    const sequence = [0, 1];
-    for (let i = 2; i < n; i++) {
-        sequence[i] = sequence[i-1] + sequence[i-2];
-    }
-    return sequence;
-}
-
-const result = fibonacci(10);
-console.log('I primi 10 numeri della sequenza di Fibonacci:');
-console.log(result);
-```
-
+- [ES01 - Introduzione a Node](https://docs.google.com/presentation/d/1io47Fa1ybT-e0npThQQ8ndE-_Q1gHRGMnrq-a0Tl_0c)
+- [ES02 - L'Event Loop](https://docs.google.com/presentation/d/1EzPyxiYQg4top0YbGJCznnL_j-mZYWvPaStsta98mBQ)
 
 ## Risorse Aggiuntive
 

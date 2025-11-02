@@ -1,0 +1,20 @@
+{
+  "name": "02-tcp-chat-server",
+  "version": "1.0.0",
+  "description": "TCP Multi-Client Chat Server with rooms, usernames and commands",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "client": "node client.js"
+  },
+  "keywords": [
+    "tcp",
+    "chat",
+    "server",
+    "multi-client",
+    "rooms",
+    "socket"
+  ],
+  "author": "",
+  "license": "MIT"
+}

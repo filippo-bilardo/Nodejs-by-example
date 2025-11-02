@@ -1,0 +1,12 @@
+{
+  "name": "01-basic-eventemitter",
+  "version": "1.0.0",
+  "description": "Esempio base di EventEmitter",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": ["eventemitter", "events", "nodejs"],
+  "author": "",
+  "license": "MIT"
+}

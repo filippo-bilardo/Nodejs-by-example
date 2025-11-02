@@ -1,0 +1,21 @@
+{
+  "name": "04-template-ejs",
+  "version": "1.0.0",
+  "description": "Esempio uso template engine EJS con Express",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "keywords": [
+    "express",
+    "ejs",
+    "template",
+    "views"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "ejs": "^3.1.9",
+    "express": "^4.18.2"
+  }
+}

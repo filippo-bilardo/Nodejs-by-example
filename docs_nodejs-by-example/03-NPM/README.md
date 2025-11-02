@@ -156,9 +156,12 @@ app.listen(port, () => {
 - [Documentazione ufficiale di NPM](https://docs.npmjs.com/)
 - [Guida a package.json](https://docs.npmjs.com/cli/v7/configuring-npm/package-json)
 - [NPM Cheat Sheet](https://www.freecodecamp.org/news/npm-cheat-sheet-most-common-commands-and-nvm/)
+- [Semantic Versioning](https://semver.org/)
+- [Creazione di pacchetti Node.js](https://docs.npmjs.com/creating-node-js-modules)
+- [NPM CLI Commands](https://docs.npmjs.com/cli/v8/commands)
 
-## Navigazione
+## Navigazione del Corso
 
 - [Indice del Corso](../README.md)
 - Modulo Precedente: [Moduli Core](../02-ModuliCore/README.md)
-- Modulo Successivo: [Express.js](../04-Express/README.md)
+- Modulo Successivo: [Socket](../04-Socket/README.md)

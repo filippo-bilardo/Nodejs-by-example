@@ -1,0 +1,21 @@
+{
+  "name": "02-chat-room",
+  "version": "1.0.0",
+  "description": "Multi-room chat with Socket.io",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "socket.io",
+    "chat",
+    "rooms",
+    "real-time"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2"
+  }
+}

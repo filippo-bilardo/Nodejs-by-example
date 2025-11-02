@@ -24,7 +24,23 @@ Invece di "reinventare la ruota", gli sviluppatori possono utilizzare pacchetti 
 ### 2. Gestione delle Dipendenze
 NPM gestisce automaticamente le dipendenze di un progetto, incluse le dipendenze delle dipendenze (dipendenze annidate).
 
-### 3. Versionamento
+NPM semplifica l'aggiunta, l'aggiornamento e la rimozione delle dipendenze nei progetti Node.js. Tutte le dipendenze vengono tracciate nel file `package.json`.
+
+```bash
+# Installare una dipendenza
+npm install nome-pacchetto
+
+# Installare una dipendenza con una versione specifica
+npm install nome-pacchetto@1.2.3
+
+# Installare una dipendenza di sviluppo
+npm install --save-dev nome-pacchetto
+
+# Rimuovere una dipendenza
+npm uninstall nome-pacchetto
+```
+
+### 3. Versioning
 Supporta il versionamento semantico (SemVer), permettendo agli sviluppatori di specificare quali versioni di un pacchetto sono compatibili con il loro progetto.
 
 ### 4. Ecosistema Collaborativo
@@ -35,10 +51,15 @@ Facilita la collaborazione tra sviluppatori, permettendo di condividere facilmen
 Ecco alcuni dei comandi più comuni di NPM:
 
 ### Inizializzazione di un Progetto
+
+NPM permette di inizializzare rapidamente nuovi progetti Node.js:
+
 ```bash
 npm init           # Inizializza un nuovo progetto con richieste interattive
 npm init -y        # Inizializza un nuovo progetto con valori predefiniti
 ```
+
+Questo comando avvia un processo interattivo che ti guida nella creazione di un file `package.json`.
 
 ### Installazione di Pacchetti
 ```bash
@@ -57,11 +78,33 @@ npm list                           # Mostra i pacchetti installati
 npm outdated                       # Mostra i pacchetti obsoleti
 ```
 
-### Esecuzione di Script
+### Pubblicazione di pacchetti
+
+NPM permette di pubblicare i tuoi pacchetti nel registro pubblico:
+
 ```bash
-npm run <script>                    # Esegue uno script definito in package.json
-npm start                          # Scorciatoia per npm run start
-npm test                           # Scorciatoia per npm run test
+npm publish
+```
+
+### Esecuzione di Script
+
+NPM consente di definire e eseguire script nel file `package.json`:
+
+```json
+{
+  "scripts": {
+    "start": "node index.js",
+    "test": "jest",
+    "build": "webpack"
+  }
+}
+```
+
+Puoi eseguire questi script con:
+
+```bash
+npm run start
+npm test  # Scorciatoia per npm run test
 ```
 
 ## NPM vs Yarn vs pnpm
@@ -73,6 +116,12 @@ Sviluppato da Facebook, Yarn è stato creato per risolvere alcuni problemi di NP
 
 ### pnpm
 Un gestore di pacchetti più recente che utilizza un approccio di archiviazione efficiente, condividendo i pacchetti tra progetti per risparmiare spazio su disco e velocizzare le installazioni.
+
+## Struttura della cartella node_modules
+
+Quando installi pacchetti con NPM, questi vengono scaricati nella cartella `node_modules` del tuo progetto. Questa cartella contiene tutti i pacchetti di cui il tuo progetto dipende, insieme alle loro dipendenze.
+
+È importante notare che la cartella `node_modules` può diventare molto grande e non dovrebbe essere inclusa nel controllo di versione. Per questo motivo, è comune aggiungere `node_modules/` al file `.gitignore`.
 
 ## Conclusione
 
