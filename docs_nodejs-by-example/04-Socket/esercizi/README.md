@@ -125,6 +125,98 @@ Service discovery con UDP broadcast/multicast.
 
 ---
 
+### 1. [Chat Application](01-chat-application/)
+**Livello:** Intermedio  
+**Durata stimata:** 2-3 ore
+
+**Obiettivo:**  
+Creare un'applicazione di chat completa con room, typing indicators e persistenza messaggi.
+
+**Requisiti:**
+- Sistema di autenticazione (username)
+- Creazione/join room
+- Invio/ricezione messaggi
+- Typing indicators
+- Lista utenti online
+- Lista room disponibili
+- Storico messaggi per room
+- Notifiche join/leave
+
+**Tecnologie:**
+- Socket.io 4.x
+- Express.js
+- HTML/CSS/JavaScript
+
+**Valutazione:**
+- Funzionalità base (40%)
+- Gestione errori (20%)
+- UI/UX (20%)
+- Codice pulito (20%)
+
+---
+
+### 2. [Real-time Dashboard](02-dashboard/)
+**Livello:** Avanzato  
+**Durata stimata:** 3-4 ore
+
+**Obiettivo:**  
+Dashboard real-time che mostra metriche di sistema con grafici aggiornati in tempo reale.
+
+**Requisiti:**
+- Streaming dati real-time
+- Grafici aggiornati in tempo reale
+- Multiple metriche (CPU, RAM, Network)
+- Storico dati
+- Alert per soglie critiche
+- Export dati
+- Throttling eventi (max 1/sec)
+
+**Tecnologie:**
+- Socket.io 4.x
+- Express.js
+- Chart.js
+- HTML/CSS/JavaScript
+
+**Valutazione:**
+- Streaming dati (30%)
+- Grafici funzionanti (25%)
+- Performance (25%)
+- Codice organizzato (20%)
+
+---
+
+### 3. [Multiplayer Game](03-multiplayer-game/)
+**Livello:** Avanzato  
+**Durata stimata:** 4-6 ore
+
+**Obiettivo:**  
+Gioco multiplayer real-time (es. Tic-Tac-Toe o simile).
+
+**Requisiti:**
+- Matchmaking
+- Game state synchronization
+- Turn-based logic
+- Win/lose detection
+- Rematch function
+- Spectator mode
+- Disconnect handling
+- Leaderboard
+
+**Tecnologie:**
+- Socket.io 4.x
+- Express.js
+- HTML5 Canvas (opzionale)
+- HTML/CSS/JavaScript
+
+**Valutazione:**
+- Game logic (30%)
+- Sincronizzazione (30%)
+- Gestione disconnect (20%)
+- UI/UX (20%)
+
+---
+
+
 ## 🎯 Come Completare gli Esercizi
 
 ### 1. Studia Teoria

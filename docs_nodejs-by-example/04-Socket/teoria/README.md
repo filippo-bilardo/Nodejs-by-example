@@ -73,6 +73,54 @@ Implementazione di protocolli custom:
 **Prerequisiti:** Tutte le guide precedenti  
 **Tempo lettura:** 60 minuti
 
+### 6. [Introduzione a Socket.io](06-socket.io_introduzione.md)
+- Cos'è Socket.io
+- WebSocket vs HTTP
+- Architettura client-server real-time
+- Installazione e setup
+- Primo esempio "Hello World"
+- Confronto con altre tecnologie
+
+### 7. [Eventi e Comunicazione](07-socket.io_eventi-comunicazione.md)
+- Sistema di eventi Socket.io
+- Emettere eventi dal server
+- Ascoltare eventi sul client
+- Eventi bidirezionali
+- Acknowledgments (callback)
+- Eventi predefiniti
+- Eventi personalizzati
+- Gestione errori
+
+### 8. [Room e Namespace](08-socket.io_room-namespace.md)
+- Concetto di Room
+- Creare e gestire room
+- Join/Leave room
+- Broadcasting in room
+- Namespace
+- Namespace multipli
+- Comunicazione tra namespace
+- Use case pratici
+
+### 9. [Broadcasting e Targeting]()
+- Broadcast a tutti i client
+- Broadcast a room specifiche
+- Broadcast a tutti tranne il mittente
+- Targeting specifico per socket ID
+- Flag di broadcasting
+- Volatile messages
+- Compression
+- Binary data
+
+### 10. [Middleware e Autenticazione]()
+- Middleware in Socket.io
+- Autenticazione JWT
+- Handshake authentication
+- Middleware per namespace
+- Middleware per socket
+- Gestione sessioni
+- Rate limiting
+- Security best practices
+
 ---
 
 ## 🎯 Percorso di Apprendimento Consigliato

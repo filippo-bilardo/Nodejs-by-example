@@ -8,7 +8,7 @@ L'**architettura event-driven** (EDA - Event-Driven Architecture) è un paradigm
 
 ```
 ┌─────────────┐         ┌──────────────┐         ┌─────────────┐
-│   Emitter   │ ─────▶ │    Event     │  ─────▶ │  Listeners  │
+│   Emitter   │ ─────>  │    Event     │  ─────> │  Listeners  │
 │  (Sorgente) │         │  (Messaggio) │         │  (Handler)  │
 └─────────────┘         └──────────────┘         └─────────────┘
 ```
@@ -69,91 +69,7 @@ console.log('Fine');
 
 ## L'Event Loop di Node.js
 
-### Architettura Generale
-
-```
-┌───────────────────────────┐
-│    JavaScript Code        │
-│   (Single Thread)         │
-└───────────┬───────────────┘
-            │
-            ▼
-┌───────────────────────────┐
-│      Event Loop           │
-│   ┌─────────────────┐     │
-│   │  Timer Phase    │     │
-│   ├─────────────────┤     │
-│   │  Poll Phase     │     │
-│   ├─────────────────┤     │
-│   │  Check Phase    │     │
-│   └─────────────────┘     │
-└───────────┬───────────────┘
-            │
-            ▼
-┌───────────────────────────┐
-│      libuv                │
-│  (Thread Pool, OS APIs)   │
-└───────────────────────────┘
-```
-
-### Come Funziona
-
-1. **Codice JavaScript** esegue in un singolo thread
-2. **Operazioni asincrone** vengono delegate a libuv
-3. **Thread pool** (default 4 threads) gestisce operazioni bloccanti
-4. **Event Loop** coordina callback quando operazioni completano
-
-### Esempio Completo
-
-```javascript
-const fs = require('fs');
-const crypto = require('crypto');
-
-console.log('1. Start');
-
-// Timer (macrotask)
-setTimeout(() => {
-  console.log('4. Timeout callback');
-}, 0);
-
-// I/O operation
-fs.readFile(__filename, () => {
-  console.log('5. File read callback');
-  
-  // Immediate (check phase)
-  setImmediate(() => {
-    console.log('7. setImmediate callback');
-  });
-  
-  // nextTick (microtask)
-  process.nextTick(() => {
-    console.log('6. nextTick callback');
-  });
-});
-
-// Promise (microtask)
-Promise.resolve().then(() => {
-  console.log('3. Promise callback');
-});
-
-// nextTick (microtask - priorità più alta)
-process.nextTick(() => {
-  console.log('2. nextTick callback');
-});
-
-console.log('End of script');
-
-/* Output:
-1. Start
-End of script
-2. nextTick callback
-3. Promise callback
-4. Timeout callback
-5. File read callback
-6. nextTick callback (dopo I/O)
-7. setImmediate callback
-*/
-```
+L'Event Loop è il meccanismo fondamentale che permette a Node.js di eseguire operazioni di I/O non bloccanti nonostante JavaScript sia single-threaded. È il cuore pulsante dell'architettura di Node.js, responsabile della gestione e dell'esecuzione del codice asincrono.
 
 ## Vantaggi dell'Event-Driven Architecture
 
@@ -256,78 +172,7 @@ orderService.on('order-created', ({ order }) => {
 
 ## Svantaggi e Limitazioni
 
-### 1. **Complessità del Debugging**
-```javascript
-// Stack trace non lineare
-setTimeout(() => {
-  setTimeout(() => {
-    setTimeout(() => {
-      throw new Error('Dove sono?'); 
-      // Stack trace non mostra il percorso completo
-    }, 100);
-  }, 100);
-}, 100);
-```
-
-### 2. **Callback Hell**
-```javascript
-// Codice difficile da leggere e mantenere
-fs.readFile('file1.txt', (err, data1) => {
-  if (err) return handleError(err);
-  
-  fs.readFile('file2.txt', (err, data2) => {
-    if (err) return handleError(err);
-    
-    fs.readFile('file3.txt', (err, data3) => {
-      if (err) return handleError(err);
-      
-      // Finalmente possiamo usare i dati
-      processData(data1, data2, data3);
-    });
-  });
-});
-
-// Soluzione moderna: async/await
-async function readFiles() {
-  try {
-    const data1 = await fs.promises.readFile('file1.txt');
-    const data2 = await fs.promises.readFile('file2.txt');
-    const data3 = await fs.promises.readFile('file3.txt');
-    processData(data1, data2, data3);
-  } catch (err) {
-    handleError(err);
-  }
-}
-```
-
-### 3. **CPU-Intensive Operations**
-```javascript
-// Operazioni CPU-intensive bloccano l'Event Loop
-function fibonacci(n) {
-  if (n <= 1) return n;
-  return fibonacci(n - 1) + fibonacci(n - 2);
-}
-
-// PROBLEMA: Questo blocca tutto!
-http.createServer((req, res) => {
-  const result = fibonacci(40); // Blocca ~1-2 secondi
-  res.end(String(result));
-}).listen(3000);
-
-// SOLUZIONE: Worker Threads
-const { Worker } = require('worker_threads');
-
-http.createServer((req, res) => {
-  const worker = new Worker('./fibonacci-worker.js');
-  worker.postMessage(40);
-  
-  worker.on('message', (result) => {
-    res.end(String(result));
-  });
-}).listen(3000);
-```
-
-### 4. **Memory Leaks con Event Listeners**
+### **Memory Leaks con Event Listeners**
 ```javascript
 // PROBLEMA: Listener non rimossi causano memory leak
 class DataStream extends EventEmitter {
@@ -494,5 +339,6 @@ L'architettura event-driven è **perfetta per**:
 ## Risorse
 
 - [Node.js Event Loop Explained](https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/)
+- [The Node.js event emitter](https://nodejs.org/en/learn/asynchronous-work/the-nodejs-event-emitter)
 - [libuv Design Overview](http://docs.libuv.org/en/v1.x/design.html)
 - [Event-Driven Architecture on Martin Fowler](https://martinfowler.com/articles/201701-event-driven.html)
