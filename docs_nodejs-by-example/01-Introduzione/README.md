@@ -7,7 +7,6 @@ Questa prima esercitazione ti introdurrà a Node.js, spiegandone le caratteristi
 - Comprendere cos'è Node.js e perché è importante
 - Installare Node.js sul proprio sistema
 - Eseguire il primo script "Hello World"
-- Esplorare il modello di programmazione asincrona
 - Utilizzare la console di Node.js (REPL)
 
 ## Argomenti Teorici Collegati
@@ -16,27 +15,12 @@ Questa prima esercitazione ti introdurrà a Node.js, spiegandone le caratteristi
 - [2. Architettura di Node.js](./teoria/02-architettura.md)
 - [3. JavaScript Runtime](./teoria/03-javascript-runtime.md)
 - [4. REPL di Node.js](./teoria/04-repl.md)
-- [5. Programmazione Asincrona](./teoria/05-programmazione-asincrona.md)
-- [6. Event Loop](./teoria/06-event-loop.md)
-</br></br>**Approfondimenti:**
-- [microtask](<teoria/AB - microtask.md>) 
-- [process.nextTick](<teoria/AB - process.nextTick.md>) 
-- [setTimeout e setInterval](<teoria/AC - setTimeout_setInterval.md>) 
-- [setImmediate](<teoria/AD - setImmediate.md>) 
-- [close_callbacks](<teoria/AE - close_callbacks.md>) 
-- [pending_callbacks](<teoria/AE - pending_callbacks.md>) 
-- [libuv](<teoria/AF - libuv.md>) 
-- [callback](<teoria/BA - callback.md>) 
-- [Promises](<teoria/BB - Promises.md>) 
-- [Async-Await](<teoria/BC - codice asincrono con Async-Await.md>)
-- [callback concetti avanzati](./teoria/callback_concetti_avanzati.md)
-- [event-loop concetti avanzati](./teoria/event-loop_concetti_avanzati.md)
-- [Worker Threads](./teoria/Worker_Threads.md)
+
 
 ## Esercitazioni Pratiche
 
 - [ES01 - Introduzione a Node](https://docs.google.com/presentation/d/1io47Fa1ybT-e0npThQQ8ndE-_Q1gHRGMnrq-a0Tl_0c)
-- [ES02 - L'Event Loop](https://docs.google.com/presentation/d/1EzPyxiYQg4top0YbGJCznnL_j-mZYWvPaStsta98mBQ)
+
 
 ## Risorse Aggiuntive
 

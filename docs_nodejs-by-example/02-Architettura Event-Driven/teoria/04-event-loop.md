@@ -87,7 +87,27 @@ setInterval(() => {
 - Esegue i callback ripetuti ogni secondo
 - Se il callback impiega più di 1 secondo, le chiamate successive si accumulano
 - Usare con cautela per evitare sovraccarichi
-- Per cancellare: `clearInterval(intervalId)`, dove `intervalId` è l'ID restituito da `setInterval()`
+- Per cancellare: `clearInterval(intervalId)`, dove `intervalId` è l'ID restituito da `setInterval()`.
+
+Esempio di ritardo causato da codice bloccante:
+```javascript
+const start = Date.now();
+
+setTimeout(() => {
+  const delay = Date.now() - start;
+  console.log(`Timer executed after ${delay}ms`);
+}, 100);
+
+// Blocking operation
+let sum = 0;
+for (let i = 0; i < 1e9; i++) {
+  sum += i;
+}
+
+// Output: Timer executed after ~500ms (non 100ms!)
+// Il timer viene eseguito DOPO che il blocking code finisce
+```
+
 
 #### 📋 **Pending Callbacks Phase**
 ```javascript
@@ -95,6 +115,19 @@ setInterval(() => {
 ```
 - Esegue callback di alcune operazioni di sistema
 - Raramente utilizzata dal codice utente
+
+```javascript
+const net = require('net');
+
+const server = net.createServer((socket) => {
+  socket.on('error', (err) => {
+    // Eseguito nella fase PENDING CALLBACKS
+    console.log('Socket error:', err.message);
+  });
+});
+
+server.listen(8080);
+```
 
 #### 🔄 **Idle, Prepare Phase**
 - Uso esclusivamente interno di Node.js
@@ -114,11 +147,53 @@ La fase Poll ha due funzioni principali:
 1. **Calcolare quanto tempo bloccarsi** in attesa di I/O
 2. **Processare eventi** nella poll queue
 
-**Comportamento:**
+```javascript
+const fs = require('fs');
+
+console.log('1. Start');
+
+// File I/O - eseguito in POLL phase
+fs.readFile('file.txt', (err, data) => {
+  console.log('3. File read complete');
+  
+  setTimeout(() => {
+    console.log('5. setTimeout dopo readFile');
+  }, 0);
+  
+  setImmediate(() => {
+    console.log('4. setImmediate dopo readFile');
+  });
+});
+
+console.log('2. End');
+
+// Output:
+// 1. Start
+// 2. End
+// 3. File read complete
+// 4. setImmediate dopo readFile  (CHECK phase, prima di timers!)
+// 5. setTimeout dopo readFile
+```
+
+**Comportamento POLL:**
 - Se la poll queue **non è vuota**: esegue callback in modo sincrono fino a esaurimento o limite sistema
 - Se la poll queue **è vuota**:
   - Se ci sono `setImmediate()` programmati → va alla fase **check**
   - Altrimenti, attende nuovi eventi
+
+```javascript
+const fs = require('fs');
+
+setTimeout(() => {
+  console.log('Timeout');
+}, 100);
+
+// Poll phase aspetterà fino a che readFile finisce
+// o timeout scade
+fs.readFile('large-file.txt', () => {
+  console.log('File done');
+});
+```
 
 #### ✅ **Check Phase**
 ```javascript
@@ -129,6 +204,29 @@ setImmediate(() => {
 ```
 - Eseguito subito dopo la fase poll
 - `setImmediate()` è progettato per eseguire script dopo il completamento della fase poll
+
+```javascript
+setImmediate(() => {
+  console.log('Immediate 1');
+});
+
+setImmediate(() => {
+  console.log('Immediate 2');
+});
+
+setTimeout(() => {
+  console.log('Timeout');
+}, 0);
+
+// Output (può variare!):
+// Timeout
+// Immediate 1
+// Immediate 2
+// oppure
+// Immediate 1
+// Immediate 2
+// Timeout
+```
 
 #### 🔚 **Close Callbacks Phase**
 ```javascript
@@ -404,6 +502,54 @@ console.log('1. Sync end');
 // 8. Immediate (o 6. Timer)
 ```
 
+**Ordine di esecuzione:**
+```
+┌─────────────────────────────┐
+│ Fase Event Loop (es. Timer) │
+└──────────┬──────────────────┘
+           ▼
+┌─────────────────────────────┐
+│   NextTick Queue            │  ← Eseguita PER PRIMA
+└──────────┬──────────────────┘
+           ▼
+┌─────────────────────────────┐
+│   Microtask Queue (Promise) │  ← Poi le Promise
+└──────────┬──────────────────┘
+           ▼
+     Prossima Fase
+```
+```javascript
+setTimeout(() => {
+  console.log('1. setTimeout');
+  
+  Promise.resolve().then(() => {
+    console.log('2. Promise in setTimeout');
+  });
+  
+  process.nextTick(() => {
+    console.log('3. nextTick in setTimeout');
+  });
+}, 0);
+
+Promise.resolve().then(() => {
+  console.log('4. Promise');
+});
+
+process.nextTick(() => {
+  console.log('5. nextTick');
+});
+
+console.log('6. Sync');
+
+// Output:
+// 6. Sync                      (codice sincrono)
+// 5. nextTick                  (nextTick queue)
+// 4. Promise                   (microtask queue)
+// 1. setTimeout                (timers phase)
+// 3. nextTick in setTimeout    (nextTick queue dopo timer)
+// 2. Promise in setTimeout     (microtask queue dopo nextTick)
+```
+
 ### ⚠️ Pericoli delle Microtask
 
 ```javascript
@@ -609,6 +755,7 @@ Nel corso delle versioni di Node.js, l'Event Loop ha subito miglioramenti signif
 - [Node.js Event Loop Official Docs](https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/)
 - [libuv Design Overview](http://docs.libuv.org/en/v1.x/design.html)
 - [V8 JavaScript Engine](https://v8.dev/)
+- [Understanding Event Loop](https://blog.insiderattack.net/event-loop-and-the-big-picture-nodejs-event-loop-part-1-1cb67a182810)
 
 ### 🎥 Video Consigliati
 - [What the heck is the event loop anyway? - Philip Roberts](https://www.youtube.com/watch?v=8aGhZQkoFbQ)

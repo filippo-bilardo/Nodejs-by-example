@@ -174,7 +174,7 @@ orderService.on('order-created', ({ order }) => {
 
 ### **Memory Leaks con Event Listeners**
 ```javascript
-// PROBLEMA: Listener non rimossi causano memory leak
+// PROBLEMA: Listener non rimossi causano memory leak (perdita di memoria)
 class DataStream extends EventEmitter {
   start() {
     setInterval(() => {
@@ -332,9 +332,9 @@ L'architettura event-driven è **perfetta per**:
 
 ## Prossimi Passi
 
-- [EventEmitter: Il Cuore degli Eventi](./02-eventemitter.md)
-- [Event Loop e Fasi di Esecuzione](./03-event-loop.md)
-- [Pattern Event-Driven Avanzati](./04-pattern-avanzati.md)
+- [EventEmitter: Il Cuore degli Eventi](./03-eventemitter.md)
+- [Event Loop e Fasi di Esecuzione](./04-event-loop.md)
+- [Pattern Event-Driven Avanzati](./05-pattern-avanzati.md)
 
 ## Risorse
 

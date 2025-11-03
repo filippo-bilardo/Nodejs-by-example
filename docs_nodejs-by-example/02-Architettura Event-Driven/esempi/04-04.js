@@ -1,4 +1,9 @@
-// ✅ USO CORRETTO delle priorità
+/**
+ * Esempio di uso corretto delle priorità nell'Event Loop di Node.js
+ * Dimostra come dare priorità alle operazioni critiche, I/O e programmate.
+ * ✅ USO CORRETTO delle priorità
+ * Date: 04/11/2025
+ */
 
 // 1. Codice critico che deve eseguire subito dopo il codice corrente
 function criticalCallback() {

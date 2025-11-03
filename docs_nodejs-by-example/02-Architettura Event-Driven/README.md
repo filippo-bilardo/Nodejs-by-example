@@ -3,19 +3,39 @@
 L'architettura event-driven è il cuore di Node.js. In questa esercitazione imparerai come costruire applicazioni reattive e scalabili usando eventi, EventEmitter e l'Event Loop.
 
 ## Obiettivi di Apprendimento
+- Esplorare il modello di programmazione asincrona
 - Comprendere l'architettura event-driven e i suoi vantaggi
 - Padroneggiare EventEmitter: creare, emettere e gestire eventi
 - Capire il funzionamento dell'Event Loop e le sue fasi
-- Implementare pattern avanzati: Observer, Pub/Sub, Event Sourcing, CQRS, Saga
 - Gestire errori in modo efficace in sistemi event-driven
+- Implementare pattern avanzati: Observer, Pub/Sub, Event Sourcing, CQRS, Saga
 - Costruire applicazioni real-time scalabili
 
 ## Argomenti Teorici Collegati
-- [Introduzione all'Architettura Event-Driven](./teoria/01-introduzione-event-driven.md)
-- [EventEmitter: Il Cuore degli Eventi](./teoria/02-eventemitter.md)
-- [Event Loop: Il Motore di Node.js](./teoria/03-event-loop.md)
-- [Pattern Event-Driven Avanzati](./teoria/04-pattern-avanzati.md)
-- [Gestione Errori negli Eventi](./teoria/05-gestione-errori.md)
+- [1. Programmazione Asincrona](./teoria/01-programmazione-asincrona.md)
+- [2. Introduzione all'Architettura Event-Driven](./teoria/02-introduzione-event-driven.md)
+- [3. EventEmitter: Il Cuore degli Eventi](./teoria/03-eventemitter.md)
+- [4. Event Loop: Il Motore di Node.js](./teoria/04-event-loop.md)
+- [5. Gestione Errori negli Eventi](./teoria/05-gestione-errori.md)
+- [6. Pattern Event-Driven Avanzati](./teoria/06-pattern-avanzati.md)
+</br></br>**Approfondimenti:**
+- [microtask](<teoria/AB - microtask.md>) 
+- [process.nextTick](<teoria/AB - process.nextTick.md>) 
+- [setTimeout e setInterval](<teoria/AC - setTimeout_setInterval.md>) 
+- [setImmediate](<teoria/AD - setImmediate.md>) 
+- [close_callbacks](<teoria/AE - close_callbacks.md>) 
+- [pending_callbacks](<teoria/AE - pending_callbacks.md>) 
+- [libuv](<teoria/AF - libuv.md>) 
+- [callback](<teoria/BA - callback.md>) 
+- [Promises](<teoria/BB - Promises.md>) 
+- [Async-Await](<teoria/BC - codice asincrono con Async-Await.md>)
+- [callback concetti avanzati](./teoria/callback_concetti_avanzati.md)
+- [event-loop concetti avanzati](./teoria/event-loop_concetti_avanzati.md)
+- [microtask concetti avanzati](./teoria/microtask_concetti_avanzati.md)
+- [Worker Threads](./teoria/Worker_Threads.md)
+
+## Esercitazioni Pratiche
+- [ES02 - L'Event Loop](https://docs.google.com/presentation/d/1EzPyxiYQg4top0YbGJCznnL_j-mZYWvPaStsta98mBQ)
 
 ## Perché Event-Driven?
 
@@ -24,31 +44,6 @@ Node.js è costruito su un'architettura event-driven che permette:
 - **Scalabilità**: Crescere orizzontalmente con facilità
 - **Reattività**: Rispondere immediatamente agli eventi
 - **Disaccoppiamento**: Componenti indipendenti che comunicano tramite eventi
-
-```javascript
-// Esempio rapido: EventEmitter in azione
-const EventEmitter = require('events');
-
-class StockTicker extends EventEmitter {
-  updatePrice(symbol, price) {
-    this.emit('price-update', { symbol, price });
-  }
-}
-
-const ticker = new StockTicker();
-
-// Listener multipli per lo stesso evento
-ticker.on('price-update', ({ symbol, price }) => {
-  console.log(`${symbol}: $${price}`);
-});
-
-ticker.on('price-update', ({ symbol, price }) => {
-  // Salva su database
-  database.save(symbol, price);
-});
-
-ticker.updatePrice('AAPL', 150.00); // Entrambi i listener vengono eseguiti
-```
 
 ## Esempi Pratici
 

@@ -2,6 +2,7 @@
 
 Questa cartella contiene esempi pratici di implementazione di architetture event-driven con Node.js.
 
+
 ## Struttura degli Esempi
 
 ### 01. Basic EventEmitter
@@ -59,6 +60,13 @@ Questa cartella contiene esempi pratici di implementazione di architetture event
 - Automatic rollback
 - Monitoring
 - **File**: `08-saga-pattern/`
+
+### 09. State Machine
+**Concetto**: Macchina a stati finiti event-driven
+- Definizione stati/transizioni
+- Eventi per cambio stato
+- Azioni su transizioni
+- **File**: `09-state-machine/`
 
 ## Come Eseguire gli Esempi
 

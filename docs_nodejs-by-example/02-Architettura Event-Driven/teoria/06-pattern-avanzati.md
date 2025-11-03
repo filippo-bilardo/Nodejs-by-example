@@ -844,7 +844,6 @@ Pattern event-driven:
 
 ## Prossimi Passi
 
-- [Gestione Errori negli Eventi](./05-gestione-errori.md)
 - [Esempi Pratici](../esempi/)
 - [Esercizi](../esercizi/)
 

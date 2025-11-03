@@ -32,10 +32,12 @@ class MyEmitter extends EventEmitter {}
 
 const myEmitter = new MyEmitter();
 
+// Registrazione listener
 myEmitter.on('event', () => {
   console.log('Evento dalla classe custom!');
 });
 
+// Emissione evento
 myEmitter.emit('event');
 ```
 
@@ -44,10 +46,12 @@ myEmitter.emit('event');
 ```javascript
 const emitter = new EventEmitter();
 
+// Listener con argomenti
 emitter.on('user-login', (username, timestamp) => {
   console.log(`User ${username} logged in at ${timestamp}`);
 });
 
+// Emissione evento con argomenti
 emitter.emit('user-login', 'mario', new Date());
 // Output: User mario logged in at [timestamp]
 ```
@@ -682,9 +686,9 @@ EventEmitter è:
 
 ## Prossimi Passi
 
-- [Event Loop e Fasi di Esecuzione](./03-event-loop.md)
-- [Pattern Event-Driven Avanzati](./04-pattern-avanzati.md)
+- [Event Loop e Fasi di Esecuzione](./04-event-loop.md)
 - [Gestione Errori negli Eventi](./05-gestione-errori.md)
+- [Pattern Event-Driven Avanzati](./06-pattern-avanzati.md)
 
 ## Risorse
 

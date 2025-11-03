@@ -1,3 +1,10 @@
+/**
+ * Esempio di utilizzo di process.nextTick, setTimeout, setImmediate e Promise in Node.js
+ * Dimostra l'ordine di esecuzione tra vari tipi di callback e microtask.
+ * La microtask queue viene svuotata DOPO ogni fase dell'Event Loop.
+ * Date: 04/11/2025
+ */
+
 console.log('1. 🟢 Sync start');
 
 setTimeout(() => {

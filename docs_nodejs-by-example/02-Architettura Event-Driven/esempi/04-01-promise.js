@@ -1,3 +1,8 @@
+/**
+ * Esempio di utilizzo di Promise e process.nextTick in Node.js
+ * Dimostra l'ordine di esecuzione tra codice sincrono, nextTick e Promise.
+ * Date: 04/11/2025
+ */
 console.log('1. Start');
 
 Promise.resolve().then(() => {
