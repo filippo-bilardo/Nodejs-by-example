@@ -86,3 +86,10 @@ Nel corso degli anni, l'architettura di Node.js si è evoluta per affrontare le 
 - Miglioramenti nelle prestazioni del garbage collector
 - Supporto per ES Modules
 - Introduzione di worker threads per operazioni CPU-intensive
+
+---
+
+- [Indice](../README.md)
+- [Lezione precedente](01-storia.md)
+- [Prossima Lezione](03-javascript-runtime.md)
+- [Prossima Esercitazione](./02-Architettura_Event-Driven/README.md)

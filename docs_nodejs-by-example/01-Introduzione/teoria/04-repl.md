@@ -778,3 +778,7 @@ Usalo quotidianamente per migliorare le tue competenze Node.js!
 **Autore**: Corso Node.js by Example  
 **Data**: Ottobre 2025  
 **Versione**: 1.0
+
+- [Indice](../README.md)
+- [Lezione precedente](03-javascript-runtime.md)
+- [Prossima Esercitazione](./02-Architettura_Event-Driven/README.md)

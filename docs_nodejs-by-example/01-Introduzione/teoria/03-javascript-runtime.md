@@ -143,3 +143,8 @@ Il runtime JavaScript di Node.js è in costante evoluzione:
 - Miglioramenti delle prestazioni di V8
 - Nuove API e deprecazione di quelle obsolete
 - Migliore integrazione con i moderni pattern di programmazione JavaScript
+
+- [Indice](../README.md)
+- [Lezione precedente](02-architettura.md)
+- [Prossima Lezione](04-repl.md)
+- [Prossima Esercitazione](./02-Architettura_Event-Driven/README.md)

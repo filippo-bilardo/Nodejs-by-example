@@ -245,7 +245,7 @@ export default class Classe { /* ... */ }
 2. **Caricamento**: CommonJS è sincrono, ESM è asincrono
 3. **Hoisting**: Le importazioni ESM sono "hoisted"
 4. **Caching**: Entrambi mettono in cache i moduli, ma con meccanismi differenti
-5. **Estensione file**: Con ESM è obbligatorio usare l'estensione `.js`
+5. **Estensione file**: Con ESM è obbligatorio usare l'estensione `.js` o `.mjs`
 
 ### Utilizzo di ES Modules in Node.js:
 

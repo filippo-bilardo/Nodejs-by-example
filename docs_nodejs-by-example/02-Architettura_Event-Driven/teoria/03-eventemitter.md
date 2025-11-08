@@ -4,6 +4,10 @@
 
 `EventEmitter` è una classe fondamentale di Node.js che implementa il pattern Observer. È la base per la maggior parte delle API asincrone di Node.js.
 
+La classe `EventEmitter` è parte del modulo core `events` e fornisce un meccanismo per:
+- Registrare funzioni di callback (listener) per specifici eventi
+- Emettere eventi che attivano l'esecuzione dei listener registrati
+
 ```javascript
 const EventEmitter = require('events');
 ```
