@@ -208,6 +208,11 @@ readFilePromise('file.txt', 'utf8')
 - `cluster`: per distribuire carico tra i core della CPU
 - `assert`: per test e verifica
 - `dns`: per risolvere nomi di dominio
+- `net`: per creare server e client TCP/IPC
+- `readline`: per leggere input da flussi leggibili (come stdin)
+- `timers`: per gestire operazioni temporizzate
+- `tty`: per interagire con terminali
+- `vm`: per eseguire codice JavaScript in un contesto separato
 
 ## CommonJS vs ES Modules
 
