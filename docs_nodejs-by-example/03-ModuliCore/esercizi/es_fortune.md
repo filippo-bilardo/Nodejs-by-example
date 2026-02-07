@@ -1,3 +1,4 @@
+# App Fortune
 realizzare l'app fortune.js che fornisce una citazione casuale da un elenco predefinito ogni volta che viene eseguito.
 Creare un database di citazioni famose e implementare un modulo che seleziona e restituisce una citazione casuale.
 
