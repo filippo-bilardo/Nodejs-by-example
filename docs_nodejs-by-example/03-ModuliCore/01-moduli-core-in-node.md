@@ -1,8 +1,4 @@
-# Moduli in Node.js
-
-## Indice
-- [Sistema di Moduli](#sistema-di-moduli)
-- [Moduli Core Principali](#moduli-core-principali)
+# Moduli e moduli core in Node.js
 
 ## Sistema di Moduli
 
