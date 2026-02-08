@@ -387,3 +387,92 @@ main();
 - [Indice del Corso](../README.md)
 - [Modulo Precedente: Sistema di File in Node.js](../03-Sistema_di_File_in_Node.js/README.md)
 - [Modulo Successivo: NPM](../05-NPM/README.md)
+
+# Moduli personalizzati in Node.js
+
+## Indice
+
+### Capitolo 1: Introduzione ai moduli in Node.js
+1.1 Cos'è un modulo  
+1.2 Il sistema modulare di Node.js  
+1.3 CommonJS vs ES Modules  
+1.4 Vantaggi dell'uso dei moduli  
+1.5 Quando creare moduli personalizzati  
+**Autovalutazione Capitolo 1**
+
+### Capitolo 2: Creazione del primo modulo personalizzato
+2.1 Struttura base di un modulo  
+2.2 Esportare funzioni con module.exports  
+2.3 Esportare oggetti e classi  
+2.4 Importare moduli con require()  
+2.5 Esempi pratici  
+2.6 Best practice per la creazione di moduli  
+**Autovalutazione Capitolo 2**
+
+### Capitolo 3: exports vs module.exports
+3.1 Differenze fondamentali  
+3.2 Quando usare exports  
+3.3 Quando usare module.exports  
+3.4 Errori comuni da evitare  
+3.5 Pattern di esportazione avanzati  
+**Autovalutazione Capitolo 3**
+
+### Capitolo 4: Organizzazione dei moduli
+4.1 Struttura di cartelle per progetti modulari  
+4.2 File index.js come punto di accesso  
+4.3 Moduli privati e pubblici  
+4.4 Convenzioni di naming  
+4.5 Gestione delle dipendenze circolari  
+**Autovalutazione Capitolo 4**
+
+### Capitolo 5: ES Modules (ESM)
+5.1 Sintassi import/export  
+5.2 Named exports vs default exports  
+5.3 Configurazione di Node.js per ESM  
+5.4 Differenze con CommonJS  
+5.5 Migrazione da CommonJS a ESM  
+5.6 Compatibilità e interoperabilità  
+**Autovalutazione Capitolo 5**
+
+### Capitolo 6: Pattern avanzati per moduli
+6.1 Module pattern e closure  
+6.2 Singleton pattern  
+6.3 Factory pattern  
+6.4 Dependency injection  
+6.5 Moduli configurabili  
+6.6 Lazy loading dei moduli  
+**Autovalutazione Capitolo 6**
+
+### Capitolo 7: Gestione del path e risoluzione dei moduli
+7.1 Path relativi vs assoluti  
+7.2 Uso di __dirname e __filename  
+7.3 Il modulo path  
+7.4 Algoritmo di risoluzione di Node.js  
+7.5 Alias e path mapping  
+**Autovalutazione Capitolo 7**
+
+### Capitolo 8: Creare pacchetti npm riutilizzabili
+8.1 Struttura di un pacchetto npm  
+8.2 Il file package.json  
+8.3 Pubblicazione su npm  
+8.4 Versioning semantico  
+8.5 Documentazione e README  
+8.6 Testing dei moduli  
+**Autovalutazione Capitolo 8**
+
+### Capitolo 9: Debugging e troubleshooting
+9.1 Errori comuni nei moduli  
+9.2 Tecniche di debugging  
+9.3 Uso del debugger integrato  
+9.4 Logging efficace  
+9.5 Gestione degli errori nei moduli  
+**Autovalutazione Capitolo 9**
+
+### Capitolo 10: Progetti pratici
+10.1 Progetto 1: Modulo di utilità per stringhe  
+10.2 Progetto 2: Sistema di logging personalizzato  
+10.3 Progetto 3: Modulo di gestione configurazioni  
+10.4 Progetto 4: API wrapper riutilizzabile  
+10.5 Progetto 5: CLI tool modulare  
+**Autovalutazione Capitolo 10**
+

@@ -15,7 +15,6 @@ In questa esercitazione esploreremo i moduli core di Node.js, imparando come uti
 - [Moduli in Node.js](./teoria/01-Moduli_in_Node.md)
 - [File System](./teoria/02-file-system.md)
 - [HTTP e Networking](./teoria/03-http-networking.md)
-- [Eventi e EventEmitter](./teoria/04-eventi-eventemitter.md)
 - [Altri Moduli Core](./teoria/05-altri-moduli-core.md)
 
 ## Esercizi Pratici

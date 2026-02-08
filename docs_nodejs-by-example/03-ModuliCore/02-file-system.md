@@ -2,674 +2,623 @@
 
 ## Introduzione
 
-Il modulo `fs` (File System) è uno dei moduli core più importanti di Node.js. Fornisce un'API per interagire con il file system in modo simile alle funzioni POSIX standard. Questo modulo permette di leggere, scrivere, modificare e cancellare file e directory.
+Il modulo `fs` (File System) è uno dei moduli core più importanti di Node.js. Fornisce un'API completa per interagire con il file system del sistema operativo, offrendo funzionalità simili alle chiamate POSIX standard ma con un'interfaccia JavaScript moderna e flessibile.
+
+Questo modulo è fondamentale per:
+- **Gestione file**: lettura, scrittura, modifica e cancellazione
+- **Gestione directory**: creazione, navigazione ed eliminazione di cartelle
+- **Operazioni su stream**: elaborazione efficiente di file di grandi dimensioni
+- **Monitoraggio**: osservazione dei cambiamenti nel file system
+- **Controllo accessi**: gestione di permessi e metadati
 
 ## Importare il Modulo
 
 ```javascript
+// Modulo classico con callback
 const fs = require('fs');
+
+// API moderna basata su Promise (Node.js 10+)
+const fsPromises = require('fs/promises');
 ```
 
 ## Operazioni Sincrone vs Asincrone
 
-Il modulo `fs` offre sia metodi sincroni che asincroni. I metodi sincroni bloccano l'esecuzione del programma fino al completamento dell'operazione, mentre quelli asincroni non bloccano e utilizzano callback o Promise per gestire il risultato.
+### Differenze Fondamentali
 
-### Esempio Sincrono
+Il modulo `fs` offre **tre paradigmi** per le operazioni sul file system:
 
-```javascript
-const fs = require('fs');
+1. **Sincrono**: Blocca l'esecuzione fino al completamento
+   - Suffisso `-Sync` (es. `readFileSync`)
+   - Semplice da usare ma può degradare le performance
+   - Ideale per script CLI o inizializzazione app
 
-try {
-  const data = fs.readFileSync('file.txt', 'utf8');
-  console.log(data);
-} catch (err) {
-  console.error('Errore:', err);
-}
-```
+2. **Asincrono con Callback**: Non blocca l'esecuzione
+   - Pattern error-first callback: `(err, result) => {}`
+   - Approccio tradizionale di Node.js
+   - Rischio di "callback hell" con operazioni complesse
 
-### Esempio Asincrono con Callback
+3. **Asincrono con Promise/Async-Await**: Non blocca, sintassi moderna
+   - API `fs/promises` disponibile da Node.js 10
+   - Codice più leggibile e manutenibile
+   - **Approccio raccomandato** per nuovi progetti
 
-```javascript
-const fs = require('fs');
+### Quando Usare Quale Approccio?
 
-fs.readFile('file.txt', 'utf8', (err, data) => {
-  if (err) {
-    console.error('Errore:', err);
-    return;
-  }
-  console.log(data);
-});
-```
+| Approccio | Quando Usarlo | Quando Evitarlo |
+|-----------|---------------|-----------------|
+| **Sincrono** | Script CLI, configurazione iniziale, operazioni singole | Server HTTP, operazioni multiple, file grandi |
+| **Callback** | Codice legacy, compatibilità con vecchie librerie | Nuovi progetti (preferire Promise) |
+| **Promise** | Applicazioni moderne, server, operazioni complesse | Quando si richiede Node.js < 10 |
 
-### Esempio Asincrono con Promise (fs/promises)
+### 📖 Esempi Pratici
 
-Dalle versioni più recenti di Node.js, è disponibile anche un'API basata su Promise:
+Per approfondire ciascun approccio con esempi eseguibili:
 
-```javascript
-const fs = require('fs/promises');
+- **[02.01 - Lettura Sincrona](esempi/02.01-lettura-sincrona.js)**: Quando usare `readFileSync()` e gestione errori
+- **[02.02 - Lettura Asincrona con Callback](esempi/02.02-lettura-asincrona-callback.js)**: Pattern error-first e gestione eventi
+- **[02.03 - Lettura Asincrona con Promise](esempi/02.03-lettura-asincrona-promise.js)**: Async/await e gestione moderna (raccomandato)
 
-async function leggiFile() {
-  try {
-    const data = await fs.readFile('file.txt', 'utf8');
-    console.log(data);
-  } catch (err) {
-    console.error('Errore:', err);
-  }
-}
+## Operazioni Base sui File
 
-leggiFile();
-```
+### Lettura File
 
-## Operazioni Comuni sui File
+La lettura di file è una delle operazioni più comuni. Node.js offre diversi metodi ottimizzati per scenari specifici:
 
-### Leggere un File
+- **File piccoli** (<1MB): Usa `readFile()` per caricare tutto in memoria
+- **File grandi**: Usa **stream** per elaborazione chunk-by-chunk
+- **File binari**: Ometti l'encoding per ottenere un Buffer
 
-```javascript
-// Sincrono
-const contenuto = fs.readFileSync('file.txt', 'utf8');
+**📖 Esempio completo**: [02.01 - Lettura Sincrona](esempi/02.01-lettura-sincrona.js) | [02.02 - Callback](esempi/02.02-lettura-asincrona-callback.js) | [02.03 - Promise](esempi/02.03-lettura-asincrona-promise.js)
 
-// Asincrono con callback
-fs.readFile('file.txt', 'utf8', (err, contenuto) => {
-  if (err) throw err;
-  console.log(contenuto);
-});
+### Scrittura File
 
-// Asincrono con Promise
-async function leggi() {
-  const contenuto = await fs.promises.readFile('file.txt', 'utf8');
-  console.log(contenuto);
-}
-```
+La scrittura sovrascrive completamente il contenuto esistente. Supporta varie opzioni:
 
-### Scrivere su un File
+- **Encoding**: `utf8`, `ascii`, `base64`, ecc.
+- **Mode**: Permessi file (es. `0o644`)
+- **Flag**: `w` (write), `wx` (write esclusivo), `w+` (read+write)
 
-```javascript
-// Sincrono
-fs.writeFileSync('file.txt', 'Contenuto del file');
+**⚠️ Attenzione**: La scrittura non è atomica! Per operazioni critiche usa file temporanei + rename.
 
-// Asincrono con callback
-fs.writeFile('file.txt', 'Contenuto del file', (err) => {
-  if (err) throw err;
-  console.log('File salvato!');
-});
+**📖 Esempio completo**: [02.04 - Scrittura File](esempi/02.04-scrittura-file.js) - Include tutti e tre i metodi
 
-// Asincrono con Promise
-async function scrivi() {
-  await fs.promises.writeFile('file.txt', 'Contenuto del file');
-  console.log('File salvato!');
-}
-```
+### Aggiunta Contenuto (Append)
 
-### Aggiungere Contenuto a un File
+L'append aggiunge contenuto alla fine del file senza sovrascriverlo. Perfetto per:
+- **Log files**: Registrazione eventi continua
+- **Data collection**: Accumulo dati senza riscritture
+- **CSV files**: Aggiunta righe a tabelle esistenti
 
-```javascript
-// Sincrono
-fs.appendFileSync('file.txt', '\nNuova riga');
+**📖 Esempio completo**: [02.05 - Append File](esempi/02.05-append-file.js) - Include SimpleLogger class
 
-// Asincrono con callback
-fs.appendFile('file.txt', '\nNuova riga', (err) => {
-  if (err) throw err;
-  console.log('Contenuto aggiunto!');
-});
+### Eliminazione File
 
-// Asincrono con Promise
-async function aggiungi() {
-  await fs.promises.appendFile('file.txt', '\nNuova riga');
-  console.log('Contenuto aggiunto!');
-}
-```
+L'eliminazione è **permanente** e non recuperabile! Best practices:
 
-### Eliminare un File
+1. **Verifica esistenza** prima di eliminare
+2. **Backup** per file critici
+3. **Conferma utente** per operazioni interattive
+4. **Soft delete** (rinomina in `.trash`) per recuperabilità
 
-```javascript
-// Sincrono
-fs.unlinkSync('file.txt');
-
-// Asincrono con callback
-fs.unlink('file.txt', (err) => {
-  if (err) throw err;
-  console.log('File eliminato!');
-});
-
-// Asincrono con Promise
-async function elimina() {
-  await fs.promises.unlink('file.txt');
-  console.log('File eliminato!');
-}
-```
+**📖 Esempio completo**: [02.06 - Eliminazione File](esempi/02.06-eliminazione-file.js) - Include utilities per cleanup sicuro
 
 ## Operazioni su Directory
 
-### Creare una Directory
+### Creazione Directory
 
-```javascript
-// Sincrono
-fs.mkdirSync('nuovaCartella');
+La creazione di directory supporta opzioni avanzate:
 
-// Asincrono con callback
-fs.mkdir('nuovaCartella', (err) => {
-  if (err) throw err;
-  console.log('Directory creata!');
-});
+- **Recursive**: Crea anche le directory parent mancanti (come `mkdir -p`)
+- **Mode**: Imposta i permessi (default: `0o777`)
+- **Nested paths**: Supporta percorsi multipli `/a/b/c`
 
-// Asincrono con Promise
-async function creaDir() {
-  await fs.promises.mkdir('nuovaCartella');
-  console.log('Directory creata!');
-}
+**💡 Best Practice**: Usa sempre `{ recursive: true }` per evitare errori quando le directory parent non esistono.
+
+**📖 Esempio completo**: [02.07 - Creazione Directory](esempi/02.07-creazione-directory.js) - Include project scaffolding automatico
+
+### Lettura Directory
+
+La lettura di directory può essere:
+
+1. **Semplice**: Lista nomi file (array di stringhe)
+2. **Con Dirent**: Oggetti con tipo (file/directory) - **più efficiente**
+3. **Ricorsiva**: Attraversa sottodirectory automaticamente
+4. **Con statistiche**: Include size, date, permessi
+
+**📖 Esempio completo**: [02.08 - Lettura Directory](esempi/02.08-lettura-directory.js) - Include traversal ricorsivo e file analysis
+
+### Eliminazione Directory
+
+L'eliminazione di directory ha **due metodi** con comportamenti diversi:
+
+**`rmdir()`**: Elimina **solo** directory vuote
+- Fallisce con errore `ENOTEMPTY` se contiene file
+- Più sicuro ma richiede svuotamento manuale
+
+**`rm()` con `{ recursive: true }`**: Elimina directory e tutto il contenuto
+- ⚠️ **PERICOLOSO**: Eliminazione permanente e ricorsiva
+- Usa sempre con `{ force: true }` per ignorare file inesistenti
+- Equivalente a `rm -rf` su Linux
+
+**📖 Esempio completo**: [02.13 - Eliminazione Directory](esempi/02.13-eliminazione-directory.js) - Include eliminazione sicura con validazioni
+
+## Informazioni e Metadati File
+
+### fs.stat() - Statistiche Complete
+
+Il metodo `stat()` restituisce un oggetto `Stats` con informazioni dettagliate:
+
+**Informazioni base**:
+- `size`: Dimensione in byte
+- `isFile()`, `isDirectory()`, `isSymbolicLink()`: Tipo elemento
+- `mode`: Permessi file (in formato numerico)
+
+**Date e timestamp**:
+- `birthtime`: Data creazione
+- `mtime`: Data ultima modifica (Modified Time)
+- `atime`: Data ultimo accesso (Access Time)
+- `ctime`: Data cambio metadata (Change Time)
+
+**Informazioni sistema**:
+- `dev`, `ino`: Device e inode number
+- `nlink`: Numero hard links
+- `uid`, `gid`: User/Group ID proprietario
+
+**📖 Esempio completo**: [02.12 - Informazioni File (stat)](esempi/02.12-informazioni-file-stat.js) - Include formattazione dimensioni e calcolo età file
+
+### Controllo Esistenza File
+
+Esistono **vari metodi** per verificare l'esistenza:
+
+1. **`fs.existsSync()`** - ⚠️ DEPRECATO ma ancora usato
+   - Introduce race condition (file può essere eliminato dopo il check)
+   
+2. **`fs.access()`** - ✅ RACCOMANDATO
+   - Controlla anche i permessi (lettura, scrittura, esecuzione)
+   - Pattern moderno: try/catch
+
+3. **`fs.stat()`** - Ottieni info + controlla esistenza
+   - Due operazioni in una
+
+**💡 Best Practice**: Non controllare esistenza prima di operare sul file. Prova l'operazione direttamente e gestisci l'errore `ENOENT`.
+
+**📖 Esempio completo**: [02.14 - Controllo Esistenza File](esempi/02.14-controllo-esistenza-file.js) - Include tutti i metodi e best practices
+
+## Stream di File - Elaborazione Efficiente
+
+### Perché Usare gli Stream?
+
+Gli stream sono **fondamentali** per applicazioni professionali perché:
+
+1. **Efficienza Memoria**: Elaborano dati chunk-by-chunk invece di caricare tutto in RAM
+   - File da 10GB? Stream usa ~64KB di memoria costante
+   - `readFile()` caricherà 10GB in RAM = crash!
+
+2. **Performance**: Inizia elaborazione prima di leggere tutto il file
+   - Lettura e scrittura in parallelo
+   - Riduce latenza totale
+
+3. **Scalabilità**: Gestisce file di qualsiasi dimensione
+   - Log files giganti
+   - Video streaming
+   - Database backup
+
+### Stream di Lettura (ReadStream)
+
+Il `createReadStream()` legge file a blocchi (chunks):
+
+**Opzioni comuni**:
+- `highWaterMark`: Dimensione buffer (default: 64KB)
+- `start`, `end`: Leggi solo una porzione del file
+- `encoding`: Automaticamente converte Buffer in stringa
+
+**Eventi principali**:
+- `data`: Nuovo chunk disponibile
+- `end`: Lettura completata
+- `error`: Errore durante lettura
+- `close`: Stream chiuso
+
+**📖 Esempio completo**: [02.09 - Stream Lettura](esempi/02.09-stream-lettura.js) - Include confronto memoria e line-by-line reading
+
+### Stream di Scrittura (WriteStream)
+
+Il `createWriteStream()` scrive dati incrementalmente:
+
+**Gestione Backpressure**:
+- `write()` ritorna `false` quando buffer è pieno
+- Ascolta evento `drain` prima di continuare
+- ⚠️ Ignorare backpressure = memory leak!
+
+**Eventi principali**:
+- `drain`: Buffer svuotato, pronto per nuovi dati
+- `finish`: Tutto scritto e flushed su disco
+- `error`: Errore durante scrittura
+
+**📖 Esempio completo**: [02.10 - Stream Scrittura](esempi/02.10-stream-scrittura.js) - Include gestione backpressure e CSV generation
+
+### Pipe e Composizione Stream
+
+Il metodo `pipe()` connette stream in modo **automatico**:
+
+**Vantaggi**:
+- Gestisce backpressure automaticamente
+- Propaga errori
+- Memory management ottimale
+
+**Pattern comune**:
+```
+readStream.pipe(transform1).pipe(transform2).pipe(writeStream)
 ```
 
-### Leggere il Contenuto di una Directory
+**Esempi pratici**:
+- File copy: `read.pipe(write)`
+- Compression: `read.pipe(gzip).pipe(write)`
+- Encryption: `read.pipe(cipher).pipe(write)`
+- HTTP upload: `read.pipe(httpRequest)`
 
-```javascript
-// Sincrono
-const files = fs.readdirSync('cartella');
-console.log(files);
+**📖 Esempio completo**: [02.11 - Stream Pipe](esempi/02.11-stream-pipe.js) - Include compression, encryption, progress monitoring
 
-// Asincrono con callback
-fs.readdir('cartella', (err, files) => {
-  if (err) throw err;
-  console.log(files);
-});
+## Operazioni File Avanzate
 
-// Asincrono con Promise
-async function leggiDir() {
-  const files = await fs.promises.readdir('cartella');
-  console.log(files);
-}
+### Copia File con Verifica Integrità
+
+La copia di file può essere **critica** quando l'integrità dei dati è importante:
+
+**Metodi disponibili**:
+1. **`fs.copyFile()`** - Copia nativa veloce
+2. **Stream pipe** - Per file grandi con progress monitoring
+3. **Con checksum** - Verifica integrità tramite hash (MD5, SHA256)
+
+**Opzioni di copia**:
+- `COPYFILE_EXCL`: Fallisce se destinazione esiste (previene sovrascritture)
+- `COPYFILE_FICLONE`: Copy-on-write se supportato dal filesystem (veloce)
+
+**Scenari d'uso**:
+- Backup critici: Usa checksum SHA256
+- File grandi (>100MB): Usa stream con progress callback
+- Operazioni massive: Copy-on-write se disponibile
+
+**📖 Esempio completo**: [02.16 - Copia File Verificata](esempi/02.16-copia-file-verificata.js) - Include checksum verification, progress monitoring, directory recursion
+
+### Backup e Rotazione File
+
+I sistemi di backup automatici sono **essenziali** per:
+- **Log rotation**: Evita log file infiniti
+- **Database backup**: Retention policy automatica
+- **Configuration versioning**: Mantieni storico modifiche
+- **Data snapshots**: Punti di ripristino temporali
+
+**Strategie di rotazione**:
+
+1. **Timestamp-based**: `file.2024-02-07T10-30-45.backup`
+   - Pro: Cronologia precisa
+   - Contro: Nomi lunghi
+
+2. **Numbered**: `file.1`, `file.2`, `file.3`
+   - Pro: Nomi corti, facile gestione
+   - Contro: Rinomina multipla a ogni rotazione
+
+3. **Incremental**: Backup solo se file cambiato (checksum)
+   - Pro: Risparmio spazio
+   - Contro: Overhead calcolo hash
+
+**Retention Policy**:
+- **maxBackups**: Numero massimo backup da mantenere
+- **maxAge**: Elimina backup più vecchi di N giorni
+- **minBackups**: Minimo da mantenere sempre (sicurezza)
+
+**📖 Esempio completo**: [02.17 - Backup e Rotazione](esempi/02.17-backup-rotazione.js) - Include log rotation, retention policy, incremental backup
+
+## Monitoraggio File System (File Watcher)
+
+### Perché Monitorare i Cambiamenti?
+
+Il monitoraggio real-time del file system abilita funzionalità avanzate:
+
+**Development tools**:
+- **Hot reload**: Ricarica automatica codice modificato
+- **Build automation**: Rebuild automatico su modifica
+- **Live preview**: Aggiorna browser quando cambia CSS/HTML
+
+**Production systems**:
+- **Log monitoring**: Analisi real-time dei log
+- **Configuration reload**: Applica config senza restart
+- **Data synchronization**: Sincronizza file tra sistemi
+- **Security monitoring**: Rileva modifiche non autorizzate
+
+### Metodi di Monitoraggio
+
+Node.js offre **due API** con caratteristiche diverse:
+
+#### 1. `fs.watch()` - Event-Based (Raccomandato)
+
+**Vantaggi**:
+- 🚀 **Efficiente**: Usa eventi nativi del sistema operativo (inotify su Linux, FSEvents su macOS)
+- ⚡ **Reattivo**: Notifiche istantanee
+- 📊 **Scalabile**: Monitora migliaia di file senza overhead
+
+**Svantaggi**:
+- ⚠️ **Comportamento platform-specific**: Differenze tra OS
+- 🔄 **Eventi duplicati**: Può emettere multipli eventi per singola modifica
+- 🐛 **Limitazioni**: Non sempre affidabile su network drives
+
+#### 2. `fs.watchFile()` - Polling-Based
+
+**Vantaggi**:
+- 🌍 **Cross-platform**: Funziona ovunque
+- 💾 **Network drives**: Funziona su NFS, SMB
+
+**Svantaggi**:
+- 🐢 **Lento**: Controllo periodico (default 5 secondi)
+- 🏃 **CPU overhead**: Costante polling
+- ❌ **Non scalabile**: Un timer per ogni file
+
+**💡 Regola pratica**: Usa `fs.watch()` a meno che non funzioni sul tuo sistema, poi fallback a `watchFile()`
+
+### Gestione Eventi
+
+**Eventi comuni**:
+- `change`: File contenuto modificato
+- `rename`: File creato, eliminato o rinominato
+
+**Problemi comuni**:
+
+1. **Eventi duplicati**: Editor salvano file con temp+rename
+   - **Soluzione**: Implementa debouncing (ignora eventi troppo vicini)
+
+2. **File deletion**: `rename` evento sia per creazione che eliminazione
+   - **Soluzione**: Verifica esistenza con `fs.access()`
+
+3. **Directory watching**: Eventi per tutto il contenuto
+   - **Soluzione**: Filtra per file di interesse
+
+**📖 Esempio completo**: [02.15 - File Watcher](esempi/02.15-file-watcher.js) - Include debouncing, classe FileWatcher, recursive watching
+
+## File Locking - Gestione Accesso Concorrente
+
+### Il Problema della Concorrenza
+
+Quando **più processi** accedono contemporaneamente allo stesso file, possono verificarsi:
+
+**Race Conditions**:
+```
+Processo A legge: counter = 5
+Processo B legge: counter = 5
+Processo A scrive: counter = 6
+Processo B scrive: counter = 6  ← Dovrebbe essere 7!
 ```
 
-### Eliminare una Directory
-
-```javascript
-// Sincrono
-fs.rmdirSync('cartella');
-
-// Asincrono con callback
-fs.rmdir('cartella', (err) => {
-  if (err) throw err;
-  console.log('Directory eliminata!');
-});
-
-// Asincrono con Promise
-async function eliminaDir() {
-  await fs.promises.rmdir('cartella');
-  console.log('Directory eliminata!');
-}
-```
-
-## Informazioni sui File
-
-```javascript
-// Sincrono
-const stats = fs.statSync('file.txt');
-console.log(`È un file: ${stats.isFile()}`);
-console.log(`È una directory: ${stats.isDirectory()}`);
-console.log(`Dimensione: ${stats.size} byte`);
-
-// Asincrono con callback
-fs.stat('file.txt', (err, stats) => {
-  if (err) throw err;
-  console.log(`È un file: ${stats.isFile()}`);
-  console.log(`È una directory: ${stats.isDirectory()}`);
-  console.log(`Dimensione: ${stats.size} byte`);
-});
-
-// Asincrono con Promise
-async function infoFile() {
-  const stats = await fs.promises.stat('file.txt');
-  console.log(`È un file: ${stats.isFile()}`);
-  console.log(`È una directory: ${stats.isDirectory()}`);
-  console.log(`Dimensione: ${stats.size} byte`);
-}
-```
-
-## Stream di File
-
-Gli stream sono particolarmente utili quando si lavora con file di grandi dimensioni, poiché consentono di elaborare i dati in piccoli blocchi anziché caricare l'intero file in memoria.
-
-### Leggere un File con Stream
-
-```javascript
-const fs = require('fs');
-const readStream = fs.createReadStream('file.txt', 'utf8');
-
-readStream.on('data', (chunk) => {
-  console.log('Chunk ricevuto:', chunk);
-});
-
-readStream.on('end', () => {
-  console.log('Lettura completata');
-});
-
-readStream.on('error', (err) => {
-  console.error('Errore:', err);
-});
-```
-
-### Scrivere su un File con Stream
-
-```javascript
-const fs = require('fs');
-const writeStream = fs.createWriteStream('output.txt');
-
-writeStream.write('Prima riga\n');
-writeStream.write('Seconda riga\n');
-writeStream.end('Ultima riga');
-
-writeStream.on('finish', () => {
-  console.log('Scrittura completata');
-});
-
-writeStream.on('error', (err) => {
-  console.error('Errore:', err);
-});
-```
-
-### Pipe tra Stream
-
-```javascript
-const fs = require('fs');
-const readStream = fs.createReadStream('input.txt');
-const writeStream = fs.createWriteStream('output.txt');
-
-// Copia il contenuto da input.txt a output.txt
-readStream.pipe(writeStream);
-
-writeStream.on('finish', () => {
-  console.log('Copia completata');
-});
-```
-
-### Stream Transform e Pipeline
-
-```javascript
-const fs = require('fs');
-const { Transform, pipeline } = require('stream');
-const zlib = require('zlib');
-
-// Creare un Transform Stream personalizzato
-const upperCaseTransform = new Transform({
-  transform(chunk, encoding, callback) {
-    // Trasforma il testo in maiuscolo
-    this.push(chunk.toString().toUpperCase());
-    callback();
-  }
-});
-
-// Utilizzare pipeline per gestire automaticamente gli errori
-pipeline(
-  fs.createReadStream('input.txt'),
-  upperCaseTransform,
-  zlib.createGzip(), // Comprime il contenuto
-  fs.createWriteStream('output.txt.gz'),
-  (err) => {
-    if (err) {
-      console.error('Errore nella pipeline:', err);
-    } else {
-      console.log('Pipeline completata con successo');
-    }
-  }
-);
-```
-
-### Operazioni File Avanzate
-
-#### Controllo Esistenza File
-
-```javascript
-const fs = require('fs').promises;
-
-// Metodo moderno con fs.access()
-async function fileExists(filePath) {
-  try {
-    await fs.access(filePath);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-// Utilizzo
-const exists = await fileExists('file.txt');
-console.log('File esiste:', exists);
-```
-
-#### Copia File con Controllo Integrità
-
-```javascript
-const fs = require('fs').promises;
-const crypto = require('crypto');
-
-async function copyFileWithChecksum(source, destination) {
-  try {
-    // Leggi e calcola checksum del file originale
-    const originalData = await fs.readFile(source);
-    const originalHash = crypto.createHash('sha256').update(originalData).digest('hex');
-    
-    // Copia il file
-    await fs.copyFile(source, destination);
-    
-    // Verifica l'integrità
-    const copiedData = await fs.readFile(destination);
-    const copiedHash = crypto.createHash('sha256').update(copiedData).digest('hex');
-    
-    if (originalHash === copiedHash) {
-      console.log('File copiato correttamente con integrità verificata');
-      return true;
-    } else {
-      console.error('Errore: integrità del file compromessa');
-      await fs.unlink(destination); // Rimuovi il file corrotto
-      return false;
-    }
-  } catch (error) {
-    console.error('Errore nella copia:', error.message);
-    return false;
-  }
-}
-```
-
-#### Backup e Rotazione File
-
-```javascript
-const fs = require('fs').promises;
-const path = require('path');
-
-async function rotateFile(filePath, maxBackups = 5) {
-  try {
-    const dir = path.dirname(filePath);
-    const name = path.basename(filePath, path.extname(filePath));
-    const ext = path.extname(filePath);
-    
-    // Sposta i backup esistenti
-    for (let i = maxBackups - 1; i >= 1; i--) {
-      const oldBackup = path.join(dir, `${name}.${i}${ext}`);
-      const newBackup = path.join(dir, `${name}.${i + 1}${ext}`);
-      
-      try {
-        await fs.access(oldBackup);
-        await fs.rename(oldBackup, newBackup);
-      } catch (err) {
-        // Il backup non esiste, continua
-      }
-    }
-    
-    // Sposta il file corrente come primo backup
-    const firstBackup = path.join(dir, `${name}.1${ext}`);
-    try {
-      await fs.rename(filePath, firstBackup);
-      console.log(`File ruotato: ${filePath} -> ${firstBackup}`);
-    } catch (err) {
-      console.log('File originale non esistente, creazione nuovo file');
-    }
-    
-  } catch (error) {
-    console.error('Errore nella rotazione:', error.message);
-  }
-}
-
-// Esempio di utilizzo
-await rotateFile('./app.log', 3);
-```
-
-## Osservare i Cambiamenti nei File
-
-### File Watcher Base
-
-```javascript
-const fs = require('fs');
-
-fs.watch('file.txt', (eventType, filename) => {
-  console.log(`Evento: ${eventType}`);
-  if (filename) {
-    console.log(`File modificato: ${filename}`);
-  }
-});
-```
-
-### File Watcher Avanzato
-
-```javascript
-const fs = require('fs');
-const path = require('path');
-
-class FileWatcher {
-  constructor(watchPath, options = {}) {
-    this.watchPath = watchPath;
-    this.options = {
-      recursive: options.recursive || false,
-      debounceTime: options.debounceTime || 100,
-      excludePatterns: options.excludePatterns || [],
-      ...options
-    };
-    this.watchers = new Map();
-    this.debounceTimeouts = new Map();
-  }
-
-  start() {
-    this.watchDirectory(this.watchPath);
-  }
-
-  watchDirectory(dirPath) {
-    const watcher = fs.watch(dirPath, { recursive: this.options.recursive }, 
-      (eventType, filename) => {
-        if (!filename) return;
-        
-        const fullPath = path.join(dirPath, filename);
-        
-        // Filtro pattern esclusi
-        if (this.shouldExclude(fullPath)) return;
-        
-        // Debounce per evitare eventi duplicati
-        this.debounceEvent(fullPath, eventType, () => {
-          this.handleFileEvent(fullPath, eventType);
-        });
-      }
-    );
-
-    this.watchers.set(dirPath, watcher);
-  }
-
-  shouldExclude(filePath) {
-    return this.options.excludePatterns.some(pattern => {
-      if (typeof pattern === 'string') {
-        return filePath.includes(pattern);
-      }
-      if (pattern instanceof RegExp) {
-        return pattern.test(filePath);
-      }
-      return false;
-    });
-  }
-
-  debounceEvent(filePath, eventType, callback) {
-    const key = `${filePath}-${eventType}`;
-    
-    if (this.debounceTimeouts.has(key)) {
-      clearTimeout(this.debounceTimeouts.get(key));
-    }
-    
-    const timeout = setTimeout(() => {
-      callback();
-      this.debounceTimeouts.delete(key);
-    }, this.options.debounceTime);
-    
-    this.debounceTimeouts.set(key, timeout);
-  }
-
-  async handleFileEvent(filePath, eventType) {
-    try {
-      const stats = await fs.promises.stat(filePath).catch(() => null);
-      
-      const event = {
-        path: filePath,
-        type: eventType,
-        isDirectory: stats ? stats.isDirectory() : false,
-        size: stats ? stats.size : 0,
-        timestamp: new Date()
-      };
-
-      console.log(`[${event.timestamp.toISOString()}] ${event.type}: ${event.path}`);
-      
-      // Emetti eventi personalizzati
-      if (eventType === 'rename' && !stats) {
-        this.onFileDeleted(event);
-      } else if (eventType === 'rename' && stats) {
-        this.onFileCreated(event);
-      } else if (eventType === 'change') {
-        this.onFileModified(event);
-      }
-    } catch (error) {
-      console.error('Errore nella gestione evento file:', error.message);
-    }
-  }
-
-  onFileCreated(event) {
-    console.log(`✅ File creato: ${event.path}`);
-  }
-
-  onFileModified(event) {
-    console.log(`📝 File modificato: ${event.path} (${event.size} byte)`);
-  }
-
-  onFileDeleted(event) {
-    console.log(`🗑️ File eliminato: ${event.path}`);
-  }
-
-  stop() {
-    for (const watcher of this.watchers.values()) {
-      watcher.close();
-    }
-    this.watchers.clear();
-    
-    for (const timeout of this.debounceTimeouts.values()) {
-      clearTimeout(timeout);
-    }
-    this.debounceTimeouts.clear();
-  }
-}
-
-// Utilizzo del File Watcher avanzato
-const watcher = new FileWatcher('./watched-folder', {
-  recursive: true,
-  debounceTime: 200,
-  excludePatterns: [
-    'node_modules',
-    '.git',
-    /\.tmp$/,
-    /~$/
-  ]
-});
-
-watcher.start();
-
-// Gestione shutdown graceful
-process.on('SIGINT', () => {
-  console.log('\nArresto del file watcher...');
-  watcher.stop();
-  process.exit(0);
-});
-```
-
-### File Lock (Blocco File)
-
-```javascript
-const fs = require('fs').promises;
-const path = require('path');
-
-class FileLock {
-  constructor(filePath, options = {}) {
-    this.filePath = filePath;
-    this.lockFilePath = `${filePath}.lock`;
-    this.options = {
-      timeout: options.timeout || 10000,
-      retryInterval: options.retryInterval || 100,
-      stale: options.stale || 60000, // Considera stale dopo 1 minuto
-      ...options
-    };
-  }
-
-  async acquire() {
-    const startTime = Date.now();
-    
-    while (Date.now() - startTime < this.options.timeout) {
-      try {
-        // Controlla se il lock è stale
-        if (await this.isLockStale()) {
-          await this.release();
-        }
-        
-        // Tenta di creare il file di lock
-        await fs.writeFile(this.lockFilePath, JSON.stringify({
-          pid: process.pid,
-          timestamp: Date.now(),
-          hostname: require('os').hostname()
-        }), { flag: 'wx' }); // Fallisce se il file esiste
-        
-        return true;
-      } catch (error) {
-        if (error.code !== 'EEXIST') {
-          throw error;
-        }
-        
-        // Il lock esiste, aspetta e riprova
-        await new Promise(resolve => 
-          setTimeout(resolve, this.options.retryInterval)
-        );
-      }
-    }
-    
-    throw new Error(`Impossibile acquisire il lock per ${this.filePath} entro ${this.options.timeout}ms`);
-  }
-
-  async isLockStale() {
-    try {
-      const lockData = await fs.readFile(this.lockFilePath, 'utf8');
-      const { timestamp } = JSON.parse(lockData);
-      return (Date.now() - timestamp) > this.options.stale;
-    } catch (error) {
-      return false; // Se non riusciamo a leggere il lock, assumiamo non sia stale
-    }
-  }
-
-  async release() {
-    try {
-      await fs.unlink(this.lockFilePath);
-    } catch (error) {
-      if (error.code !== 'ENOENT') {
-        throw error;
-      }
-    }
-  }
-
-  async withLock(callback) {
-    await this.acquire();
-    try {
-      return await callback();
-    } finally {
-      await this.release();
-    }
-  }
-}
-
-// Esempio di utilizzo del file lock
-async function safeFileOperation(filePath) {
-  const lock = new FileLock(filePath);
-  
-  return await lock.withLock(async () => {
-    console.log('Lock acquisito, eseguendo operazione...');
-    
-    // Operazione critica sul file
-    const data = await fs.readFile(filePath, 'utf8').catch(() => '');
-    const newData = data + '\nNuova riga aggiunta in modo sicuro';
-    await fs.writeFile(filePath, newData);
-    
-    console.log('Operazione completata');
-    return newData;
-  });
-}
-```
+**Corruzioni Data**:
+- Scritture parziali sovrapposte
+- Letture incoerenti (dati misti da due versioni)
+- File troncati o malformati
+
+### Strategie di Locking
+
+Node.js non ha locking nativo, ma offre **building blocks** per implementarlo:
+
+#### 1. Lock File Pattern
+
+Crea un file `.lock` come semaforo:
+
+**Vantaggi**:
+- 🚀 Semplice da implementare
+- 🌍 Cross-platform
+- 🔍 Visibile nel filesystem (debug facile)
+
+**Implementazione**:
+- Usa flag `wx` (write exclusive) per creazione atomica
+- Salva PID per identificare proprietario
+- Rileva lock "stale" (processo morto)
+- Implementa timeout per evitare deadlock
+
+#### 2. Advisory Locking (fcntl)
+
+Usa system call `fcntl()` su Linux/Unix:
+
+**Vantaggi**:
+- ⚡ Veloce (kernel-level)
+- 🔒 Rilascio automatico se processo termina
+
+**Svantaggi**:
+- ❌ Non supportato su Windows
+- 🐛 Richiede moduli nativi (`fs-ext`)
+
+#### 3. Read-Write Lock
+
+Permette **multiple letture** simultanee ma **scrittura esclusiva**:
+
+**Pattern**:
+- Letture: Creano lock in directory condivisa
+- Scrittura: Attende che directory sia vuota
+
+**Use case**: Database file, configuration files
+
+### Best Practices
+
+✅ **DO**:
+- Imposta sempre un **timeout** per evitare deadlock
+- Gestisci **stale locks** (processo crashed)
+- Usa pattern **try-finally** per garantire rilascio
+- Implementa **retry** con exponential backoff
+- Logga **lock contention** per debugging
+
+❌ **DON'T**:
+- Non fare busy-waiting (CPU 100%)
+- Non assumere lock sia sempre rilasciato
+- Non usare `fs.existsSync()` per check (race condition)
+- Non dimenticare lock su file temporanei
+
+**📖 Esempio completo**: [02.18 - File Locking](esempi/02.18-file-locking.js) - Include lock file, stale detection, read-write lock, FileLock class
+
+## Indice Esempi Completi
+
+Tutti gli esempi sono disponibili nella cartella [esempi/](esempi/) e possono essere eseguiti direttamente con Node.js:
+
+### 📁 Operazioni Base File
+- **[02.01](esempi/02.01-lettura-sincrona.js)** - Lettura sincrona con `readFileSync()`
+- **[02.02](esempi/02.02-lettura-asincrona-callback.js)** - Lettura asincrona con callback (pattern error-first)
+- **[02.03](esempi/02.03-lettura-asincrona-promise.js)** - Lettura asincrona con async/await (⭐ raccomandato)
+- **[02.04](esempi/02.04-scrittura-file.js)** - Scrittura file (sync, callback, promise)
+- **[02.05](esempi/02.05-append-file.js)** - Append file + SimpleLogger class
+- **[02.06](esempi/02.06-eliminazione-file.js)** - Eliminazione sicura file + cleanup utilities
+
+### 📂 Operazioni Directory
+- **[02.07](esempi/02.07-creazione-directory.js)** - Creazione directory + project scaffolding
+- **[02.08](esempi/02.08-lettura-directory.js)** - Lettura directory + recursive traversal + statistics
+- **[02.13](esempi/02.13-eliminazione-directory.js)** - Eliminazione ricorsiva + selective deletion
+
+### 📊 Informazioni e Metadata
+- **[02.12](esempi/02.12-informazioni-file-stat.js)** - fs.stat() + formattazione dimensioni + età file
+- **[02.14](esempi/02.14-controllo-esistenza-file.js)** - Controllo esistenza + permessi + best practices
+
+### 🌊 Stream Processing
+- **[02.09](esempi/02.09-stream-lettura.js)** - ReadStream + chunk processing + memory efficiency
+- **[02.10](esempi/02.10-stream-scrittura.js)** - WriteStream + backpressure handling + CSV generation
+- **[02.11](esempi/02.11-stream-pipe.js)** - Pipe operations + compression + encryption + progress
+
+### 🔄 Operazioni Avanzate
+- **[02.15](esempi/02.15-file-watcher.js)** - File watcher + debouncing + FileWatcher class
+- **[02.16](esempi/02.16-copia-file-verificata.js)** - Copia con checksum + progress + FileCopier class
+- **[02.17](esempi/02.17-backup-rotazione.js)** - Backup automatici + log rotation + retention policy
+- **[02.18](esempi/02.18-file-locking.js)** - File locking + stale detection + read-write lock
+
+## Best Practices e Raccomandazioni
+
+### ⚡ Performance
+
+1. **Usa async/await per nuovo codice**
+   ```javascript
+   // ✅ Raccomandato
+   const data = await fs.promises.readFile('file.txt', 'utf8');
+   
+   // ❌ Evita operazioni sincrone in produzione
+   const data = fs.readFileSync('file.txt', 'utf8');
+   ```
+
+2. **Stream per file grandi (>10MB)**
+   ```javascript
+   // ✅ Memory-efficient
+   fs.createReadStream('large.log').pipe(processStream);
+   
+   // ❌ Carica tutto in RAM
+   const data = await fs.promises.readFile('large.log');
+   ```
+
+3. **Batch operations per molti file**
+   ```javascript
+   // ✅ Parallelize con limite
+   await Promise.all(files.slice(0, 10).map(f => processFile(f)));
+   
+   // ❌ Seriale lento
+   for (const file of files) await processFile(file);
+   ```
+
+### 🛡️ Sicurezza
+
+1. **Valida sempre i percorsi**
+   ```javascript
+   const safePath = path.join(baseDir, path.normalize(userInput));
+   if (!safePath.startsWith(baseDir)) {
+     throw new Error('Path traversal detected');
+   }
+   ```
+
+2. **Gestisci permessi file**
+   ```javascript
+   // Crea file con permessi restrittivi
+   await fs.promises.writeFile('secret.txt', data, { mode: 0o600 });
+   ```
+
+3. **Non esporre errori dettagliati**
+   ```javascript
+   try {
+     await fs.promises.readFile(userPath);
+   } catch (err) {
+     // ❌ Non fare: throw err (path disclosure)
+     throw new Error('File not accessible');
+   }
+   ```
+
+### 🐛 Error Handling
+
+1. **Gestisci errori specifici**
+   ```javascript
+   try {
+     await fs.promises.readFile('config.json');
+   } catch (err) {
+     if (err.code === 'ENOENT') {
+       // File non esiste, usa default
+       return DEFAULT_CONFIG;
+     }
+     if (err.code === 'EACCES') {
+       // Permessi insufficienti
+       throw new Error('Permission denied');
+     }
+     throw err; // Errore inatteso
+   }
+   ```
+
+2. **Cleanup in caso di errore**
+   ```javascript
+   const tempFile = 'temp.txt';
+   try {
+     await fs.promises.writeFile(tempFile, data);
+     await processFile(tempFile);
+   } finally {
+     await fs.promises.unlink(tempFile).catch(() => {});
+   }
+   ```
+
+### 💾 Atomicità e Durabilità
+
+1. **Write to temp + rename pattern**
+   ```javascript
+   const tempFile = `${targetFile}.tmp`;
+   await fs.promises.writeFile(tempFile, data);
+   await fs.promises.rename(tempFile, targetFile); // Atomico!
+   ```
+
+2. **Verifica sync per dati critici**
+   ```javascript
+   const fd = await fs.promises.open('critical.dat', 'w');
+   await fd.write(data);
+   await fd.sync(); // Force flush to disk
+   await fd.close();
+   ```
+
+## Risorse Aggiuntive
+
+### 📚 Documentazione Ufficiale
+- [Node.js fs module](https://nodejs.org/api/fs.html)
+- [Node.js fs/promises API](https://nodejs.org/api/fs.html#promises-api)
+- [Node.js stream module](https://nodejs.org/api/stream.html)
+
+### 🎓 Approfondimenti
+- [Stream Handbook](https://github.com/substack/stream-handbook)
+- [Node.js Best Practices](https://github.com/goldbergyoni/nodebestpractices)
+- [File System Design Patterns](https://www.patterns.dev/)
+
+### 🔧 Librerie Utili
+- **[fs-extra](https://github.com/jprichardson/node-fs-extra)**: fs con funzioni aggiuntive
+- **[graceful-fs](https://github.com/isaacs/node-graceful-fs)**: fs più robusto
+- **[chokidar](https://github.com/paulmillr/chokidar)**: File watcher migliore
+- **[glob](https://github.com/isaacs/node-glob)**: Pattern matching file
 
 ## Conclusione
 
-Il modulo `fs` di Node.js offre un'ampia gamma di funzionalità per lavorare con il file system. La scelta tra operazioni sincrone e asincrone dipende dalle esigenze specifiche dell'applicazione, ma in generale è consigliabile utilizzare le versioni asincrone per evitare di bloccare il thread principale, specialmente in applicazioni con molte richieste concorrenti.
+Il modulo `fs` è uno degli strumenti più potenti e versatili di Node.js. Questa guida ha coperto:
+
+✅ **Operazioni base**: Lettura, scrittura, eliminazione file e directory  
+✅ **Stream processing**: Elaborazione efficiente di file grandi  
+✅ **Monitoraggio**: File watcher per applicazioni reattive  
+✅ **Operazioni avanzate**: Backup, rotazione, locking  
+✅ **Best practices**: Performance, sicurezza, error handling  
+
+**🎯 Prossimi Passi**:
+1. Esegui gli esempi nella cartella `esempi/`
+2. Modifica gli esempi per i tuoi use case
+3. Implementa un progetto pratico (es. file manager, backup tool)
+4. Esplora librerie avanzate come fs-extra e chokidar
+
+**💡 Ricorda**: Preferisci sempre approcci **asincroni** e usa **stream** per file grandi. La scelta tra sincrone e asincrone dipende dal contesto, ma in ambienti server l'asincronicità è fondamentale per mantenere alte performance con richieste concorrenti.

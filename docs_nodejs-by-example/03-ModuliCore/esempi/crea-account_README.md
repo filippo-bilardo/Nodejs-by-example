@@ -67,7 +67,7 @@ sudo node crea-account-studenti.js
 
 ```
 ╔════════════════════════════════════════════════════╗
-║   CREAZIONE ACCOUNT STUDENTI DA FILE CSV          ║
+║   CREAZIONE ACCOUNT STUDENTI DA FILE CSV           ║
 ╚════════════════════════════════════════════════════╝
 
 📄 Lettura file: studenti.cvs
