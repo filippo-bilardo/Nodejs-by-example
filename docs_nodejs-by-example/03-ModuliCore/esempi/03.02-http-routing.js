@@ -253,11 +253,13 @@ const server = http.createServer((req, res) => {
 // ============================================
 
 const PORT = 3001;
-const HOST = 'localhost';
+//const HOST = 'localhost'; // Ascolta solo su localhost (non accessibile da rete esterna)
+const HOST = '0.0.0.0'; // Ascolta su tutte le interfacce di rete (accessibile da rete esterna)
 
 server.listen(PORT, HOST, () => {
   console.log(`\n${'='.repeat(60)}`);
   console.log(`✓ Server HTTP con routing attivo su http://${HOST}:${PORT}/`);
+  console.log(`✓ Server HTTP con routing attivo su https://w4s-3001.filippobilardo.it/`);
   console.log(`${'='.repeat(60)}\n`);
   
   console.log('📍 ROUTE DISPONIBILI:');

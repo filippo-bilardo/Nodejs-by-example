@@ -50,8 +50,9 @@ const server = http.createServer((req, res) => {
 // AVVIO SERVER
 // ============================================
 
-const PORT = 3000;
-const HOST = 'localhost';
+const PORT = 3001;
+//const HOST = 'localhost'; // Ascolta solo su localhost (non accessibile da rete esterna)
+const HOST = '0.0.0.0'; // Ascolta su tutte le interfacce di rete (accessibile da rete esterna)
 
 /**
  * Avvia il server sulla porta specificata
@@ -60,7 +61,7 @@ const HOST = 'localhost';
 server.listen(PORT, HOST, () => {
   console.log(`✓ Server HTTP in esecuzione su http://${HOST}:${PORT}/`);
   console.log('\nPremi Ctrl+C per fermare il server');
-  console.log('\n📝 Apri il browser e visita http://localhost:3000/\n');
+  console.log(`\n📝 Apri il browser e visita https://w4s-3001.filippobilardo.it/\n`);
 });
 
 // ============================================
