@@ -159,6 +159,7 @@ app.listen(port, () => {
 - [Semantic Versioning](https://semver.org/)
 - [Creazione di pacchetti Node.js](https://docs.npmjs.com/creating-node-js-modules)
 - [NPM CLI Commands](https://docs.npmjs.com/cli/v8/commands)
+- [Node JS Tutorial Italiano 11 - Nodemon](https://www.youtube.com/watch?v=1z-BVcGWyic)
 
 ## Navigazione del Corso
 
