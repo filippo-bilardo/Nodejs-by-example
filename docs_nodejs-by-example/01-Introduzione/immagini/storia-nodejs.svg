@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="415" viewBox="0 0 1040 415" role="img" aria-labelledby="title desc">
+<title id="title">Le tappe di Node.js</title>
+<desc id="desc">Linea del tempo: Node.js nasce nel 2009; npm nel 2010; il fork io.js si sviluppa tra 2014 e 2015; Node.js 4 e la Foundation arrivano nel 2015.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#42596a"/></marker></defs>
+<rect width="1040" height="415" rx="20" fill="#f4f7fa"/>
+<rect x="32" y="30" width="6" height="58" rx="3" fill="#176544"/>
+<g font-family="DejaVu Sans, Arial, sans-serif">
+<text x="54" y="53" font-size="27" fill="#172c3c" font-weight="700" text-anchor="start">Le tappe di Node.js</text>
+<text x="54" y="82" font-size="16" fill="#42596a" font-weight="400" text-anchor="start">Dalla nascita del runtime alla convergenza con io.js</text>
+<polyline points="64,166 980,166" fill="none" stroke="#42596a" stroke-width="2.5" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<circle cx="145" cy="166" r="7" fill="#176544"/>
+<text x="145" y="139" font-size="22" fill="#176544" font-weight="700" text-anchor="middle">2009</text>
+<rect x="32" y="191" width="226" height="153" rx="14" fill="#ffffff" stroke="#cad7df" stroke-width="1.5"/>
+<rect x="50" y="210" width="5" height="23" rx="2" fill="#176544"/>
+<text x="66" y="229" font-size="20" fill="#176544" font-weight="700" text-anchor="start">Node.js</text>
+<text x="52" y="263" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">Ryan Dahl</text>
+<text x="52" y="290" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">JavaScript fuori</text>
+<text x="52" y="317" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">dal browser</text>
+<circle cx="395" cy="166" r="7" fill="#176544"/>
+<text x="395" y="139" font-size="22" fill="#176544" font-weight="700" text-anchor="middle">2010</text>
+<rect x="282" y="191" width="226" height="153" rx="14" fill="#ffffff" stroke="#cad7df" stroke-width="1.5"/>
+<rect x="300" y="210" width="5" height="23" rx="2" fill="#176544"/>
+<text x="316" y="229" font-size="20" fill="#176544" font-weight="700" text-anchor="start">npm</text>
+<text x="302" y="263" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">Pacchetti condivisi</text>
+<text x="302" y="290" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">e gestione delle</text>
+<text x="302" y="317" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">dipendenze</text>
+<circle cx="645" cy="166" r="7" fill="#176544"/>
+<text x="645" y="139" font-size="22" fill="#176544" font-weight="700" text-anchor="middle">2014–2015</text>
+<rect x="532" y="191" width="226" height="153" rx="14" fill="#ffffff" stroke="#cad7df" stroke-width="1.5"/>
+<rect x="550" y="210" width="5" height="23" rx="2" fill="#176544"/>
+<text x="566" y="229" font-size="20" fill="#176544" font-weight="700" text-anchor="start">io.js</text>
+<text x="552" y="263" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">Fork del progetto</text>
+<text x="552" y="290" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">e confronto sulla</text>
+<text x="552" y="317" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">governance</text>
+<circle cx="895" cy="166" r="7" fill="#176544"/>
+<text x="895" y="139" font-size="22" fill="#176544" font-weight="700" text-anchor="middle">2015</text>
+<rect x="782" y="191" width="226" height="153" rx="14" fill="#ffffff" stroke="#cad7df" stroke-width="1.5"/>
+<rect x="800" y="210" width="5" height="23" rx="2" fill="#176544"/>
+<text x="816" y="229" font-size="20" fill="#176544" font-weight="700" text-anchor="start">Convergenza</text>
+<text x="802" y="263" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">Node.js Foundation</text>
+<text x="802" y="290" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">e rilascio di</text>
+<text x="802" y="317" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">Node.js 4.0.0</text>
+<text x="32" y="391" font-size="15" fill="#42596a" font-weight="400" text-anchor="start">La storia aiuta a capire perché contano comunità, compatibilità e manutenzione nel tempo.</text>
+</g>
+</svg>

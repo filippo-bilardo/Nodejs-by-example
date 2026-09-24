@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="445" viewBox="0 0 1040 445" role="img" aria-labelledby="title desc">
+<title id="title">Il ciclo del REPL</title>
+<desc id="desc">Read legge 2 + 3, Eval calcola il risultato, Print mostra 5, Loop torna al prompt per una nuova espressione.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#42596a"/></marker></defs>
+<rect width="1040" height="445" rx="20" fill="#f4f7fa"/>
+<rect x="32" y="30" width="6" height="58" rx="3" fill="#176544"/>
+<g font-family="DejaVu Sans, Arial, sans-serif">
+<text x="54" y="53" font-size="27" fill="#172c3c" font-weight="700" text-anchor="start">Il ciclo del REPL</text>
+<text x="54" y="82" font-size="16" fill="#42596a" font-weight="400" text-anchor="start">Prova una singola espressione e osserva il suo valore</text>
+<rect x="32" y="155" width="226" height="138" rx="14" fill="#eaf5ee" stroke="#cad7df" stroke-width="1.5"/>
+<rect x="50" y="174" width="5" height="23" rx="2" fill="#176544"/>
+<text x="66" y="193" font-size="20" fill="#176544" font-weight="700" text-anchor="start">1. READ</text>
+<text x="52" y="227" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">Legge l’input</text>
+<text x="52" y="254" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">&gt; 2 + 3</text>
+<rect x="282" y="155" width="226" height="138" rx="14" fill="#ffffff" stroke="#cad7df" stroke-width="1.5"/>
+<rect x="300" y="174" width="5" height="23" rx="2" fill="#176544"/>
+<text x="316" y="193" font-size="20" fill="#176544" font-weight="700" text-anchor="start">2. EVAL</text>
+<text x="302" y="227" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">Valuta l’espressione</text>
+<text x="302" y="254" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">2 + 3 → 5</text>
+<rect x="532" y="155" width="226" height="138" rx="14" fill="#ffffff" stroke="#cad7df" stroke-width="1.5"/>
+<rect x="550" y="174" width="5" height="23" rx="2" fill="#176544"/>
+<text x="566" y="193" font-size="20" fill="#176544" font-weight="700" text-anchor="start">3. PRINT</text>
+<text x="552" y="227" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">Mostra il risultato</text>
+<text x="552" y="254" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">5</text>
+<rect x="782" y="155" width="226" height="138" rx="14" fill="#ffffff" stroke="#cad7df" stroke-width="1.5"/>
+<rect x="800" y="174" width="5" height="23" rx="2" fill="#176544"/>
+<text x="816" y="193" font-size="20" fill="#176544" font-weight="700" text-anchor="start">4. LOOP</text>
+<text x="802" y="227" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">Attende nuovo input</text>
+<text x="802" y="254" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">&gt;</text>
+<polyline points="260,221 278,221" fill="none" stroke="#42596a" stroke-width="2.5" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<polyline points="510,221 528,221" fill="none" stroke="#42596a" stroke-width="2.5" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<polyline points="760,221 778,221" fill="none" stroke="#42596a" stroke-width="2.5" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<polyline points="895,295 895,344 145,344 145,295" fill="none" stroke="#42596a" stroke-width="2.5" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="520" y="373" font-size="17" fill="#42596a" font-weight="400" text-anchor="middle">La sessione conserva le dichiarazioni tra un input e il successivo.</text>
+<text x="32" y="421" font-size="15" fill="#42596a" font-weight="400" text-anchor="start">Il terminale avvia node; nel prompt &gt; si digitano espressioni JavaScript e comandi come .help o .exit.</text>
+</g>
+</svg>

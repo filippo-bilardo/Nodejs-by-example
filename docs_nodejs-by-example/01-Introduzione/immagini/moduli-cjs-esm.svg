@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="495" viewBox="0 0 1040 495" role="img" aria-labelledby="title desc">
+<title id="title">Dividere un programma in moduli</title>
+<desc id="desc">In CommonJS calcoli.cjs esporta funzioni con module.exports e app.cjs le importa con require. In ESM calcoli.mjs usa export e app.mjs usa import. Entrambe le app stampano somma 8 e prodotto 15.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#42596a"/></marker></defs>
+<rect width="1040" height="495" rx="20" fill="#f4f7fa"/>
+<rect x="32" y="30" width="6" height="58" rx="3" fill="#176544"/>
+<g font-family="DejaVu Sans, Arial, sans-serif">
+<text x="54" y="53" font-size="27" fill="#172c3c" font-weight="700" text-anchor="start">Dividere un programma in moduli</text>
+<text x="54" y="82" font-size="16" fill="#42596a" font-weight="400" text-anchor="start">Due formati, la stessa separazione di responsabilità</text>
+<rect x="32" y="126" width="360" height="120" rx="14" fill="#ffffff" stroke="#cad7df" stroke-width="1.5"/>
+<rect x="50" y="145" width="5" height="23" rx="2" fill="#176544"/>
+<text x="66" y="164" font-size="20" fill="#176544" font-weight="700" text-anchor="start">calcoli.cjs</text>
+<text x="52" y="198" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">Definisce somma e moltiplica</text>
+<text x="52" y="225" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">Esporta con module.exports</text>
+<rect x="648" y="126" width="360" height="120" rx="14" fill="#ffffff" stroke="#cad7df" stroke-width="1.5"/>
+<rect x="666" y="145" width="5" height="23" rx="2" fill="#176544"/>
+<text x="682" y="164" font-size="20" fill="#176544" font-weight="700" text-anchor="start">app.cjs</text>
+<text x="668" y="198" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">Importa con require(...)</text>
+<text x="668" y="225" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">Chiama le funzioni e stampa</text>
+<polyline points="394,186 644,186" fill="none" stroke="#42596a" stroke-width="2.5" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="520" y="170" font-size="16" fill="#176544" font-weight="700" text-anchor="middle">COMMONJS</text>
+<rect x="32" y="281" width="360" height="120" rx="14" fill="#ffffff" stroke="#cad7df" stroke-width="1.5"/>
+<rect x="50" y="300" width="5" height="23" rx="2" fill="#2256a0"/>
+<text x="66" y="319" font-size="20" fill="#2256a0" font-weight="700" text-anchor="start">calcoli.mjs</text>
+<text x="52" y="353" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">Definisce somma e moltiplica</text>
+<text x="52" y="380" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">Esporta con export</text>
+<rect x="648" y="281" width="360" height="120" rx="14" fill="#ffffff" stroke="#cad7df" stroke-width="1.5"/>
+<rect x="666" y="300" width="5" height="23" rx="2" fill="#2256a0"/>
+<text x="682" y="319" font-size="20" fill="#2256a0" font-weight="700" text-anchor="start">app.mjs</text>
+<text x="668" y="353" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">Importa con import ... from</text>
+<text x="668" y="380" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">Chiama le funzioni e stampa</text>
+<polyline points="394,341 644,341" fill="none" stroke="#42596a" stroke-width="2.5" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="520" y="325" font-size="16" fill="#2256a0" font-weight="700" text-anchor="middle">ES MODULES</text>
+<text x="520" y="440" font-size="19" fill="#172c3c" font-weight="700" text-anchor="middle">Risultato in entrambi i casi: Somma: 8  ·  Prodotto: 15</text>
+<text x="32" y="471" font-size="15" fill="#42596a" font-weight="400" text-anchor="start">Le frecce indicano le funzionalità rese disponibili. Le variabili interne restano nello scope del modulo.</text>
+</g>
+</svg>

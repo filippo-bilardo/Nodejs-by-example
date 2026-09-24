@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="492" viewBox="0 0 1040 492" role="img" aria-labelledby="title desc">
+<title id="title">Stesso linguaggio, ambienti diversi</title>
+<desc id="desc">JavaScript offre Array, JSON, Promise e funzioni sia nel browser sia in Node.js. Il browser offre DOM e document; Node.js offre file system e process. Entrambi espongono alcune API come fetch, URL e timer.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#42596a"/></marker></defs>
+<rect width="1040" height="492" rx="20" fill="#f4f7fa"/>
+<rect x="32" y="30" width="6" height="58" rx="3" fill="#176544"/>
+<g font-family="DejaVu Sans, Arial, sans-serif">
+<text x="54" y="53" font-size="27" fill="#172c3c" font-weight="700" text-anchor="start">Stesso linguaggio, ambienti diversi</text>
+<text x="54" y="82" font-size="16" fill="#42596a" font-weight="400" text-anchor="start">Le API disponibili dipendono dal runtime</text>
+<rect x="32" y="115" width="976" height="85" rx="14" fill="#eaf5ee" stroke="#cad7df" stroke-width="1.5"/>
+<rect x="50" y="134" width="5" height="23" rx="2" fill="#176544"/>
+<text x="66" y="153" font-size="20" fill="#176544" font-weight="700" text-anchor="start">JavaScript / ECMAScript</text>
+<text x="52" y="187" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">Funzioni, oggetti, Array, JSON, Promise</text>
+<rect x="32" y="225" width="468" height="151" rx="14" fill="#ffffff" stroke="#cad7df" stroke-width="1.5"/>
+<rect x="50" y="244" width="5" height="23" rx="2" fill="#2256a0"/>
+<text x="66" y="263" font-size="20" fill="#2256a0" font-weight="700" text-anchor="start">Browser · pagina web</text>
+<text x="52" y="297" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">document e DOM</text>
+<text x="52" y="324" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">Interfaccia della pagina HTML</text>
+<text x="52" y="351" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">Interazione con l’utente</text>
+<rect x="540" y="225" width="468" height="151" rx="14" fill="#ffffff" stroke="#cad7df" stroke-width="1.5"/>
+<rect x="558" y="244" width="5" height="23" rx="2" fill="#176544"/>
+<text x="574" y="263" font-size="20" fill="#176544" font-weight="700" text-anchor="start">Node.js</text>
+<text x="560" y="297" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">process e Buffer</text>
+<text x="560" y="324" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">File system: node:fs</text>
+<text x="560" y="351" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">Server HTTP: node:http</text>
+<rect x="32" y="399" width="976" height="55" rx="14" fill="#edf3fc" stroke="#cad7df" stroke-width="1.5"/>
+<rect x="50" y="418" width="5" height="23" rx="2" fill="#2256a0"/>
+<text x="66" y="437" font-size="20" fill="#2256a0" font-weight="700" text-anchor="start">API presenti in entrambi: console, timer, fetch, URL</text>
+<text x="32" y="468" font-size="15" fill="#42596a" font-weight="400" text-anchor="start">Condividere il linguaggio non rende automaticamente portabile il codice che dipende dalle API dell’ambiente.</text>
+</g>
+</svg>

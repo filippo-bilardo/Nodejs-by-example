@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="470" viewBox="0 0 1040 470" role="img" aria-labelledby="title desc">
+<title id="title">JavaScript, fuori dal browser</title>
+<desc id="desc">Un file JavaScript è eseguito da Node.js, che usa V8 e API di sistema per creare strumenti da terminale, servizi web e programmi che lavorano con file.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#42596a"/></marker></defs>
+<rect width="1040" height="470" rx="20" fill="#f4f7fa"/>
+<rect x="32" y="30" width="6" height="58" rx="3" fill="#176544"/>
+<g font-family="DejaVu Sans, Arial, sans-serif">
+<text x="54" y="53" font-size="27" fill="#172c3c" font-weight="700" text-anchor="start">JavaScript, fuori dal browser</text>
+<text x="54" y="82" font-size="16" fill="#42596a" font-weight="400" text-anchor="start">Un linguaggio • un runtime • più tipi di programmi</text>
+<rect x="32" y="161" width="230" height="142" rx="14" fill="#ffffff" stroke="#cad7df" stroke-width="1.5"/>
+<rect x="50" y="180" width="5" height="23" rx="2" fill="#176544"/>
+<text x="66" y="199" font-size="20" fill="#176544" font-weight="700" text-anchor="start">Il tuo codice</text>
+<text x="52" y="233" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">Variabili e funzioni</text>
+<text x="52" y="260" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">File .js / .cjs / .mjs</text>
+<rect x="337" y="128" width="330" height="205" rx="14" fill="#eaf5ee" stroke="#cad7df" stroke-width="1.5"/>
+<rect x="355" y="147" width="5" height="23" rx="2" fill="#176544"/>
+<text x="371" y="166" font-size="20" fill="#176544" font-weight="700" text-anchor="start">Node.js</text>
+<text x="357" y="200" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">V8 esegue JavaScript</text>
+<text x="357" y="227" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">Le API accedono a file,</text>
+<text x="357" y="254" font-size="17" fill="#172c3c" font-weight="400" text-anchor="start">rete e processi</text>
+<polyline points="264,232 333,232" fill="none" stroke="#42596a" stroke-width="2.5" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="742" y="120" width="266" height="78" rx="14" fill="#ffffff" stroke="#cad7df" stroke-width="1.5"/>
+<rect x="760" y="139" width="5" height="23" rx="2" fill="#2256a0"/>
+<text x="776" y="158" font-size="20" fill="#2256a0" font-weight="700" text-anchor="start">Terminale e script</text>
+<rect x="742" y="216" width="266" height="78" rx="14" fill="#ffffff" stroke="#cad7df" stroke-width="1.5"/>
+<rect x="760" y="235" width="5" height="23" rx="2" fill="#2256a0"/>
+<text x="776" y="254" font-size="20" fill="#2256a0" font-weight="700" text-anchor="start">Server e API</text>
+<rect x="742" y="312" width="266" height="78" rx="14" fill="#ffffff" stroke="#cad7df" stroke-width="1.5"/>
+<rect x="760" y="331" width="5" height="23" rx="2" fill="#2256a0"/>
+<text x="776" y="350" font-size="20" fill="#2256a0" font-weight="700" text-anchor="start">File e automazione</text>
+<polyline points="669,232 704,232 704,159 738,159" fill="none" stroke="#42596a" stroke-width="2.5" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<polyline points="704,232 704,255 738,255" fill="none" stroke="#42596a" stroke-width="2.5" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<polyline points="704,255 704,351 738,351" fill="none" stroke="#42596a" stroke-width="2.5" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="32" y="446" font-size="15" fill="#42596a" font-weight="400" text-anchor="start">Per i primi esempi bastano Node.js e un editor: non occorre installare librerie esterne.</text>
+</g>
+</svg>

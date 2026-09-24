@@ -1,702 +1,311 @@
-# Introduzione ai moduli in Node.js
+# 5. Moduli in Node.js: CommonJS ed ES Modules
 
-## Cos'è un modulo in Node.js
+## Obiettivi
 
-Un **modulo** in Node.js è un'unità autonoma e riutilizzabile di codice JavaScript che incapsula funzionalità specifiche. Ogni file JavaScript in Node.js è automaticamente trattato come un modulo separato con il proprio **scope isolato**.
+Separare un programma in file con responsabilità chiare, esportare e importare funzionalità, scegliere esplicitamente il formato dei moduli e riconoscere i principali errori di caricamento.
 
-### Concetti fondamentali
+## Un modulo è un confine nel programma
 
-**1. Isolamento dello scope**
+Un modulo contiene codice e decide quali funzionalità rendere disponibili agli altri moduli. Le variabili locali restano nel suo **scope**, cioè nell'ambito in cui sono accessibili; le esportazioni costituiscono la sua interfaccia.
 
-In Node.js, le variabili e le funzioni definite in un file non sono automaticamente accessibili da altri file. Questo previene conflitti e inquinamento dello scope globale.
+Per esempio, `calcoli` può offrire una funzione `somma`, mentre `app` si occupa di chiamarla e stampare il risultato. In questo modo puoi cambiare l'organizzazione interna dei calcoli senza riscrivere ogni punto del programma che li usa.
 
-```javascript
-// file1.js
-const messaggio = "Ciao da file1";
-function saluta() {
-    console.log(messaggio);
-}
+![CommonJS collega calcoli.cjs e app.cjs con module.exports e require; ESM collega calcoli.mjs e app.mjs con export e import.](./immagini/moduli-cjs-esm.svg)
 
-// file2.js
-const messaggio = "Ciao da file2"; // Non c'è conflitto con file1.js
-console.log(messaggio); // "Ciao da file2"
+*Il modulo dei calcoli espone funzioni; il modulo applicativo le usa e mostra il risultato.*
+
+## Due classificazioni diverse
+
+La **provenienza** di un modulo è distinta dal **formato** con cui viene scritto.
+
+| Provenienza | Esempio | Installazione necessaria? |
+| --- | --- | --- |
+| Integrato in Node.js | `node:path`, `node:fs`, `node:http` | No |
+| Locale, scritto nel progetto | `./calcoli.cjs` | No |
+| Pacchetto esterno | Un pacchetto gestito con npm | Sì, se non già presente nel progetto |
+
+Il prefisso `node:` identifica esplicitamente i moduli integrati. Un pacchetto può contenere più moduli e risorse: “pacchetto” e “singolo file” non sono sinonimi.
+
+I due formati principali sono **CommonJS (CJS)** ed **ECMAScript Modules (ESM)**. Entrambi permettono di organizzare il codice, con regole differenti.
+
+## 1. Laboratorio CommonJS
+
+Crea una cartella di lavoro `laboratorio-moduli` e aprila nel terminale:
+
+```bash
+mkdir laboratorio-moduli
+cd laboratorio-moduli
 ```
 
-**2. Esportazione esplicita**
+Salva i due file seguenti nella cartella. Usiamo l'estensione `.cjs` per indicare CommonJS senza dipendere da altre impostazioni del progetto.
 
-Per rendere funzioni, oggetti o variabili disponibili ad altri moduli, dobbiamo esportarli esplicitamente:
+**`calcoli.cjs`**
 
 ```javascript
-// utils.js
 function somma(a, b) {
-    return a + b;
+  return a + b;
 }
 
 function moltiplica(a, b) {
-    return a * b;
+  return a * b;
 }
 
-// Esportazione esplicita
-module.exports = {
-    somma,
-    moltiplica
-};
+module.exports = { somma, moltiplica };
 ```
 
-**3. Importazione**
-
-Per usare un modulo in un altro file, dobbiamo importarlo usando `require()`:
+**`app.cjs`**
 
 ```javascript
-// app.js
-const utils = require('./utils');
+const { somma, moltiplica } = require('./calcoli.cjs');
 
-console.log(utils.somma(5, 3)); // 8
-console.log(utils.moltiplica(4, 2)); // 8
+console.log('Somma:', somma(5, 3));
+console.log('Prodotto:', moltiplica(5, 3));
 ```
 
-### Perché i moduli sono importanti
-
-**1. Organizzazione del codice**
-
-I moduli permettono di suddividere applicazioni complesse in parti gestibili:
-
-```javascript
-// Senza moduli - tutto in un file
-// app.js (1500 righe di codice difficili da gestire)
-function connectDatabase() { /* ... */ }
-function sendEmail() { /* ... */ }
-function validateUser() { /* ... */ }
-function processPayment() { /* ... */ }
-// ... centinaia di altre funzioni
-
-// Con moduli - codice organizzato
-// database.js
-module.exports = {
-    connect() { /* ... */ }
-};
-
-// email.js
-module.exports = {
-    send() { /* ... */ }
-};
-
-// validators.js
-module.exports = {
-    validateUser() { /* ... */ }
-};
-
-// payments.js
-module.exports = {
-    process() { /* ... */ }
-};
-
-// app.js - file principale pulito
-const db = require('./database');
-const email = require('./email');
-const validators = require('./validators');
-const payments = require('./payments');
-```
-
-**2. Riutilizzabilità**
-
-I moduli ben progettati possono essere riutilizzati in progetti diversi:
-
-```javascript
-// stringUtils.js - modulo riutilizzabile
-module.exports = {
-    capitalizza(str) {
-        if (!str) return '';
-        return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-    },
-    
-    tronca(str, maxLength) {
-        if (str.length <= maxLength) return str;
-        return str.substring(0, maxLength - 3) + '...';
-    },
-    
-    slugify(str) {
-        return str
-            .toLowerCase()
-            .trim()
-            .replace(/[^\w\s-]/g, '')
-            .replace(/[\s_-]+/g, '-')
-            .replace(/^-+|-+$/g, '');
-    }
-};
-
-// Può essere usato in progetto-A, progetto-B, progetto-C...
-const stringUtils = require('./stringUtils');
-console.log(stringUtils.slugify("Hello World!")); // "hello-world"
-```
-
-**3. Manutenibilità**
-
-Con i moduli, è più facile trovare e correggere bug:
-
-```javascript
-// Se c'è un bug nella validazione email, so esattamente dove guardare
-// validators.js
-module.exports = {
-    validaEmail(email) {
-        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return regex.test(email);
-    }
-};
-```
-
-## Tipi di moduli in Node.js
-
-Node.js supporta tre tipi principali di moduli:
-
-### 1. Moduli core (built-in)
-
-Moduli forniti nativamente da Node.js, disponibili senza installazione:
-
-```javascript
-// File system
-const fs = require('fs');
-fs.readFileSync('file.txt', 'utf8');
-
-// Path
-const path = require('path');
-const fullPath = path.join(__dirname, 'files', 'data.json');
-
-// HTTP
-const http = require('http');
-const server = http.createServer((req, res) => {
-    res.end('Hello World');
-});
-
-// Events
-const EventEmitter = require('events');
-const emitter = new EventEmitter();
-
-// Crypto
-const crypto = require('crypto');
-const hash = crypto.createHash('sha256');
-```
-
-**Moduli core più comuni:**
-Node.js include numerosi moduli core che forniscono funzionalità essenziali:
-
-- `fs` (File System) Permette di interagire con il file system.
-- `path` Fornisce utilità per lavorare con percorsi di file e directory.
-- `os` Fornisce informazioni e metodi relativi al sistema operativo.
-- `http` e `https` Permettono di creare server web e fare richieste HTTP/HTTPS.
-- `url` Fornisce utilità per il parsing degli URL.
-- `events` Implementa il pattern Observer tramite Event Emitter.
-- `util` Fornisce funzioni di utilità per sviluppatori.
-- `buffer` Per lavorare con dati binari
-- `stream` Per elaborare dati in modo sequenziale
-- `crypto` Per funzionalità crittografiche
-- `zlib` Per compressione/decompressione
-- `child_process` Per eseguire processi esterni
-- `cluster` Per distribuire carico tra i core della CPU
-- `assert` Per test e verifica
-- `dns` Per risolvere nomi di dominio
-- `net` Per creare server e client TCP/IPC
-- `readline` Per leggere input da flussi leggibili (come stdin)
-- `timers` Per gestire operazioni temporizzate
-- `tty` Per interagire con terminali
-- `vm` Per eseguire codice JavaScript in un contesto separato
-
-### 2. Moduli di terze parti (npm)
-
-Moduli installati tramite npm (Node Package Manager):
+Esegui:
 
 ```bash
-# Installazione
-npm install express
-npm install lodash
-npm install axios
+node app.cjs
 ```
 
-```javascript
-// Uso di moduli npm
-const express = require('express');
-const _ = require('lodash');
-const axios = require('axios');
+Risultato atteso:
 
-const app = express();
-
-app.get('/', (req, res) => {
-    res.send('Hello World');
-});
-
-// Lodash per manipolazione dati
-const numbers = [1, 2, 3, 4, 5];
-const doubled = _.map(numbers, n => n * 2);
-
-// Axios per HTTP requests
-axios.get('https://api.example.com/data')
-    .then(response => console.log(response.data));
+```text
+Somma: 8
+Prodotto: 15
 ```
 
-### 3. Moduli locali (personalizzati)
+`module.exports` è il valore reso disponibile dal modulo; `require()` lo carica. `./` indica un percorso relativo al file che importa. Senza `./`, Node.js cercherebbe un modulo integrato o un pacchetto, non lo stesso file locale.
 
-Moduli creati da noi nel progetto:
+### module.exports ed exports
 
-```javascript
-// math.js - modulo locale
-module.exports = {
-    somma(a, b) {
-        return a + b;
-    },
-    
-    sottrai(a, b) {
-        return a - b;
-    }
-};
+All'inizio di un modulo CommonJS, `exports` si riferisce allo stesso oggetto di `module.exports`. Puoi quindi aggiungere una proprietà con `exports.somma = somma`. Per sostituire l'intera esportazione devi invece assegnare a `module.exports`.
 
-// app.js
-const math = require('./math'); // ./ indica percorso relativo
-
-console.log(math.somma(10, 5)); // 15
-```
-
-## Come funziona il sistema di moduli
-
-### Il wrapper delle funzioni
-
-Node.js avvolge ogni modulo in una funzione wrapper prima dell'esecuzione:
+Questi frammenti illustrano **alternative**, non istruzioni da concatenare:
 
 ```javascript
-// Il tuo codice
-const messaggio = "Hello";
-console.log(messaggio);
-
-// Viene effettivamente eseguito come:
-(function(exports, require, module, __filename, __dirname) {
-    const messaggio = "Hello";
-    console.log(messaggio);
-});
-```
-
-**Parametri disponibili in ogni modulo:**
-
-```javascript
-// myModule.js
-console.log(__filename); // Percorso completo del file corrente
-console.log(__dirname);  // Percorso della directory corrente
-console.log(module);     // Oggetto module corrente
-console.log(exports);    // Reference a module.exports
-console.log(require);    // Funzione per importare moduli
-```
-
-### Il processo di caricamento
-
-Quando esegui `require('./myModule')`, Node.js:
-
-1. **Risolve il percorso** del modulo
-2. **Controlla la cache** - se già caricato, ritorna la versione in cache
-3. **Carica il file** dal disco
-4. **Avvolge il codice** nella funzione wrapper
-5. **Esegue il codice** del modulo
-6. **Memorizza in cache** il risultato
-7. **Ritorna** `module.exports`
-
-```javascript
-// Il ciclo di vita di un modulo
-
-// 1. Prima richiesta - il modulo viene caricato ed eseguito
-const config = require('./config');
-console.log('Config caricato');
-
-// 2. Seconda richiesta - ritorna dalla cache (non esegue di nuovo)
-const config2 = require('./config');
-
-// config e config2 sono lo STESSO oggetto
-console.log(config === config2); // true
-```
-
-### Module.exports vs exports
-
-Node.js fornisce due modi per esportare, ma c'è una differenza importante:
-
-```javascript
-// exports è un alias di module.exports
-console.log(exports === module.exports); // true
-
-// ✅ Corretto - aggiungere proprietà a exports
+// Aggiunge una proprietà all'oggetto esportato:
 exports.somma = (a, b) => a + b;
-exports.sottrai = (a, b) => a - b;
-
-// ✅ Corretto - assegnare a module.exports
-module.exports = {
-    somma: (a, b) => a + b,
-    sottrai: (a, b) => a - b
-};
-
-// ❌ Errore - NON riassegnare exports
-exports = {
-    somma: (a, b) => a + b
-}; // Questo NON funziona!
-
-// Perché? exports è solo una reference a module.exports
-// Riassegnarlo rompe il collegamento
 ```
 
-**Regola semplice:** Usa sempre `module.exports` quando vuoi esportare un singolo valore, classe o funzione. Usa `exports.proprieta` per aggiungere proprietà.
-
-## Esempi pratici
-
-### Esempio 1: Modulo di utility
-
 ```javascript
-// dateUtils.js
-function formattaData(data) {
-    const giorno = String(data.getDate()).padStart(2, '0');
-    const mese = String(data.getMonth() + 1).padStart(2, '0');
-    const anno = data.getFullYear();
-    return `${giorno}/${mese}/${anno}`;
-}
-
-function aggiungiGiorni(data, giorni) {
-    const risultato = new Date(data);
-    risultato.setDate(risultato.getDate() + giorni);
-    return risultato;
-}
-
-function differenzaGiorni(data1, data2) {
-    const diff = Math.abs(data2 - data1);
-    return Math.ceil(diff / (1000 * 60 * 60 * 24));
-}
-
-module.exports = {
-    formattaData,
-    aggiungiGiorni,
-    differenzaGiorni
-};
-
-// app.js
-const dateUtils = require('./dateUtils');
-
-const oggi = new Date();
-console.log(dateUtils.formattaData(oggi));
-
-const futuro = dateUtils.aggiungiGiorni(oggi, 7);
-console.log(`Tra 7 giorni: ${dateUtils.formattaData(futuro)}`);
-
-const diff = dateUtils.differenzaGiorni(oggi, futuro);
-console.log(`Differenza: ${diff} giorni`);
+// Sostituisce il valore esportato con una funzione:
+module.exports = (a, b) => a + b;
 ```
 
-### Esempio 2: Modulo con classe
-
 ```javascript
-// User.js
-class User {
-    constructor(nome, email) {
-        this.id = Date.now();
-        this.nome = nome;
-        this.email = email;
-        this.dataCreazione = new Date();
-        this.attivo = true;
-    }
-    
-    saluta() {
-        return `Ciao, sono ${this.nome}`;
-    }
-    
-    disattiva() {
-        this.attivo = false;
-        console.log(`Utente ${this.nome} disattivato`);
-    }
-    
-    static creaAdmin(nome, email) {
-        const admin = new User(nome, email);
-        admin.ruolo = 'admin';
-        return admin;
-    }
-}
-
-module.exports = User;
-
-// app.js
-const User = require('./User');
-
-const mario = new User('Mario Rossi', 'mario@email.com');
-console.log(mario.saluta()); // "Ciao, sono Mario Rossi"
-
-const admin = User.creaAdmin('Admin', 'admin@email.com');
-console.log(admin.ruolo); // "admin"
+// Errore didattico: cambia solo la variabile locale exports.
+// Chi importa non riceve questo nuovo oggetto.
+exports = { somma: (a, b) => a + b };
 ```
 
-### Esempio 3: Modulo di configurazione
+La seconda alternativa richiede un'importazione come `const somma = require('./calcoli.cjs')`, perché il valore esportato è direttamente la funzione.
+
+Il wrapper CommonJS fornisce al modulo anche `require`, `module`, `__filename` e `__dirname`. Questi nomi non sono automaticamente disponibili negli ES Modules. Vedi la [documentazione CommonJS](https://nodejs.org/api/modules.html#the-module-wrapper).
+
+## 2. Lo stesso programma con ES Modules
+
+Nella stessa cartella crea altri due file. `.mjs` indica esplicitamente un ES Module.
+
+**`calcoli.mjs`**
 
 ```javascript
-// config.js
-const config = {
-    database: {
-        host: process.env.DB_HOST || 'localhost',
-        port: process.env.DB_PORT || 5432,
-        name: process.env.DB_NAME || 'myapp',
-        user: process.env.DB_USER || 'admin'
-    },
-    
-    server: {
-        port: process.env.PORT || 3000,
-        env: process.env.NODE_ENV || 'development'
-    },
-    
-    isDevelopment() {
-        return this.server.env === 'development';
-    },
-    
-    getConnectionString() {
-        const db = this.database;
-        return `postgres://${db.user}@${db.host}:${db.port}/${db.name}`;
-    }
-};
+export function somma(a, b) {
+  return a + b;
+}
 
-module.exports = config;
-
-// app.js
-const config = require('./config');
-
-console.log(`Server in ascolto sulla porta ${config.server.port}`);
-console.log(`Connessione DB: ${config.getConnectionString()}`);
-
-if (config.isDevelopment()) {
-    console.log('Modalità sviluppo attiva');
+export function moltiplica(a, b) {
+  return a * b;
 }
 ```
 
-### Esempio 4: Modulo con stato privato
+**`app.mjs`**
 
 ```javascript
-// counter.js
-let contatore = 0; // Variabile privata
+import { somma, moltiplica } from './calcoli.mjs';
+
+console.log('Somma:', somma(5, 3));
+console.log('Prodotto:', moltiplica(5, 3));
+```
+
+Esegui `node app.mjs`: il risultato è identico alla versione CommonJS.
+
+Le parentesi graffe selezionano le **esportazioni nominate**. Esiste anche l'esportazione `default`, importata senza graffe: i due stili non sono intercambiabili.
+
+Le importazioni statiche ESM vanno al livello principale del modulo. Per caricare un modulo durante l'esecuzione si può usare `import()`, che restituisce una Promise; è disponibile anche da CommonJS. Le importazioni relative ESM richiedono l'estensione del file e non cercano automaticamente `index.js` dentro una cartella. Consulta le [regole ESM](https://nodejs.org/api/esm.html#mandatory-file-extensions).
+
+## 3. Come Node.js interpreta i file .js
+
+| File o configurazione | Formato |
+| --- | --- |
+| File `.cjs` | CommonJS |
+| File `.mjs` | ES Module |
+| File `.js` con `"type": "commonjs"` nel `package.json` applicabile | CommonJS |
+| File `.js` con `"type": "module"` nel `package.json` applicabile | ES Module |
+
+Per un file `.js`, conta il `package.json` più vicino risalendo le cartelle secondo le regole dei pacchetti. Le versioni moderne possono rilevare sintassi ESM in file ambigui: nei progetti didattici rendi esplicita la scelta. Vedi la [documentazione sui formati dei pacchetti](https://nodejs.org/api/packages.html#determining-module-system).
+
+```mermaid
+flowchart TD
+    A[Quale estensione ha il file?] --> B[.cjs]
+    A --> C[.mjs]
+    A --> D[.js]
+    B --> E[CommonJS: require e module.exports]
+    C --> F[ESM: import ed export]
+    D --> G{type nel package.json applicabile}
+    G -->|commonjs| E
+    G -->|module| F
+    G -->|assente| H[Configurazione ambigua: rendi esplicito il formato]
+```
+
+L'ultimo ramo è un consiglio per configurare il progetto, non l'algoritmo completo di rilevamento di Node.js.
+
+Per provare ESM con `.js`, crea una **nuova sottocartella** `versione-js` e inserisci questo `package.json`:
+
+```json
+{
+  "name": "laboratorio-moduli",
+  "private": true,
+  "type": "module"
+}
+```
+
+Copia al suo interno `calcoli.mjs` e `app.mjs`, rinominandoli `calcoli.js` e `app.js`. Modifica anche l'importazione in `app.js` affinché punti a `./calcoli.js`. Dalla cartella `versione-js`, esegui `node app.js`.
+
+Non serve `npm install`: non ci sono dipendenze esterne. Il campo `type` configura l'interpretazione dei file, non scarica librerie.
+
+## 4. Percorsi: modulo locale o file di dati?
+
+| Espressione | Risoluzione |
+| --- | --- |
+| `require('./calcoli.cjs')` | Rispetto al modulo CommonJS che importa |
+| `import ... from './calcoli.mjs'` | Rispetto al modulo ESM che importa |
+| `readFile('./dati.txt', ...)` | Rispetto a `process.cwd()` |
+| `new URL('./dati.txt', import.meta.url)` | Rispetto al modulo ESM corrente |
+
+In CommonJS puoi costruire il percorso di un file di dati con `path.join(__dirname, 'dati.txt')`. In ESM puoi passare a molte API del file system un URL costruito con `new URL(...)`, come nella [guida sul runtime](./03-javascript-runtime.md).
+
+CommonJS supporta anche alcune convenzioni per caricare cartelle, tra cui il campo `main` e il ripiego su `index.js`. Per questi laboratori preferisci il nome completo del file: rende visibile quale modulo viene caricato.
+
+## 5. Cache e stato condiviso
+
+Un modulo CommonJS normalmente viene eseguito una volta per file risolto, nello stesso processo. Successive chiamate a `require()` riutilizzano l'esportazione in cache.
+
+Crea **`contatore.cjs`**:
+
+```javascript
+console.log('Inizializzo il contatore');
+let valore = 0;
 
 module.exports = {
+  incrementa() {
+    valore += 1;
+    return valore;
+  },
+};
+```
+
+Crea **`prova-cache.cjs`**:
+
+```javascript
+const primo = require('./contatore.cjs');
+const secondo = require('./contatore.cjs');
+
+console.log('Stesso oggetto:', primo === secondo);
+console.log(primo.incrementa());
+console.log(secondo.incrementa());
+```
+
+Esegui `node prova-cache.cjs`:
+
+```text
+Inizializzo il contatore
+Stesso oggetto: true
+1
+2
+```
+
+Il valore locale non è accessibile direttamente, ma entrambe le importazioni agiscono sullo stesso stato. Avviando un altro processo con `node prova-cache.cjs`, il conteggio riparte. Anche ESM ha una cache, con regole proprie: non va confusa con `require.cache`. La [documentazione della cache CommonJS](https://nodejs.org/api/modules.html#caching) descrive anche i casi particolari.
+
+### Oggetti indipendenti con una factory
+
+Se vuoi due contatori indipendenti, esporta una funzione che li crea. Salva **`crea-contatore.cjs`**:
+
+```javascript
+module.exports = function creaContatore() {
+  let valore = 0;
+  return {
     incrementa() {
-        contatore++;
-        return contatore;
+      valore += 1;
+      return valore;
     },
-    
-    decrementa() {
-        contatore--;
-        return contatore;
-    },
-    
-    getValore() {
-        return contatore;
-    },
-    
-    reset() {
-        contatore = 0;
-    }
+  };
 };
-
-// app.js
-const counter = require('./counter');
-
-console.log(counter.incrementa()); // 1
-console.log(counter.incrementa()); // 2
-console.log(counter.incrementa()); // 3
-console.log(counter.getValore());  // 3
-
-counter.reset();
-console.log(counter.getValore());  // 0
-
-// Non puoi accedere direttamente a 'contatore'
-console.log(counter.contatore); // undefined
 ```
 
-### Esempio 5: Modulo factory
+In **`prova-factory.cjs`**:
 
 ```javascript
-// logger.js
-const fs = require('fs');
+const creaContatore = require('./crea-contatore.cjs');
+const primo = creaContatore();
+const secondo = creaContatore();
 
-function creaLogger(nomeFile) {
-    let contatore = 0;
-    
-    return {
-        log(messaggio) {
-            contatore++;
-            const timestamp = new Date().toISOString();
-            const entry = `[${contatore}] ${timestamp}: ${messaggio}\n`;
-            
-            fs.appendFileSync(nomeFile, entry);
-            console.log(entry.trim());
-        },
-        
-        error(errore) {
-            this.log(`ERROR - ${errore.message}`);
-        },
-        
-        getContatore() {
-            return contatore;
-        }
-    };
+console.log(primo.incrementa());
+console.log(primo.incrementa());
+console.log(secondo.incrementa());
+```
+
+`node prova-factory.cjs` stampa `1`, `2`, `1`, ciascuno su una riga. La funzione esportata viene riutilizzata, ma ogni sua chiamata crea un nuovo stato.
+
+## Quale formato scegliere?
+
+Segui il formato già adottato dal progetto. Per sperimentare, `.cjs` e `.mjs` permettono di confrontare i due sistemi senza ambiguità. In un nuovo progetto ESM, dichiara `"type": "module"` se vuoi usare `.js`.
+
+Evita di mescolare casualmente `require` e `import`: l'interoperabilità esiste, ma dipende dal tipo di esportazioni, dalla versione e dall'eventuale uso di `await` al livello principale. ESM non rende automaticamente parallelo il codice; il *tree-shaking* è un'ottimizzazione di strumenti di build, non qualcosa che Node.js applica da solo quando esegui un modulo.
+
+## Errori frequenti
+
+| Errore o sintomo | Possibile causa e controllo |
+| --- | --- |
+| `MODULE_NOT_FOUND` o `ERR_MODULE_NOT_FOUND` | File assente, percorso errato, estensione ESM mancante oppure pacchetto non installato |
+| `require is not defined in ES module scope` | Stai usando `require` in ESM: adotta `import` oppure scegli CommonJS |
+| `Cannot use import statement outside a module` | Il file viene interpretato come CommonJS: verifica estensione e `type` |
+| Un'esportazione è `undefined` | Controlla nome, forma dell'esportazione e possibili riassegnazioni di `exports` |
+| `does not provide an export named ...` | L'importazione nominata non corrisponde a un'esportazione del modulo |
+| Un contatore viene condiviso inaspettatamente | Il modulo restituisce lo stesso oggetto dalla cache; valuta una factory |
+
+## Esercizio finale
+
+Aggiungi `media(numeri)` a entrambe le versioni di `calcoli`. Per questo esercizio considera valido un array non vuoto di numeri; se l'array è vuoto, genera un errore con `throw new Error('Array vuoto')`.
+
+Verifica questi risultati:
+
+| Chiamata | Risultato |
+| --- | --- |
+| `media([6, 8, 10])` | `8` |
+| `media([7])` | `7` |
+| `media([])` | Errore `Array vuoto` |
+
+<details>
+<summary>Soluzione e indicazioni per esportarla</summary>
+
+```javascript
+function media(numeri) {
+  if (numeri.length === 0) {
+    throw new Error('Array vuoto');
+  }
+  const totale = numeri.reduce((somma, numero) => somma + numero, 0);
+  return totale / numeri.length;
 }
-
-module.exports = creaLogger;
-
-// app.js
-const creaLogger = require('./logger');
-
-const logger1 = creaLogger('app.log');
-const logger2 = creaLogger('errors.log');
-
-logger1.log('Applicazione avviata');
-logger1.log('Utente connesso');
-
-logger2.error(new Error('Connessione database fallita'));
-
-console.log(`Logger1 ha ${logger1.getContatore()} entries`);
-console.log(`Logger2 ha ${logger2.getContatore()} entries`);
 ```
 
-## Percorsi nei moduli
+In CommonJS aggiungi `media` all'oggetto `module.exports`. In ESM anteponi `export` alla dichiarazione. Aggiorna l'importazione nel rispettivo file `app` e prova i casi indicati. Per osservare l'errore senza interrompere il resto delle prove, racchiudi la chiamata con array vuoto in `try`/`catch`.
 
-### Percorsi relativi
+</details>
 
-```javascript
-// Stesso livello
-const utils = require('./utils');
+## Navigazione
 
-// Sottocartella
-const db = require('./database/connection');
-
-// Cartella superiore
-const shared = require('../shared/helpers');
-
-// Due livelli superiori
-const config = require('../../config/settings');
-```
-
-### Percorsi assoluti e __dirname
-
-```javascript
-// __dirname contiene il percorso della directory corrente
-console.log(__dirname); // /home/user/myapp/src
-
-// __filename contiene il percorso completo del file
-console.log(__filename); // /home/user/myapp/src/app.js
-
-// Costruire percorsi assoluti
-const path = require('path');
-const configPath = path.join(__dirname, 'config', 'database.js');
-const config = require(configPath);
-```
-
-### Importare cartelle
-
-Quando importi una cartella, Node.js cerca automaticamente `index.js`:
-
-```javascript
-// Struttura:
-// utils/
-//   ├── index.js
-//   ├── validators.js
-//   └── formatters.js
-
-// utils/index.js
-module.exports = {
-    validators: require('./validators'),
-    formatters: require('./formatters')
-};
-
-// app.js
-const utils = require('./utils'); // Carica automaticamente index.js
-
-utils.validators.validaEmail('test@email.com');
-utils.formatters.formattaData(new Date());
-```
-
-## Cache dei moduli
-
-Node.js memorizza in cache i moduli dopo il primo caricamento:
-
-```javascript
-// myModule.js
-console.log('Modulo caricato!');
-
-module.exports = {
-    messaggio: 'Hello'
-};
-
-// app.js
-const mod1 = require('./myModule'); // Stampa: "Modulo caricato!"
-const mod2 = require('./myModule'); // Non stampa nulla (usa la cache)
-
-console.log(mod1 === mod2); // true - stesso oggetto
-
-// Visualizzare la cache
-console.log(require.cache);
-
-// Invalidare la cache (raramente necessario)
-delete require.cache[require.resolve('./myModule')];
-const mod3 = require('./myModule'); // Stampa di nuovo: "Modulo caricato!"
-```
-
-## CommonJS vs ES Modules
-
-Node.js supporta due sistemi di moduli:
-
-### CommonJS (tradizionale)
-
-```javascript
-// Esportazione
-module.exports = { somma, sottrai };
-
-// Importazione
-const math = require('./math');
-```
-
-**Caratteristiche:**
-- Sistema originale di Node.js
-- Caricamento sincrono
-- Esportazioni dinamiche
-- File `.js` standard
-
-### ES Modules (moderno)
-
-```javascript
-// Esportazione
-export function somma(a, b) { return a + b; }
-export function sottrai(a, b) { return a - b; }
-
-// Importazione
-import { somma, sottrai } from './math.mjs';
-```
-
-**Caratteristiche:**
-- Standard ECMAScript
-- Caricamento asincrono
-- Esportazioni statiche
-- File `.mjs` o `.js` con `"type": "module"` in package.json
-
-### Quando usare quale
-
-**Usa CommonJS quando:**
-- Lavori su progetti Node.js esistenti
-- Hai bisogno di compatibilità con vecchie versioni
-- Vuoi esportazioni condizionali
-
-**Usa ES Modules quando:**
-- Inizi un nuovo progetto
-- Vuoi condividere codice con il browser
-- Vuoi sfruttare il tree-shaking
-
-## Riepilogo
-
-I moduli in Node.js sono fondamentali per:
-
-1. **Organizzare** il codice in unità logiche
-2. **Riutilizzare** funzionalità in progetti diversi
-3. **Incapsulare** implementazioni e proteggere lo scope
-4. **Gestire** le dipendenze in modo esplicito
-5. **Facilitare** testing e manutenzione
-
-**Ricorda:**
-- Ogni file è un modulo con scope isolato
-- Usa `module.exports` per esportare
-- Usa `require()` per importare
-- Node.js memorizza in cache i moduli
-- I moduli possono essere core, npm, o locali
-
-Con una buona organizzazione dei moduli, il tuo codice Node.js sarà più pulito, manutenibile e scalabile.
+- [Indice dell'unità](./README.md)
+- [Guida precedente: REPL](./04-repl.md)
+- [Unità successiva: Architettura Event-Driven](../02-Architettura_Event-Driven/README.md)
+- [Approfondimento successivo: Moduli personalizzati](../04-ModuliPersonalizzati/README.md)

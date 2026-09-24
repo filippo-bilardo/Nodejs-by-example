@@ -8,4 +8,4 @@
 console.log('Hello, Node.js!');
 
 // Per eseguire questo script, usa il comando:
-// node hello.js
+// Dalla cartella 01-Introduzione: node esempi/01-hello.js
