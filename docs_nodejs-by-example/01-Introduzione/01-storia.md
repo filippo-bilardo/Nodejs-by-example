@@ -4,7 +4,11 @@
 
 Node.js è un **ambiente di runtime JavaScript** costruito sul motore V8 di Google Chrome. In termini semplici, Node.js permette di eseguire codice JavaScript al di fuori del browser web, rendendolo utilizzabile per sviluppare applicazioni lato server.
 
+![Panoramica di Node.js](immagini/panoramica-nodejs.svg)
+
 A differenza del JavaScript tradizionale che viene eseguito solo nei browser web, Node.js porta JavaScript sul server, permettendo agli sviluppatori di creare applicazioni web complete utilizzando un unico linguaggio di programmazione per sia il frontend che il backend.
+
+![Runtime Browser vs Node.js](immagini/runtime-browser-node.svg)
 
 ## A cosa serve Node.js?
 
@@ -89,6 +93,8 @@ Node.js è stato creato da Ryan Dahl nel 2009. La sua idea nacque dalla frustraz
 - Crescita esponenziale dell'ecosistema npm
 - Adozione diffusa in ambito enterprise
 - Integrazione con tecnologie cloud e container
+
+![storia](immagini/storia-nodejs.svg)
 
 ## Impatto e Innovazione
 

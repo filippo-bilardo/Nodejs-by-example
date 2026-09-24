@@ -44,6 +44,8 @@ Node.js utilizza un modello di esecuzione single-threaded con un event loop, che
 
 4. **Operazioni Asincrone**: Le API di Node.js sono progettate per essere non bloccanti
 
+![architettura](immagini/architettura-io.svg)
+
 ## Architettura Orientata agli Eventi
 
 Node.js è costruito attorno a un'architettura orientata agli eventi (event-driven):
@@ -63,6 +65,8 @@ Node.js implementa un sistema di moduli per organizzare il codice:
 2. **ES Modules**: Supporto per il sistema di moduli standard di JavaScript
    - `import` e `export` per gestire le dipendenze
    - Supportato nativamente nelle versioni recenti di Node.js
+
+![Sistema di Moduli](immagini/moduli-cjs-esm.svg)
 
 ## Vantaggi dell'Architettura
 

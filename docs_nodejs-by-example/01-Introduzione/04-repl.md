@@ -37,6 +37,8 @@ Il REPL è estremamente utile per:
 3. **Print**: Stampa il risultato
 4. **Loop**: Torna al punto 1
 
+![Ciclo REPL](immagini/ciclo-repl.svg)
+
 ---
 
 ## Avviare il REPL
