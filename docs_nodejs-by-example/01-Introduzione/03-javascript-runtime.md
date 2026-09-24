@@ -1,188 +1,150 @@
-# 3. JavaScript runtime: dal browser a Node.js
+# JavaScript Runtime in Node.js
 
-## Obiettivi
+## Cos'è un JavaScript Runtime?
 
-Distinguere linguaggio, motore e runtime; riconoscere le API disponibili in Node.js; usare argomenti, percorsi e lettura asincrona di file.
+Un JavaScript Runtime è un ambiente che fornisce tutti gli elementi necessari per eseguire codice JavaScript. Include un motore JavaScript, librerie standard, API per interagire con l'ambiente esterno e meccanismi per la gestione della memoria.
 
-## Linguaggio, motore e ambiente
+## V8: Il Cuore di Node.js
 
-**ECMAScript** definisce il linguaggio JavaScript: sintassi, tipi e funzionalità come array e Promise. Un **motore**, come V8, esegue quel linguaggio. Il **runtime** aggiunge servizi per interagire con l'ambiente circostante.
+Node.js utilizza il motore JavaScript V8 sviluppato da Google per Chrome:
 
-V8 interpreta ed esegue il codice, può compilarlo e ottimizzarlo durante l'esecuzione e gestisce la memoria degli oggetti. Le API per leggere un file o creare un server sono invece fornite dall'ambiente Node.js.
+### Caratteristiche di V8
 
-![Browser e Node.js condividono JavaScript e alcune API; il browser offre il DOM, Node.js offre process e file system.](./immagini/runtime-browser-node.svg)
+- **Compilazione JIT (Just-In-Time)**: Converte il codice JavaScript in codice macchina ottimizzato durante l'esecuzione
+- **Garbage Collection**: Gestisce automaticamente l'allocazione e il rilascio della memoria
+- **Hidden Classes**: Ottimizzazione per migliorare l'accesso alle proprietà degli oggetti
+- **Inline Caching**: Accelera l'accesso alle proprietà memorizzando nella cache i percorsi di accesso
+- **Ottimizzazione del codice**: Analizza il codice durante l'esecuzione e lo ricompila con ottimizzazioni
 
-*Il linguaggio è condiviso; le API dell’ambiente determinano quali operazioni sono possibili.*
+### Differenze tra V8 in Node.js e nei Browser
 
-## Confronto con il browser
+- **API disponibili**: Node.js non ha DOM, BOM o Web API, ma fornisce API specifiche per il server
+- **Configurazione**: In Node.js, V8 può essere configurato con flag specifici
+- **Isolamento**: Ogni istanza di Node.js ha il proprio isolato V8
 
-| Funzionalità | Browser, nel contesto di una pagina | Node.js |
-| --- | --- | --- |
-| `Array`, `JSON`, `Promise` | Sì | Sì |
-| `globalThis` | Accesso all'oggetto globale | Accesso all'oggetto globale |
-| `window`, `document`, DOM | Sì, per interagire con la pagina | Nessun DOM integrato |
-| `console`, timer | Sì | Sì, con possibili differenze di comportamento |
-| `fetch`, `URL`, `AbortController` | Sì | Sì nelle versioni usate in queste guide |
-| `process`, `Buffer` | Non come API native della pagina | Sì |
-| `node:fs`, `node:http` | Non come moduli nativi del browser | Sì |
+## Global Object in Node.js
 
-Node.js implementa anche alcune Web API: è quindi impreciso dire che siano tutte assenti. Consulta le [API globali di Node.js](https://nodejs.org/api/globals.html) e il [confronto ufficiale con il browser](https://nodejs.org/en/learn/getting-started/differences-between-nodejs-and-the-browser).
-
-### Esperimento: riconoscere l'ambiente
-
-Salva in `ambiente.cjs` ed esegui `node ambiente.cjs`:
+A differenza dei browser dove l'oggetto globale è `window`, in Node.js l'oggetto globale è `global`:
 
 ```javascript
-console.log('document:', typeof document);
-console.log('process:', typeof process);
-console.log('fetch:', typeof fetch);
-console.log('console condivisa:', globalThis.console === console);
+// Nel browser
+console.log(window); // Oggetto Window
+
+// In Node.js
+console.log(global); // Oggetto Global
 ```
 
-Risultato atteso con Node.js 24 avviato senza opzioni particolari:
+Alcuni membri importanti dell'oggetto `global`:
 
-```text
-document: undefined
-process: object
-fetch: function
-console condivisa: true
-```
+- `process`: Informazioni e controllo sul processo corrente
+- `Buffer`: Per gestire dati binari
+- `console`: Per output sulla console
+- `setTimeout`, `setInterval`, `setImmediate`: Per la programmazione asincrona
+- `__dirname`, `__filename`: Percorsi del file corrente (non sono tecnicamente in `global` ma sono disponibili globalmente)
 
-`typeof` permette di controllare un identificatore assente senza accedere direttamente al suo valore. Nella console del browser, il risultato relativo a `document` sarà diverso.
+## Sistema di Moduli
 
-## Oggetti globali e scope dei moduli
+Node.js supporta due sistemi di moduli principali:
 
-Usa `globalThis` per riferirti all'oggetto globale in modo comune ai diversi ambienti. Node.js offre anche `global`, ma `globalThis` è la forma standard.
-
-Le variabili dichiarate al livello principale di un **file modulo** restano nel suo scope. Non vengono automaticamente condivise con altri file. In CommonJS, `require`, `module`, `exports`, `__filename` e `__dirname` sono valori forniti al modulo: non sono proprietà globali disponibili allo stesso modo in ESM. La [guida sui moduli](./05-moduli-in-node.md) mostra come passare da un formato all'altro.
-
-## Il processo e gli argomenti
-
-Un **processo** è un programma in esecuzione. L'oggetto `process` permette di osservarne alcune caratteristiche:
+### 1. CommonJS (Sistema Tradizionale)
 
 ```javascript
-// informazioni.cjs
-console.log('Node.js:', process.version);
-console.log('Motore V8:', process.versions.v8);
-console.log('Sistema:', process.platform);
-console.log('Cartella di avvio:', process.cwd());
-console.log('Argomenti utente:', process.argv.slice(2));
+// Importare un modulo
+const fs = require('fs');
+
+// Esportare funzionalità
+module.exports = { myFunction, myVariable };
+// oppure
+exports.myFunction = function() {};
 ```
 
-Esegui:
-
-```bash
-node informazioni.cjs Anna 18
-```
-
-Le prime righe dipendono dall'ambiente; l'ultima stampa:
-
-```text
-Argomenti utente: [ 'Anna', '18' ]
-```
-
-`18` è una stringa. Per usarla come numero occorre convertirla e controllare che sia valida, per esempio con `Number()` e `Number.isFinite()`.
-
-`process.env` contiene le variabili d'ambiente, normalmente come stringhe. È utile per la configurazione: una variabile assente vale `undefined`.
-
-## Cartella corrente e cartella del modulo
-
-Questi percorsi rispondono a domande diverse:
-
-- `process.cwd()`: da quale cartella stai eseguendo il programma?
-- `__dirname` in CommonJS: in quale cartella si trova il modulo corrente?
-- `import.meta.url` in ESM: qual è l'URL del modulo corrente?
-
-Un percorso relativo passato a `fs`, come `'./dati.txt'`, viene risolto rispetto alla **cartella corrente del processo**. Un percorso relativo in `require('./calcoli.cjs')` o `import './calcoli.mjs'` viene invece risolto rispetto al **modulo che importa**.
-
-Confondere queste due regole è una causa frequente di file non trovati.
-
-## Leggere un file con Promise e async/await
-
-Nella guida precedente hai visto la versione con callback. Qui usiamo l'API basata su Promise. Salva in `leggi-modulo.mjs` ed esegui `node leggi-modulo.mjs`:
+### 2. ES Modules (Standard ECMAScript)
 
 ```javascript
-import { readFile } from 'node:fs/promises';
+// Importare un modulo
+import fs from 'fs';
+import { readFile } from 'fs/promises';
 
-try {
-  const testo = await readFile(new URL('./leggi-modulo.mjs', import.meta.url), 'utf8');
-  console.log('Il modulo contiene import:', testo.includes('import'));
-} catch (errore) {
-  console.error('Lettura fallita:', errore.code);
-  process.exitCode = 1;
+// Esportare funzionalità
+export function myFunction() {}
+export const myVariable = 42;
+export default myMainFunction;
+```
+
+## Gestione della Memoria
+
+Node.js eredita la gestione della memoria di V8:
+
+1. **Heap Memory**: Dove gli oggetti vengono allocati
+2. **Stack Memory**: Per i frame di chiamata delle funzioni e variabili primitive
+3. **Garbage Collection**: Processo che libera memoria non più utilizzata
+
+### Limitazioni di Memoria
+
+- Limite predefinito di ~1.4GB su sistemi a 64 bit (configurabile)
+- Possibilità di personalizzare i parametri del garbage collector
+
+## API Asincrone
+
+Node.js fornisce diverse API per la programmazione asincrona:
+
+### 1. Callback-based API (Stile Tradizionale)
+
+```javascript
+fs.readFile('file.txt', (err, data) => {
+  if (err) throw err;
+  console.log(data);
+});
+```
+
+### 2. Promise-based API
+
+```javascript
+fs.promises.readFile('file.txt')
+  .then(data => console.log(data))
+  .catch(err => console.error(err));
+```
+
+### 3. Async/Await (Basato su Promise)
+
+```javascript
+async function readMyFile() {
+  try {
+    const data = await fs.promises.readFile('file.txt');
+    console.log(data);
+  } catch (err) {
+    console.error(err);
+  }
 }
 ```
 
-Risultato atteso:
+## Interazione con Codice Nativo
 
-```text
-Il modulo contiene import: true
-```
+Node.js permette di estendere le funzionalità JavaScript con codice nativo:
 
-Il percorso è costruito rispetto al modulo, perciò funziona anche avviando lo script da un'altra cartella. `readFile()` restituisce una Promise. `await` sospende la continuazione di questo modulo fino al completamento dell'operazione, lasciando al runtime la possibilità di gestire altro lavoro. Il `catch` gestisce un eventuale rifiuto della Promise.
+1. **N-API**: API stabile per costruire addon nativi
+2. **node-addon-api**: Wrapper C++ per N-API
+3. **FFI (Foreign Function Interface)**: Per chiamare funzioni da librerie condivise
 
-Per osservare l'errore, sostituisci il nome nel `new URL(...)` con un file inesistente: il codice stampa normalmente `ENOENT` e segnala un insuccesso tramite `process.exitCode = 1`.
+## Debugging e Profiling
 
-Le tre forme da riconoscere sono:
+Node.js offre strumenti integrati per il debugging e l'analisi delle prestazioni:
 
-| Stile | Come arriva il risultato | Come si gestisce l'errore |
-| --- | --- | --- |
-| Callback | Argomento della funzione richiamata | Primo argomento, secondo la convenzione error-first |
-| Promise | `.then(...)` | `.catch(...)` |
-| `async`/`await` | Valore ottenuto con `await` | `try`/`catch` intorno all'attesa |
+- **Inspector Protocol**: Compatibile con Chrome DevTools
+- **--inspect flag**: Abilita il debugging remoto
+- **Profiler V8**: Per analizzare l'utilizzo della CPU
+- **Heap Snapshots**: Per analizzare l'utilizzo della memoria
 
-Una Promise rappresenta un risultato futuro; non implica da sola un nuovo thread.
+## Evoluzione del Runtime
 
-```mermaid
-sequenceDiagram
-    participant M as Modulo JavaScript
-    participant F as API readFile
-    participant R as Runtime e I/O
-    M->>F: Richiede la lettura
-    F->>R: Avvia il lavoro di I/O
-    F-->>M: Restituisce una Promise
-    Note over M: await sospende questa continuazione
-    Note over R: Può gestire altro lavoro
-    R-->>F: Lettura completata oppure errore
-    F-->>M: La Promise viene risolta o rifiutata
-    Note over M: Riprende dopo await oppure entra nel catch
-```
+Il runtime JavaScript di Node.js è in costante evoluzione:
 
-Lo schema descrive il caso della lettura di un file: a essere sospesa è la continuazione che usa `await`, non tutto il processo.
+- Supporto per nuove funzionalità ECMAScript
+- Miglioramenti delle prestazioni di V8
+- Nuove API e deprecazione di quelle obsolete
+- Migliore integrazione con i moderni pattern di programmazione JavaScript
 
-## Memoria e diagnostica: un primo sguardo
-
-Il *call stack* tiene traccia delle chiamate in corso; la *heap* ospita gli oggetti gestiti da V8. Il garbage collector recupera memoria per oggetti non più raggiungibili. Se un array continua ad accumulare riferimenti a oggetti, questi possono restare raggiungibili e occupare memoria.
-
-Non esiste un unico limite fisso della heap valido per tutte le versioni e le macchine. Puoi interrogare il runtime con `memoria.cjs`:
-
-```javascript
-const { getHeapStatistics } = require('node:v8');
-const limiteMiB = getHeapStatistics().heap_size_limit / 1024 / 1024;
-console.log('Limite heap V8 in MiB:', Math.round(limiteMiB));
-```
-
-Il numero varia; non coincide con tutta la memoria del processo. Il significato delle statistiche è descritto nell'[API V8](https://nodejs.org/api/v8.html#v8getheapstatistics).
-
-Per esplorare l'esecuzione con un debugger puoi avviare `node --inspect-brk informazioni.cjs`: il processo attende il collegamento di un debugger, per esempio quello dell'editor. Questo approfondimento non è necessario per completare l'unità.
-
-## Verifica
-
-1. `fetch` disponibile significa che Node.js dispone anche di `document`?
-2. Perché `node informazioni.cjs 18` non passa direttamente un numero?
-3. Spostandoti in un'altra cartella, cambia `process.cwd()` oppure la posizione del modulo?
-
-<details>
-<summary>Risposte</summary>
-
-1. No: le API sono offerte separatamente e Node.js non integra il DOM di una pagina.
-2. Il terminale passa argomenti testuali; la conversione spetta al programma.
-3. Cambia la cartella di avvio del processo. Il modulo resta nella posizione in cui è salvato.
-
-</details>
-
-## Navigazione
-
-- [Indice dell'unità](./README.md)
-- [Guida precedente: Architettura](./02-architettura.md)
-- [Guida successiva: REPL](./04-repl.md)
+- [Indice](../README.md)
+- [Lezione precedente](02-architettura.md)
+- [Prossima Lezione](04-repl.md)
+- [Prossima Esercitazione](./02-Architettura_Event-Driven/README.md)
