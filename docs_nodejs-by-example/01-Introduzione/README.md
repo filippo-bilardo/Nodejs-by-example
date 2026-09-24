@@ -11,15 +11,16 @@ Questa prima esercitazione ti introdurrà a Node.js, spiegandone le caratteristi
 
 ## Argomenti Teorici Collegati
 
-- [1. Storia di Node.js](./teoria/01-storia.md)
-- [2. Architettura di Node.js](./teoria/02-architettura.md)
-- [3. JavaScript Runtime](./teoria/03-javascript-runtime.md)
-- [4. REPL di Node.js](./teoria/04-repl.md)
+- [1. Storia di Node.js](./01-storia.md)
+- [2. Architettura di Node.js](./02-architettura.md)
+- [3. JavaScript Runtime](./03-javascript-runtime.md)
+- [4. REPL di Node.js](./04-repl.md)
+- [5. Moduli in Node.js](./05-moduli-in-node.md)
 
 
 ## Esercitazioni Pratiche
 
-- [ES01 - Introduzione a Node](https://docs.google.com/presentation/d/1io47Fa1ybT-e0npThQQ8ndE-_Q1gHRGMnrq-a0Tl_0c)
+- [ES01 - Introduzione a Node](https://docs.google.com/presentation/d/1ZB6qUwG6CxxarcsVaAvTSR7DyaWXR5slIHf0qLfA1Cw)
 
 
 ## Risorse Aggiuntive
@@ -31,4 +32,4 @@ Questa prima esercitazione ti introdurrà a Node.js, spiegandone le caratteristi
 ## Navigazione
 
 - [Indice del Corso](../README.md)
-- Modulo Successivo: [Moduli Core](../02-ModuliCore/README.md)
+- Modulo Successivo: [Moduli Core](../02-Architettura_Event-Driven/README.md)
