@@ -179,3 +179,9 @@ L'audit regolare delle dipendenze, combinato con strategie di mitigazione del ri
 ---
 
 [Torna all'indice dell'esercitazione](../README.md)
+
+## Navigazione
+
+- [← Precedente: Pubblicazione di Pacchetti su NPM](04-pubblicazione-pacchetti.md)
+- [↑ Indice dell’esercitazione](README.md)
+- [Successiva: Modulo 4: Comunicazione di Rete con Socket TCP/UDP →](../05-Socket/README.md)

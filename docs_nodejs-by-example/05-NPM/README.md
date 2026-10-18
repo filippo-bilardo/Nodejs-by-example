@@ -145,11 +145,11 @@ app.listen(port, () => {
 
 ## Argomenti Teorici Collegati
 
-- [1. Introduzione a NPM](./teoria/01-introduzione-npm.md)
-- [2. Package.json in Dettaglio](./teoria/02-package-json.md)
-- [3. Gestione Dipendenze](./teoria/03-gestione-dipendenze.md)
-- [4. Pubblicazione Pacchetti](./teoria/04-pubblicazione-pacchetti.md)
-- [5. Sicurezza e Audit](./teoria/05-sicurezza-audit.md)
+- [1. Introduzione a NPM](01-introduzione-npm.md)
+- [2. Package.json in Dettaglio](02-package-json.md)
+- [3. Gestione Dipendenze](03-gestione-dipendenze.md)
+- [4. Pubblicazione Pacchetti](04-pubblicazione-pacchetti.md)
+- [5. Sicurezza e Audit](05-sicurezza-audit.md)
 
 ## Risorse Aggiuntive
 
@@ -161,8 +161,8 @@ app.listen(port, () => {
 - [NPM CLI Commands](https://docs.npmjs.com/cli/v8/commands)
 - [Node JS Tutorial Italiano 11 - Nodemon](https://www.youtube.com/watch?v=1z-BVcGWyic)
 
-## Navigazione del Corso
+## Navigazione
 
-- [Indice del Corso](../README.md)
-- Modulo Precedente: [Moduli Core](../02-ModuliCore/README.md)
-- Modulo Successivo: [Socket](../04-Socket/README.md)
+- [← Precedente: Gestione delle Dipendenze tra Moduli in Node.js](../04-ModuliPersonalizzati/03-gestione-dipendenze.md)
+- [↑ Indice del corso](../README.md)
+- [Successiva: Introduzione a NPM →](01-introduzione-npm.md)

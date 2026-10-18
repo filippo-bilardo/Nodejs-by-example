@@ -221,9 +221,9 @@ Gioco multiplayer real-time (es. Tic-Tac-Toe o simile).
 
 ### 1. Studia Teoria
 Prima di iniziare:
-- [01-introduzione-socket-protocolli.md](../teoria/01-introduzione-socket-protocolli.md)
-- [02-modulo-net-tcp.md](../teoria/02-modulo-net-tcp.md)
-- [03-modulo-dgram-udp.md](../teoria/03-modulo-dgram-udp.md)
+- [01-introduzione-socket-protocolli.md](../01-introduzione-socket-protocolli.md)
+- [02-modulo-net-tcp.md](../02-modulo-net-tcp.md)
+- [03-modulo-dgram-udp.md](../03-modulo-dgram-udp.md)
 
 ### 2. Analizza Esempi
 Studia esempi correlati:
@@ -451,7 +451,7 @@ function sendWithRetry(socket, message, address, port, maxRetries = 3) {
 
 ## 📚 Risorse
 
-- [Teoria](../teoria/)
+- [Teoria](../)
 - [Esempi Completi](../esempi/)
 - [Node.js net docs](https://nodejs.org/api/net.html)
 - [Node.js dgram docs](https://nodejs.org/api/dgram.html)

@@ -742,11 +742,11 @@ Utilizza le conoscenze acquisite in questa esercitazione per implementare tutte 
 
 ## Argomenti Teorici Collegati
 
-- [1. Fondamenti del Routing in Express.js](./teoria/01-fondamenti-routing.md)
-- [2. Router Modulari](./teoria/02-router-modulari.md)
-- [3. Parametri di Route e Query](./teoria/03-parametri.md)
-- [4. Pattern di Routing Avanzati](./teoria/04-pattern-avanzati.md)
-- [5. Organizzazione MVC delle Route](./teoria/05-mvc-routing.md)
+- 1. Fondamenti del Routing in Express.js (guida non ancora disponibile)
+- 2. Router Modulari (guida non ancora disponibile)
+- 3. Parametri di Route e Query (guida non ancora disponibile)
+- 4. Pattern di Routing Avanzati (guida non ancora disponibile)
+- 5. Organizzazione MVC delle Route (guida non ancora disponibile)
 
 ## Risorse Aggiuntive
 
@@ -756,6 +756,6 @@ Utilizza le conoscenze acquisite in questa esercitazione per implementare tutte 
 
 ## Navigazione
 
-- [Indice del Corso](../README.md)
-- Modulo Precedente: [Express.js Fondamenti](../07-ExpressFondamenti/README.md)
-- Modulo Successivo: [Middleware](../09-Middleware/README.md)
+- [← Precedente: Gestione dei Form e Upload di File](../07-GestioneRichiesteHTTP/04-gestione-form.md)
+- [↑ Indice del corso](../../README.md)
+- [Successiva: REST API con Node.js →](../../08-REST_API/README.md)

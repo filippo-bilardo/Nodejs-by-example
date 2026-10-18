@@ -93,7 +93,8 @@ Nel corso degli anni, l'architettura di Node.js si è evoluta per affrontare le 
 
 ---
 
-- [Indice](../README.md)
-- [Lezione precedente](01-storia.md)
-- [Prossima Lezione](03-javascript-runtime.md)
-- [Prossima Esercitazione](./02-Architettura_Event-Driven/README.md)
+## Navigazione
+
+- [← Precedente: Introduzione a Node.js](01-storia.md)
+- [↑ Indice dell’esercitazione](README.md)
+- [Successiva: JavaScript Runtime in Node.js →](03-javascript-runtime.md)

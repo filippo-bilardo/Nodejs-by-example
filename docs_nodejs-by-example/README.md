@@ -11,34 +11,39 @@ Questo corso è strutturato in 20 esercitazioni progressive che vi permetteranno
 ## Indice delle Esercitazioni
 
 ### Fondamenti di Node.js
-1. [Introduzione a Node.js](./01-Introduzione/README.md) - Installazione e primi passi
-2. [Moduli Core](./02-ModuliCore/README.md) - Utilizzo dei moduli integrati
-3. [Sistema di File](./03-SistemaFile/README.md) - Operazioni di lettura e scrittura
-4. [Moduli Personalizzati](./04-ModuliPersonalizzati/README.md) - Creazione e utilizzo
-5. [NPM e Gestione Pacchetti](./05-NPM/README.md) - Utilizzo del Node Package Manager
+
+1. [Introduzione a Node.js](./01-Introduzione/README.md)
+2. [Architettura Event-Driven](02-Architettura_Event-Driven/README.md)
+3. [Moduli Core di Node.js](03-ModuliCore/README.md)
+4. [Moduli Personalizzati in Node.js](04-ModuliPersonalizzati/README.md)
+5. [NPM e Gestione Pacchetti](./05-NPM/README.md)
+6. [Comunicazione di Rete con Socket TCP/UDP](05-Socket/README.md)
 
 ### Sviluppo Web con Node.js
-6. [HTTP e Server Web](./06-ServerWeb/README.md) - Creazione di un server HTTP
-7. [Express.js Fondamenti](./07-ExpressFondamenti/README.md) - Introduzione al framework Express
-8. [Routing con Express](./08-ExpressRouting/README.md) - Gestione delle rotte
-9. [Middleware](./09-Middleware/README.md) - Utilizzo e creazione di middleware
-10. [Template Engine](./10-TemplateEngine/README.md) - Rendering di pagine dinamiche
+
+7. [Server Web in Node.js](06-ServerWeb/README.md)
+8. [REST API con Node.js](08-REST_API/README.md)
+9. [Middleware e Autenticazione in Express](09-Middleware-Autenticazione/README.md)
+10. [Template Engine in Node.js](10-TemplateEngine/README.md)
 
 ### Database e Persistenza
-11. [Database NoSQL: MongoDB](./11-MongoDB/README.md) - Integrazione con MongoDB
-12. [Database SQL: MySQL](./12-MySQL/README.md) - Integrazione con MySQL
-13. [ORM e ODM](./13-ORM/README.md) - Utilizzo di Sequelize e Mongoose
+
+11. [Database NoSQL - MongoDB](11-MongoDB/README.md)
+12. [MySQL con Node.js](12-MySQL/README.md)
+13. [ORM (Object-Relational Mapping) in Node.js](13-ORM/README.md)
 
 ### Funzionalità Avanzate
-14. [Autenticazione e Autorizzazione](./14-Autenticazione/README.md) - Implementazione di sistemi di login
-15. [API RESTful](./15-REST/README.md) - Progettazione e implementazione
-16. [WebSocket](./16-WebSocket/README.md) - Comunicazione in tempo reale
-17. [Testing](./17-Testing/README.md) - Unit e Integration testing
+
+14. [Autenticazione e Autorizzazione in Node.js](14-Autenticazione/README.md)
+15. [WebSocket e Comunicazione Real-time](15-WebSocket/README.md)
+16. [Gestione degli Errori e Logging in Node.js](16-GestioneErrori/README.md)
+17. [Testing in Node.js](17-Testing/README.md)
 
 ### Progetti e Deployment
-18. [Microservizi](./18-Microservizi/README.md) - Architettura a microservizi
-19. [Sicurezza](./19-Sicurezza/README.md) - Best practices di sicurezza
-20. [Deployment](./20-Deployment/README.md) - Pubblicazione di applicazioni Node.js
+
+18. [Microservizi in Node.js](18-Microservizi/README.md)
+19. [CI/CD per Applicazioni Node.js](19-CI-CD/README.md)
+20. [Deployment di Applicazioni Node.js](20-Deployment/README.md)
 
 ## Come Utilizzare Questo Corso
 

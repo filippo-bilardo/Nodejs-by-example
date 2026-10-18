@@ -160,7 +160,7 @@ Per ogni esercizio, verifica:
 
 ## Risorse Utili
 
-- [Teoria Express](../teoria/)
+- [Teoria Express](../)
 - [Esempi Pratici](../esempi/)
 - [Documentazione Express](https://expressjs.com/)
 - [HTTP Status Codes](https://httpstatuses.com/)

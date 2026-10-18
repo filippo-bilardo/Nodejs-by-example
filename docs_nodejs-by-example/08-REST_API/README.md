@@ -12,10 +12,10 @@ Questo modulo esplora i principi e l'implementazione delle API REST (Representat
 - Documentare e testare le API REST
 
 ## Argomenti Teorici
-- [Principi REST e architettura](./teoria/01-principi-rest.md)
-- [Implementazione di API con Express](./teoria/02-implementazione-api.md)
-- [Autenticazione e sicurezza](./teoria/03-autenticazione-sicurezza.md)
-- [Documentazione e testing](./teoria/04-documentazione-testing.md)
+- [Principi REST e architettura](01-principi-rest.md)
+- [Implementazione di API con Express](02-implementazione-api.md)
+- Autenticazione e sicurezza (guida non ancora disponibile)
+- Documentazione e testing (guida non ancora disponibile)
 
 ## Esercizi Pratici
 
@@ -44,8 +44,8 @@ Crea una documentazione completa per la tua API utilizzando strumenti come Swagg
 ## Conclusione
 Al termine di questo modulo, sarai in grado di progettare e implementare API RESTful robuste, sicure e ben documentate utilizzando Node.js ed Express. Queste competenze sono fondamentali per lo sviluppo di applicazioni web moderne, microservizi e architetture orientate ai servizi. Le API REST rappresentano uno standard de facto per la comunicazione tra client e server nel web moderno, e la padronanza di questi concetti ti permetterà di creare sistemi distribuiti efficienti e scalabili.
 
-## Navigazione del Corso
+## Navigazione
 
-- [Indice del Corso](../README.md)
-- [Modulo Precedente: Gestione Richieste HTTP](../07-GestioneRichiesteHTTP/README.md)
-- [Modulo Successivo: Middleware e Autenticazione](../09-Middleware-Autenticazione/README.md)
+- [← Precedente: Esercitazione 8: Routing con Express](../06-ServerWeb/08-ExpressRouting/README.md)
+- [↑ Indice del corso](../README.md)
+- [Successiva: Principi REST e Architettura →](01-principi-rest.md)

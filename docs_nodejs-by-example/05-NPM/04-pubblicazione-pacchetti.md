@@ -180,3 +180,9 @@ La pubblicazione di pacchetti su NPM è un modo potente per contribuire all'ecos
 ---
 
 [Torna all'indice dell'esercitazione](../README.md)
+
+## Navigazione
+
+- [← Precedente: Gestione delle Dipendenze](03-gestione-dipendenze.md)
+- [↑ Indice dell’esercitazione](README.md)
+- [Successiva: Sicurezza e Audit in NPM →](05-sicurezza-audit.md)

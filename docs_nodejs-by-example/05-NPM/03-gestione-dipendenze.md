@@ -188,3 +188,9 @@ La gestione efficace delle dipendenze è cruciale per lo sviluppo di applicazion
 ---
 
 [Torna all'indice dell'esercitazione](../README.md)
+
+## Navigazione
+
+- [← Precedente: Package.json in Dettaglio](02-package-json.md)
+- [↑ Indice dell’esercitazione](README.md)
+- [Successiva: Pubblicazione di Pacchetti su NPM →](04-pubblicazione-pacchetti.md)

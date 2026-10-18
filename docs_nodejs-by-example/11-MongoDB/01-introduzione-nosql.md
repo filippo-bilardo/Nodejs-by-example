@@ -207,6 +207,6 @@ Per gli sviluppatori Node.js, i database NoSQL come MongoDB offrono un'integrazi
 
 ## Navigazione
 
-- [Indice del Corso Node.js](../../README.md)
-- [Modulo 11: MongoDB](../README.md)
-- [Successivo: MongoDB: Concetti Fondamentali](./02-mongodb-concetti.md)
+- [← Precedente: Esercitazione 11: Database NoSQL - MongoDB](README.md)
+- [↑ Indice dell’esercitazione](README.md)
+- [Successiva: MongoDB: Concetti Fondamentali →](02-mongodb-concetti.md)

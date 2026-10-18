@@ -31,15 +31,15 @@ L'architettura a microservizi offre numerosi vantaggi:
 
 ## Contenuti Teorici
 
-1. [Introduzione ai Microservizi](./teoria/01-introduzione-microservizi.md)
-2. [Comunicazione tra Microservizi](./teoria/02-comunicazione-tra-microservizi.md)
-3. [Pattern di Progettazione Microservizi](./teoria/03-pattern-di-progettazione-microservizi.md)
-4. [Docker e Containerizzazione](./teoria/04-docker-e-containerizzazione.md)
-5. [Implementazione Microservizi in Node.js](./teoria/05-implementazione-microservizi-nodejs.md)
-6. [Orchestrazione e Gestione Microservizi](./teoria/06-orchestrazione-e-gestione-microservizi.md)
-7. [Testing dei Microservizi](./teoria/07-testing-microservizi.md)
-8. [Sicurezza nei Microservizi](./teoria/08-sicurezza-microservizi.md)
-9. [Monitoraggio e Logging nei Microservizi](./teoria/09-monitoraggio-logging-microservizi.md)
+1. [Introduzione ai Microservizi](01-introduzione-microservizi.md)
+2. [Comunicazione tra Microservizi](02-comunicazione-tra-microservizi.md)
+3. [Pattern di Progettazione Microservizi](03-pattern-di-progettazione-microservizi.md)
+4. [Docker e Containerizzazione](04-docker-e-containerizzazione.md)
+5. [Implementazione Microservizi in Node.js](05-implementazione-microservizi-nodejs.md)
+6. [Orchestrazione e Gestione Microservizi](06-orchestrazione-e-gestione-microservizi.md)
+7. [Testing dei Microservizi](07-testing-microservizi.md)
+8. [Sicurezza nei Microservizi](08-sicurezza-microservizi.md)
+9. [Monitoraggio e Logging nei Microservizi](09-monitoraggio-logging-microservizi.md)
 
 ## Esercitazioni Pratiche
 
@@ -77,3 +77,9 @@ Implementare pattern di resilienza come Circuit Breaker, Retry e Timeout per ges
 L'architettura a microservizi offre potenti strumenti per costruire applicazioni scalabili e resilienti, ma introduce anche nuove sfide in termini di complessità operativa e di sviluppo. Questo modulo fornisce le basi per comprendere quando e come adottare i microservizi, e come implementarli efficacemente utilizzando Node.js e le tecnologie correlate.
 
 Nel prossimo modulo, esploreremo l'integrazione continua e il deployment continuo (CI/CD) per automatizzare il processo di rilascio delle applicazioni Node.js.
+
+## Navigazione
+
+- [← Precedente: End-to-End Testing in Node.js](../17-Testing/07-e2e-testing.md)
+- [↑ Indice del corso](../README.md)
+- [Successiva: Introduzione ai Microservizi →](01-introduzione-microservizi.md)

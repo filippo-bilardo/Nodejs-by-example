@@ -123,6 +123,8 @@ Da progetto sperimentale a tecnologia mainstream, Node.js ha trasformato il pano
 
 ---
 
-- [Indice](../README.md)
-- [Prossima Lezione](02-architettura.md)
-- [Prossima Esercitazione](./02-Architettura_Event-Driven/README.md)
+## Navigazione
+
+- [← Precedente: Esercitazione 1: Introduzione a Node.js](README.md)
+- [↑ Indice dell’esercitazione](README.md)
+- [Successiva: Architettura di Node.js →](02-architettura.md)

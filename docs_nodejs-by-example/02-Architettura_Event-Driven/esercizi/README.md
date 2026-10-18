@@ -139,9 +139,9 @@ Ogni esercizio sarà valutato su:
 
 ## Risorse Utili
 
-- [Teoria - EventEmitter](../teoria/02-eventemitter.md)
-- [Teoria - Event Loop](../teoria/03-event-loop.md)
-- [Teoria - Pattern](../teoria/04-pattern-avanzati.md)
+- [Teoria - EventEmitter](../03-eventemitter.md)
+- [Teoria - Event Loop](../04-event-loop.md)
+- [Teoria - Pattern](../06-pattern-avanzati.md)
 - [Esempi](../esempi/)
 
 ## Submission

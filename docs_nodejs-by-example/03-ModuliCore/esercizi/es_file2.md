@@ -11,9 +11,9 @@ In questa esercitazione esploreremo il modulo `fs` (File System) di Node.js, che
 - Utilizzare gli stream per operazioni efficienti su file di grandi dimensioni
 
 ## Argomenti Teorici Collegati
-- [Operazioni File System in Node.js](../teoria/01-file-system.md#operazioni-di-base)
-- [API Sincrone vs Asincrone](../teoria/01-file-system.md#api-sincrone-vs-asincrone)
-- [Stream e Buffer](../teoria/01-file-system.md#stream-e-buffer)
+- [Operazioni File System in Node.js](../02-file-system.md#operazioni-base-sui-file)
+- [API Sincrone vs Asincrone](../02-file-system.md#operazioni-sincrone-vs-asincrone)
+- [Stream e Buffer](../02-file-system.md#stream-di-file---elaborazione-efficiente)
 
 ## Esercizi Pratici
 
@@ -606,5 +606,5 @@ mostraMenu();
 ## Navigazione
 
 - [Indice del Corso](../README.md)
-- Modulo Precedente: [Moduli Core](../02-ModuliCore/README.md)
-- Modulo Successivo: [Moduli Personalizzati](../04-ModuliPersonalizzati/README.md)
+- Modulo Precedente: [Moduli Core](../README.md)
+- Modulo Successivo: [Moduli Personalizzati](../../04-ModuliPersonalizzati/README.md)

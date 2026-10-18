@@ -16,12 +16,12 @@ L'autenticazione verifica l'identità di un utente, mentre l'autorizzazione dete
 
 ## Materiale Teorico
 
-- [Fondamenti di Autenticazione e Autorizzazione](./teoria/01-fondamenti-autenticazione.md)
-- [JSON Web Tokens (JWT)](./teoria/02-jwt.md)
-- [Strategie di Autenticazione con Passport.js](./teoria/03-passport-strategie.md)
-- [OAuth e Autenticazione Social](./teoria/04-oauth-social.md)
-- [Gestione delle Sessioni](./teoria/05-gestione-sessioni.md)
-- [Best Practices di Sicurezza](./teoria/06-sicurezza-best-practices.md)
+- [Fondamenti di Autenticazione e Autorizzazione](01-fondamenti-autenticazione.md)
+- [JSON Web Tokens (JWT)](02-jwt.md)
+- Strategie di Autenticazione con Passport.js (guida non ancora disponibile)
+- OAuth e Autenticazione Social (guida non ancora disponibile)
+- Gestione delle Sessioni (guida non ancora disponibile)
+- Best Practices di Sicurezza (guida non ancora disponibile)
 
 ## Esercizi Pratici
 
@@ -79,3 +79,9 @@ Crea un sistema di gestione delle sessioni che includa:
 Implementare un sistema di autenticazione e autorizzazione robusto è fondamentale per qualsiasi applicazione web moderna. Le competenze acquisite in questa esercitazione ti permetteranno di creare sistemi sicuri che proteggono i dati degli utenti e garantiscono l'accesso appropriato alle risorse dell'applicazione.
 
 Ricorda che la sicurezza è un processo continuo, non un prodotto finito. Mantieniti aggiornato sulle ultime best practices e vulnerabilità di sicurezza per garantire che i tuoi sistemi rimangano protetti nel tempo.
+
+## Navigazione
+
+- [← Precedente: Query Avanzate e Ottimizzazione in Sequelize](../13-ORM/05-query-avanzate.md)
+- [↑ Indice del corso](../README.md)
+- [Successiva: Fondamenti di Autenticazione e Autorizzazione →](01-fondamenti-autenticazione.md)

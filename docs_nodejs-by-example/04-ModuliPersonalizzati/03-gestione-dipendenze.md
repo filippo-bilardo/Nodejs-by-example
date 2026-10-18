@@ -268,3 +268,9 @@ console.log(counterA === counterB); // Output: false
 La gestione efficace delle dipendenze è cruciale per sviluppare applicazioni Node.js robuste e manutenibili. Comprendere come i moduli interagiscono tra loro, come evitare problemi comuni come le dipendenze circolari e come organizzare il codice in modo efficiente sono competenze fondamentali per ogni sviluppatore Node.js.
 
 Una buona architettura modulare facilita la collaborazione tra sviluppatori, migliora la testabilità del codice e rende più semplice l'evoluzione dell'applicazione nel tempo.
+
+## Navigazione
+
+- [← Precedente: Pattern di Esportazione in Node.js](02-pattern-esportazione.md)
+- [↑ Indice dell’esercitazione](README.md)
+- [Successiva: Esercitazione 3: NPM e Gestione Pacchetti →](../05-NPM/README.md)

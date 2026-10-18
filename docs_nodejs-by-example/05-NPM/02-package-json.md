@@ -287,3 +287,9 @@ Il file `package.json` è molto più di un semplice elenco di dipendenze: è la 
 ---
 
 [Torna all'indice dell'esercitazione](../README.md)
+
+## Navigazione
+
+- [← Precedente: Introduzione a NPM](01-introduzione-npm.md)
+- [↑ Indice dell’esercitazione](README.md)
+- [Successiva: Gestione delle Dipendenze →](03-gestione-dipendenze.md)

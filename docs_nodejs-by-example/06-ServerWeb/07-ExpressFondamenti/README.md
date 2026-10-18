@@ -554,11 +554,11 @@ Utilizza le conoscenze acquisite in questa esercitazione per implementare tutte 
 
 ## Argomenti Teorici Collegati
 
-- [1. Introduzione a Express.js](./teoria/01-introduzione-express.md)
-- [2. Routing in Express.js](./teoria/02-routing.md)
-- [3. Middleware in Express.js](./teoria/03-middleware.md)
-- [4. Gestione delle Richieste e Risposte](./teoria/04-richieste-risposte.md)
-- [5. Gestione degli Errori](./teoria/05-gestione-errori.md)
+- [1. Introduzione a Express.js](../04-Express/01-introduzione-express.md)
+- [2. Routing in Express.js](../04-Express/02-routing.md)
+- [3. Middleware in Express.js](../04-Express/03-middleware.md)
+- [4. Gestione delle Richieste e Risposte](../04-Express/04-gestione-richieste.md)
+- 5. Gestione degli Errori (guida non ancora disponibile)
 
 ## Risorse Aggiuntive
 
@@ -568,6 +568,6 @@ Utilizza le conoscenze acquisite in questa esercitazione per implementare tutte 
 
 ## Navigazione
 
-- [Indice del Corso](../README.md)
-- Modulo Precedente: [HTTP e Server Web](../06-ServerWeb/README.md)
-- Modulo Successivo: [Routing con Express](../08-ExpressRouting/README.md)
+- [← Precedente: 05. Template Engine in Express.js](../04-Express/05-template-engine.md)
+- [↑ Indice del corso](../../README.md)
+- [Successiva: Gestione delle Richieste HTTP in Node.js →](../07-GestioneRichiesteHTTP/README.md)

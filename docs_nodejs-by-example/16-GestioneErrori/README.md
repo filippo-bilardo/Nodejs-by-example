@@ -16,10 +16,10 @@ Questa esercitazione si concentra su tecniche avanzate per la gestione degli err
 - Comprensione dei concetti di programmazione asincrona
 
 ## Contenuti Teorici
-- [Gestione delle Eccezioni in Node.js](./teoria/01-gestione-eccezioni.md)
-- [Middleware per la Gestione degli Errori](./teoria/02-middleware-errori.md)
-- [Logging con Winston e Morgan](./teoria/03-logging.md)
-- [Monitoraggio delle Applicazioni](./teoria/04-monitoraggio.md)
+- [Gestione delle Eccezioni in Node.js](01-gestione-eccezioni.md)
+- [Middleware per la Gestione degli Errori](02-middleware-errori.md)
+- [Logging con Winston e Morgan](03-logging.md)
+- [Monitoraggio delle Applicazioni](04-monitoraggio.md)
 
 ## Esercizi Pratici
 
@@ -50,3 +50,9 @@ Aggiungi funzionalità di monitoraggio alla tua applicazione:
 
 ## Conclusione
 Al termine di questa esercitazione, avrai acquisito competenze avanzate nella gestione degli errori e nel logging, essenziali per lo sviluppo di applicazioni Node.js robuste e di qualità professionale. Queste tecniche ti aiuteranno a identificare e risolvere rapidamente i problemi, migliorando l'affidabilità e la manutenibilità delle tue applicazioni.
+
+## Navigazione
+
+- [← Precedente: Notifiche Push e Aggiornamenti Live con Socket.io](../15-WebSocket/04-notifiche-push.md)
+- [↑ Indice del corso](../README.md)
+- [Successiva: Gestione delle Eccezioni in Node.js →](01-gestione-eccezioni.md)

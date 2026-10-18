@@ -16,13 +16,13 @@ Questo modulo si concentra sulle tecniche e le best practices per il deployment 
 - Comprensione dei concetti di CI/CD (dal modulo precedente)
 
 ## Contenuti Teorici
-- [Preparazione per la Produzione](./teoria/01-preparazione-produzione.md)
-- [Strategie di Deployment](./teoria/02-strategie-deployment.md)
-- [Cloud Deployment](./teoria/03-cloud-deployment.md)
-- [Containerizzazione con Docker](./teoria/04-containerizzazione-docker.md)
-- [Serverless Deployment](./teoria/05-serverless-deployment.md)
-- [Monitoraggio e Scaling](./teoria/06-monitoraggio-scaling.md)
-- [Piattaforme di Hosting](./teoria/07-piattaforme-hosting.md)
+- [Preparazione per la Produzione](01-preparazione-produzione.md)
+- [Strategie di Deployment](02-strategie-deployment.md)
+- [Cloud Deployment](03-cloud-deployment.md)
+- [Containerizzazione con Docker](04-containerizzazione-docker.md)
+- [Serverless Deployment](05-serverless-deployment.md)
+- [Monitoraggio e Scaling](06-monitoraggio-scaling.md)
+- Piattaforme di Hosting (guida non ancora disponibile)
 
 ## Esercizi Pratici
 
@@ -58,3 +58,9 @@ Sviluppa un'applicazione basata su microservizi utilizzando Node.js, Docker e Ku
 
 ## Conclusione
 Al termine di questo modulo, sarai in grado di preparare e deployare applicazioni Node.js in ambienti di produzione utilizzando diverse strategie e piattaforme. Avrai acquisito competenze fondamentali per garantire che le tue applicazioni siano robuste, scalabili e facilmente manutenibili in produzione.
+
+## Navigazione
+
+- [← Precedente: Sicurezza nelle Pipeline CI/CD](../19-CI-CD/06-sicurezza-pipeline-ci-cd.md)
+- [↑ Indice del corso](../README.md)
+- [Successiva: Preparazione per la Produzione →](01-preparazione-produzione.md)

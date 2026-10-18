@@ -12,10 +12,10 @@ Questo modulo esplora le tecniche avanzate per la gestione delle richieste HTTP 
 - Gestire il caricamento di file
 
 ## Argomenti Teorici
-- [Metodi HTTP e loro utilizzo](./teoria/01-metodi-http.md)
-- [Gestione dei parametri URL](./teoria/02-parametri-url.md)
-- [Body parsing e middleware](./teoria/03-body-parsing.md)
-- [Gestione dei form e upload di file](./teoria/04-gestione-form.md)
+- [Metodi HTTP e loro utilizzo](01-metodi-http.md)
+- [Gestione dei parametri URL](02-parametri-url.md)
+- [Body parsing e middleware](03-body-parsing.md)
+- [Gestione dei form e upload di file](04-gestione-form.md)
 
 ## Esercizi Pratici
 
@@ -43,8 +43,8 @@ Combina tutte le tecniche apprese per creare un'API completa che gestisca divers
 ## Conclusione
 Al termine di questo modulo, sarai in grado di gestire efficacemente diversi tipi di richieste HTTP nelle tue applicazioni Node.js, elaborare dati in vari formati e implementare funzionalità comuni come la validazione dei dati e l'upload di file. Queste competenze sono fondamentali per lo sviluppo di API robuste e applicazioni web interattive.
 
-## Navigazione del Corso
+## Navigazione
 
-- [Indice del Corso](../README.md)
-- [Modulo Precedente: Server Web](../06-ServerWeb/README.md)
-- [Modulo Successivo: REST API](../08-REST_API/README.md)
+- [← Precedente: Esercitazione 7: Express.js Fondamenti](../07-ExpressFondamenti/README.md)
+- [↑ Indice del corso](../../README.md)
+- [Successiva: Metodi HTTP e loro utilizzo →](01-metodi-http.md)

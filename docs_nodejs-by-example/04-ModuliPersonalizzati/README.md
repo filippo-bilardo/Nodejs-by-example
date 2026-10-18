@@ -11,9 +11,9 @@ In questa esercitazione esploreremo come creare e utilizzare moduli personalizza
 - Organizzare il codice in modo efficiente
 
 ## Argomenti Teorici Collegati
-- [Creazione di Moduli Personalizzati](./teoria/01-creazione-moduli.md)
-- [Pattern di Esportazione](./teoria/02-pattern-esportazione.md)
-- [Gestione delle Dipendenze](./teoria/03-gestione-dipendenze.md)
+- [Creazione di Moduli Personalizzati](01-moduli-personalizzati.md)
+- [Pattern di Esportazione](02-pattern-esportazione.md)
+- [Gestione delle Dipendenze](03-gestione-dipendenze.md)
 
 ## Esercizi Pratici
 
@@ -382,14 +382,6 @@ main();
 - [Patterns di modularizzazione in JavaScript](https://addyosmani.com/resources/essentialjsdesignpatterns/book/#modulepatternjavascript)
 - [CommonJS vs ES Modules](https://blog.logrocket.com/commonjs-vs-es-modules-node-js/)
 
-## Navigazione del Corso
-
-- [Indice del Corso](../README.md)
-- [Modulo Precedente: Sistema di File in Node.js](../03-Sistema_di_File_in_Node.js/README.md)
-- [Modulo Successivo: NPM](../05-NPM/README.md)
-
-# Moduli personalizzati in Node.js
-
 ## Indice
 
 ### Capitolo 1: Introduzione ai moduli in Node.js
@@ -476,3 +468,8 @@ main();
 10.5 Progetto 5: CLI tool modulare  
 **Autovalutazione Capitolo 10**
 
+## Navigazione
+
+- [← Precedente: Modulo Zlib - Compressione e Decompressione](../03-ModuliCore/09-zlib.md)
+- [↑ Indice del corso](../README.md)
+- [Successiva: Moduli personalizzati in Node.js →](01-moduli-personalizzati.md)

@@ -700,3 +700,9 @@ I moduli in Node.js sono fondamentali per:
 - I moduli possono essere core, npm, o locali
 
 Con una buona organizzazione dei moduli, il tuo codice Node.js sarà più pulito, manutenibile e scalabile.
+
+## Navigazione
+
+- [← Precedente: REPL di Node.js](04-repl.md)
+- [↑ Indice dell’esercitazione](README.md)
+- [Successiva: Esercitazione 3: Architettura Event-Driven →](../02-Architettura_Event-Driven/README.md)

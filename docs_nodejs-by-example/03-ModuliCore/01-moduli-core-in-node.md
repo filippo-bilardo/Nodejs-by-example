@@ -207,3 +207,9 @@ readFilePromise('file.txt', 'utf8')
 - `tty`: per interagire con terminali
 - `vm`: per eseguire codice JavaScript in un contesto separato
 - `querystring`: per lavorare con stringhe di query URL
+
+## Navigazione
+
+- [← Precedente: Esercitazione 2: Moduli Core di Node.js](README.md)
+- [↑ Indice dell’esercitazione](README.md)
+- [Successiva: Il modulo File System in Node.js →](02-file-system.md)

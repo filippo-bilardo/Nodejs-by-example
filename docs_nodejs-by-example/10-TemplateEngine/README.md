@@ -1,10 +1,10 @@
 # Esercitazione 10: Template Engine in Node.js
 
 ## Argomenti Teorici Collegati
-- [Introduzione ai Template Engine](./teoria/01-introduzione-template-engine.md)
-- [EJS: Embedded JavaScript](./teoria/02-ejs.md)
-- [Handlebars: Logica Minima](./teoria/03-handlebars.md)
-- [Pug: Template Engine Minimalista](./teoria/04-pug.md)
+- [Introduzione ai Template Engine](01-introduzione-template-engine.md)
+- [EJS: Embedded JavaScript](02-ejs.md)
+- [Handlebars: Logica Minima](03-handlebars.md)
+- [Pug: Template Engine Minimalista](04-pug.md)
 
 ## Descrizione
 In questa esercitazione esploreremo i template engine, strumenti fondamentali per lo sviluppo di applicazioni web dinamiche con Node.js. I template engine permettono di separare la logica dell'applicazione dalla presentazione, rendendo il codice più organizzato e manutenibile.
@@ -271,8 +271,8 @@ In questa esercitazione hai imparato a utilizzare i template engine per creare p
 
 Nel prossimo modulo, esploreremo come integrare un database con la tua applicazione Express per creare applicazioni web complete con persistenza dei dati.
 
-## Navigazione del Corso
+## Navigazione
 
-- [Indice del Corso](../README.md)
-- [Modulo Precedente: Middleware e Autenticazione](../09-Middleware-Autenticazione/README.md)
-- [Modulo Successivo: MongoDB](../11-MongoDB/README.md)
+- [← Precedente: Sicurezza delle API](../09-Middleware-Autenticazione/04-sicurezza-api.md)
+- [↑ Indice del corso](../README.md)
+- [Successiva: Introduzione ai Template Engine →](01-introduzione-template-engine.md)

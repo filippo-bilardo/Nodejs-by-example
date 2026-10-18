@@ -16,10 +16,10 @@ Questa esercitazione si concentra sull'implementazione di middleware in Express.
 - Familiarità con JavaScript asincrono e Promises
 
 ## Materiale Teorico
-- [Middleware in Express](./teoria/01-middleware-express.md)
-- [Autenticazione e Autorizzazione](./teoria/02-autenticazione-autorizzazione.md)
-- [JWT (JSON Web Tokens)](./teoria/03-jwt.md)
-- [Sicurezza delle API](./teoria/04-sicurezza-api.md)
+- [Middleware in Express](01-middleware-express.md)
+- [Autenticazione e Autorizzazione](02-autenticazione-autorizzazione.md)
+- [JWT (JSON Web Tokens)](03-jwt.md)
+- [Sicurezza delle API](04-sicurezza-api.md)
 
 ## Esercizi Pratici
 
@@ -63,8 +63,8 @@ Per completare l'esercitazione, crea un repository GitHub contenente:
 - Documentazione delle API implementate
 - Test unitari per i middleware e le funzionalità di autenticazione
 
-## Navigazione del Corso
+## Navigazione
 
-- [Indice del Corso](../README.md)
-- [Modulo Precedente: REST API](../08-REST_API/README.md)
-- [Modulo Successivo: Template Engine](../10-TemplateEngine/README.md)
+- [← Precedente: Implementazione di API con Express](../08-REST_API/02-implementazione-api.md)
+- [↑ Indice del corso](../README.md)
+- [Successiva: Middleware in Express.js →](01-middleware-express.md)

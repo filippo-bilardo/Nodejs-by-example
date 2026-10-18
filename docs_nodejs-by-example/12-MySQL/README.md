@@ -24,11 +24,11 @@ MySQL è un sistema di gestione di database relazionali (RDBMS) open source che 
 
 ## Contenuti Teorici
 
-1. [Introduzione ai Database Relazionali](./teoria/01-introduzione-db-relazionali.md)
-2. [Installazione e Configurazione di MySQL](./teoria/02-installazione-mysql.md)
-3. [Operazioni SQL Fondamentali](./teoria/03-operazioni-sql.md)
-4. [Connessione a MySQL da Node.js](./teoria/04-connessione-nodejs-mysql.md)
-5. [Pattern di Gestione delle Connessioni](./teoria/05-pattern-connessioni.md)
+1. [Introduzione ai Database Relazionali](01-introduzione-db-relazionali.md)
+2. [Installazione e Configurazione di MySQL](02-installazione-mysql.md)
+3. [Operazioni SQL Fondamentali](03-operazioni-sql.md)
+4. [Connessione a MySQL da Node.js](04-connessione-nodejs-mysql.md)
+5. [Pattern di Gestione delle Connessioni](05-pattern-connessioni.md)
 
 ## Esercizi Pratici
 
@@ -87,3 +87,9 @@ Implementa funzionalità avanzate utilizzando transazioni e altre caratteristich
 ## Conclusione
 
 Al termine di questo modulo, avrai acquisito le competenze necessarie per integrare MySQL nelle tue applicazioni Node.js, gestire dati relazionali in modo efficiente e implementare pattern comuni per lo sviluppo di applicazioni basate su database.
+
+## Navigazione
+
+- [← Precedente: Modellazione dei Dati in MongoDB](../11-MongoDB/05-modellazione-dati.md)
+- [↑ Indice del corso](../README.md)
+- [Successiva: Introduzione ai Database Relazionali →](01-introduzione-db-relazionali.md)

@@ -12,27 +12,30 @@ L'architettura event-driven è il cuore di Node.js. In questa esercitazione impa
 - Costruire applicazioni real-time scalabili
 
 ## Argomenti Teorici Collegati
-- [1. Programmazione Asincrona](./teoria/01-programmazione-asincrona.md)
-- [2. Introduzione all'Architettura Event-Driven](./teoria/02-introduzione-event-driven.md)
-- [3. EventEmitter: Il Cuore degli Eventi](./teoria/03-eventemitter.md)
-- [4. Event Loop: Il Motore di Node.js](./teoria/04-event-loop.md)
-- [5. Gestione Errori negli Eventi](./teoria/05-gestione-errori.md)
-- [6. Pattern Event-Driven Avanzati](./teoria/06-pattern-avanzati.md)
-</br></br>**Approfondimenti:**
-- [microtask](<teoria/AB - microtask.md>) 
-- [process.nextTick](<teoria/AB - process.nextTick.md>) 
-- [setTimeout e setInterval](<teoria/AC - setTimeout_setInterval.md>) 
-- [setImmediate](<teoria/AD - setImmediate.md>) 
-- [close_callbacks](<teoria/AE - close_callbacks.md>) 
-- [pending_callbacks](<teoria/AE - pending_callbacks.md>) 
-- [libuv](<teoria/AF - libuv.md>) 
-- [callback](<teoria/BA - callback.md>) 
-- [Promises](<teoria/BB - Promises.md>) 
-- [Async-Await](<teoria/BC - codice asincrono con Async-Await.md>)
-- [callback concetti avanzati](./teoria/callback_concetti_avanzati.md)
-- [event-loop concetti avanzati](./teoria/event-loop_concetti_avanzati.md)
-- [microtask concetti avanzati](./teoria/microtask_concetti_avanzati.md)
-- [Worker Threads](./teoria/Worker_Threads.md)
+
+- [Teoria: Architettura Event-Driven](indice-guide.md)
+- [1. Programmazione Asincrona](01-programmazione-asincrona.md)
+- [2. Introduzione all'Architettura Event-Driven](02-introduzione-event-driven.md)
+- [3. EventEmitter: Il Cuore degli Eventi](03-eventemitter.md)
+- [4. Event Loop: Il Motore di Node.js](04-event-loop.md)
+- [5. Gestione Errori negli Eventi](05-gestione-errori.md)
+- [Gestione degli Errori: Callback, Promise e Async/Await](05-pattern_gestioni_errori.md)
+- [6. Pattern Event-Driven Avanzati](06-pattern-avanzati.md)
+- [microtask](<AB - microtask.md>)
+- [process.nextTick](<AB - process.nextTick.md>)
+- [setTimeout e setInterval](<AC - setTimeout_setInterval.md>)
+- [setImmediate](<AD - setImmediate.md>)
+- [close_callbacks](<AE - close_callbacks.md>)
+- [pending_callbacks](<AE - pending_callbacks.md>)
+- [libuv](<AF - libuv.md>)
+- [callback](<BA - callback.md>)
+- [Promises](<BB - Promises.md>)
+- [Async-Await](<BC - codice asincrono con Async-Await.md>)
+- [callback concetti avanzati](callback_concetti_avanzati.md)
+- [event-loop concetti avanzati](event-loop_concetti_avanzati.md)
+- [microtask concetti avanzati](microtask_concetti_avanzati.md)
+- [Worker Threads](Worker_Threads.md)
+- [L'Event Loop di Node.js: come funziona la programmazione asincrona](eventloop.md)
 
 ## Esercitazioni Pratiche
 - [ES02 - L'Event Loop](https://docs.google.com/presentation/d/1EzPyxiYQg4top0YbGJCznnL_j-mZYWvPaStsta98mBQ)
@@ -339,7 +342,7 @@ console.log('6. Script end');
    └───────────────────────────┘
 ```
 
-**🎯 Approfondimento:** [Event Loop in Dettaglio](./teoria/03-event-loop.md)
+**🎯 Approfondimento:** [Event Loop in Dettaglio](04-event-loop.md)
 
 ---
 
@@ -408,7 +411,7 @@ account.deposit(500);
 console.log(eventStore.getEvents('ACC001'));
 ```
 
-**🎯 Approfondimento:** [Pattern Avanzati](./teoria/04-pattern-avanzati.md)
+**🎯 Approfondimento:** [Pattern Avanzati](06-pattern-avanzati.md)
 
 ---
 
@@ -491,7 +494,7 @@ class CircuitBreaker extends EventEmitter {
 }
 ```
 
-**🎯 Approfondimento:** [Gestione Errori](./teoria/05-gestione-errori.md)
+**🎯 Approfondimento:** [Gestione Errori](05-gestione-errori.md)
 
 ---
 
@@ -614,12 +617,10 @@ Orchestratore saga distribuito con:
 
 ---
 
+**Happy Event-Driven Programming!** 🚀
+
 ## Navigazione
 
-- [← Modulo Precedente: Moduli Core](../02-ModuliCore/)
-- [→ Modulo Successivo: Comunicazione di Rete](../04-Socket_TCP_UDP/)
-- [↑ Torna all'indice principale](../README.md)
-
----
-
-**Happy Event-Driven Programming!** 🚀
+- [← Precedente: Introduzione ai moduli in Node.js](../01-Introduzione/05-moduli-in-node.md)
+- [↑ Indice del corso](../README.md)
+- [Successiva: Teoria: Architettura Event-Driven →](indice-guide.md)

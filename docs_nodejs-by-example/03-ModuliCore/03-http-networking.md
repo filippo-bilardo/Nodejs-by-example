@@ -873,10 +873,16 @@ Dopo aver completato questa guida, sei pronto per:
 5. **Production Deployment**: Deploy su AWS, Azure, o Heroku
 
 Continua l'apprendimento con:
-- [Moduli Streams](./04-streams.md (nota: se disponibile)
-- [Eventi e EventEmitter](./05-eventi.md) (nota: se disponibile)
+- [Stream di File](02-file-system.md#stream-di-file---elaborazione-efficiente)
+- [Eventi e EventEmitter](../02-Architettura_Event-Driven/03-eventemitter.md)
 - [Moduli per Gestione File](./02-file-system.md)
 
 ---
 
 **📝 Nota**: Tutti gli esempi sono completi, eseguibili e commentati. Esplora la cartella `esempi/` per vedere il codice completo!
+
+## Navigazione
+
+- [← Precedente: Il modulo File System in Node.js](02-file-system.md)
+- [↑ Indice dell’esercitazione](README.md)
+- [Successiva: Modulo Crypto - Crittografia in Node.js →](04-crypto.md)

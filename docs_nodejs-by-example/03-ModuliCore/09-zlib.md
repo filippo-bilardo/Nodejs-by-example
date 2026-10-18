@@ -374,3 +374,9 @@ server.listen(3000);
 ---
 
 **💡 Tip**: Compression può ridurre bandwidth del **70-90%** per text files!
+
+## Navigazione
+
+- [← Precedente: Modulo Process - Monitoraggio e Controllo Processo](08-process.md)
+- [↑ Indice dell’esercitazione](README.md)
+- [Successiva: Esercitazione 4: Moduli Personalizzati in Node.js →](../04-ModuliPersonalizzati/README.md)

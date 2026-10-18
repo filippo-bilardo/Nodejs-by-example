@@ -316,11 +316,11 @@ app.listen(port, () => {
 
 ## Argomenti Teorici Collegati
 
-- [1. Introduzione a Express.js](./teoria/01-introduzione-express.md)
-- [2. Routing](./teoria/02-routing.md)
-- [3. Middleware](./teoria/03-middleware.md)
-- [4. Gestione delle Richieste](./teoria/04-gestione-richieste.md)
-- [5. Template Engine](./teoria/05-template-engine.md)
+- [1. Introduzione a Express.js](01-introduzione-express.md)
+- [2. Routing](02-routing.md)
+- [3. Middleware](03-middleware.md)
+- [4. Gestione delle Richieste](04-gestione-richieste.md)
+- [5. Template Engine](05-template-engine.md)
 
 ## Risorse Aggiuntive
 
@@ -330,6 +330,6 @@ app.listen(port, () => {
 
 ## Navigazione
 
-- [Indice del Corso](../README.md)
-- Modulo Precedente: [NPM e Gestione Pacchetti](../03-NPM/README.md)
-- Modulo Successivo: [Database](../05-Database/README.md)
+- [← Precedente: Middleware e Routing](../04-middleware-routing.md)
+- [↑ Indice del corso](../../README.md)
+- [Successiva: 01. Introduzione a Express.js →](01-introduzione-express.md)

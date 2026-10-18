@@ -403,7 +403,7 @@ function broadcast(roomName, message, excludeSocketId) {
 
 ## 📚 Risorse
 
-- [Teoria TCP](../../teoria/02-modulo-net-tcp.md)
+- [Teoria TCP](../../02-modulo-net-tcp.md)
 - [Esempio Chat Server](../../esempi/02-tcp-chat-server/)
 - [Node.js net docs](https://nodejs.org/api/net.html)
 

@@ -24,10 +24,10 @@ Questa tecnologia è fondamentale per applicazioni che richiedono aggiornamenti 
 - Applicazioni collaborative
 
 ## Argomenti Teorici Collegati
-- [Introduzione ai WebSocket](./teoria/01-introduzione-websocket.md)
-- [Socket.io: Concetti Fondamentali](./teoria/02-socketio-fondamenti.md)
-- [Implementazione di Chat Real-time](./teoria/03-chat-realtime.md)
-- [Notifiche Push e Aggiornamenti Live](./teoria/04-notifiche-push.md)
+- [Introduzione ai WebSocket](01-introduzione-websocket.md)
+- [Socket.io: Concetti Fondamentali](02-socketio-fondamenti.md)
+- [Implementazione di Chat Real-time](03-chat-realtime.md)
+- [Notifiche Push e Aggiornamenti Live](04-notifiche-push.md)
 
 ## Esercizi Pratici
 
@@ -56,3 +56,9 @@ I WebSocket rappresentano un potente strumento per lo sviluppo di applicazioni w
 
 ---
 [INDICE](../README.md)
+
+## Navigazione
+
+- [← Precedente: JSON Web Tokens (JWT)](../14-Autenticazione/02-jwt.md)
+- [↑ Indice del corso](../README.md)
+- [Successiva: Introduzione ai WebSocket →](01-introduzione-websocket.md)

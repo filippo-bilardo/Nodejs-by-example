@@ -695,7 +695,6 @@ async function aggiungiUtenteAGruppo(utenteId, gruppoId) {
 
 ## Navigazione
 
-- [Indice del Corso Node.js](../../README.md)
-- [Modulo 11: MongoDB](../README.md)
-- [Precedente: Mongoose](./04-mongoose.md)
-- [Torna all'Introduzione NoSQL](./01-introduzione-nosql.md)
+- [← Precedente: Mongoose: ODM per MongoDB](04-mongoose.md)
+- [↑ Indice dell’esercitazione](README.md)
+- [Successiva: MySQL con Node.js →](../12-MySQL/README.md)

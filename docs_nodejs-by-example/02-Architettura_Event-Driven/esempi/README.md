@@ -117,7 +117,7 @@ npm start
 
 ## Risorse Aggiuntive
 
-- [Teoria - EventEmitter](../teoria/02-eventemitter.md)
-- [Teoria - Event Loop](../teoria/03-event-loop.md)
-- [Teoria - Pattern Avanzati](../teoria/04-pattern-avanzati.md)
+- [Teoria - EventEmitter](../03-eventemitter.md)
+- [Teoria - Event Loop](../04-event-loop.md)
+- [Teoria - Pattern Avanzati](../06-pattern-avanzati.md)
 - [Esercizi](../esercizi/)

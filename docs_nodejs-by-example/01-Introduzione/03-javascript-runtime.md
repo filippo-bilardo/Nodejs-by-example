@@ -178,7 +178,8 @@ Rimanere aggiornati sull'evoluzione del runtime è importante per sfruttare al m
 
 ---
 
-- [Indice](../README.md)
-- [Lezione precedente](02-architettura.md)
-- [Prossima Lezione](04-repl.md)
-- [Prossima Esercitazione](./02-Architettura_Event-Driven/README.md)
+## Navigazione
+
+- [← Precedente: Architettura di Node.js](02-architettura.md)
+- [↑ Indice dell’esercitazione](README.md)
+- [Successiva: REPL di Node.js →](04-repl.md)

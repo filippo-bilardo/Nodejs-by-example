@@ -12,10 +12,17 @@ In questa esercitazione esploreremo come creare server web utilizzando Node.js. 
 - Gestire form e dati JSON nelle richieste
 
 ## Argomenti Teorici Collegati
-- [Introduzione ai Server Web](./teoria/01-introduzione-server-web.md)
-- [Modulo HTTP in Node.js](./teoria/02-modulo-http.md)
-- [Express.js: Concetti Fondamentali](./teoria/03-express-fondamenti.md)
-- [Middleware e Routing](./teoria/04-middleware-routing.md)
+- [Introduzione ai Server Web](01-introduzione-server-web.md)
+- [Modulo HTTP in Node.js](02-modulo-http.md)
+- [Express.js: Concetti Fondamentali](03-express-fondamenti.md)
+- [Middleware e Routing](04-middleware-routing.md)
+
+## Approfondimenti
+
+- [Express.js](04-Express/README.md)
+- [Express.js: fondamenti](07-ExpressFondamenti/README.md)
+- [Gestione delle richieste HTTP](07-GestioneRichiesteHTTP/README.md)
+- [Routing con Express](08-ExpressRouting/README.md)
 
 ## Esercizi Pratici
 
@@ -528,8 +535,8 @@ node server.js
 - [RESTful API Design](https://restfulapi.net/)
 - [Express.js Middleware](https://expressjs.com/en/guide/using-middleware.html)
 
-## Navigazione del Corso
+## Navigazione
 
-- [Indice del Corso](../README.md)
-- [Modulo Precedente: NPM](../05-NPM/README.md)
-- [Modulo Successivo: Gestione Richieste HTTP](../07-GestioneRichiesteHTTP/README.md)
+- [← Precedente: Room e Namespace](../05-Socket/08-socket.io_room-namespace.md)
+- [↑ Indice del corso](../README.md)
+- [Successiva: Introduzione ai Server Web →](01-introduzione-server-web.md)

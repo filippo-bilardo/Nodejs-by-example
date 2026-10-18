@@ -622,3 +622,9 @@ Il modulo `fs` è uno degli strumenti più potenti e versatili di Node.js. Quest
 4. Esplora librerie avanzate come fs-extra e chokidar
 
 **💡 Ricorda**: Preferisci sempre approcci **asincroni** e usa **stream** per file grandi. La scelta tra sincrone e asincrone dipende dal contesto, ma in ambienti server l'asincronicità è fondamentale per mantenere alte performance con richieste concorrenti.
+
+## Navigazione
+
+- [← Precedente: Moduli e moduli core in Node.js](01-moduli-core-in-node.md)
+- [↑ Indice dell’esercitazione](README.md)
+- [Successiva: I moduli HTTP e per il Networking in Node.js →](03-http-networking.md)

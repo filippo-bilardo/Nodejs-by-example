@@ -132,3 +132,9 @@ Nei prossimi capitoli, esploreremo in dettaglio il file package.json, la gestion
 ---
 
 [Torna all'indice dell'esercitazione](../README.md)
+
+## Navigazione
+
+- [← Precedente: Esercitazione 3: NPM e Gestione Pacchetti](README.md)
+- [↑ Indice dell’esercitazione](README.md)
+- [Successiva: Package.json in Dettaglio →](02-package-json.md)

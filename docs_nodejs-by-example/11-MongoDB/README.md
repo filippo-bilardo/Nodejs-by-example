@@ -400,8 +400,14 @@ app.listen(PORT, () => {
 
 ## Argomenti Teorici Collegati
 
-- [1. Introduzione ai Database NoSQL](./teoria/01-introduzione-nosql.md)
-- [2. MongoDB: Concetti Fondamentali](./teoria/02-mongodb-concetti.md)
-- [3. Operazioni CRUD in MongoDB](./teoria/03-mongodb-crud.md)
-- [4. Mongoose: ODM per MongoDB](./teoria/04-mongoose.md)
-- [5. Modellazione dei Dati in MongoDB](./teoria/05-modellazione-dati.md)
+- [1. Introduzione ai Database NoSQL](01-introduzione-nosql.md)
+- [2. MongoDB: Concetti Fondamentali](02-mongodb-concetti.md)
+- [3. Operazioni CRUD in MongoDB](03-mongodb-crud.md)
+- [4. Mongoose: ODM per MongoDB](04-mongoose.md)
+- [5. Modellazione dei Dati in MongoDB](05-modellazione-dati.md)
+
+## Navigazione
+
+- [← Precedente: Pug: Template Engine Minimalista](../10-TemplateEngine/04-pug.md)
+- [↑ Indice del corso](../README.md)
+- [Successiva: Introduzione ai Database NoSQL →](01-introduzione-nosql.md)

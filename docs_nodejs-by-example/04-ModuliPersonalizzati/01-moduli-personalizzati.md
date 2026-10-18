@@ -1874,3 +1874,9 @@ d) `.module.js`
 9. **c)** Il prefisso underscore `_` è una convenzione (non un vincolo tecnico) per indicare che una funzione o variabile dovrebbe essere considerata privata e non usata esternamente al modulo.
 
 10. **b)** `.mjs` è l'estensione specifica per ES Modules. In alternativa si può usare `.js` con `"type": "module"` nel package.json.
+
+## Navigazione
+
+- [← Precedente: Esercitazione 4: Moduli Personalizzati in Node.js](README.md)
+- [↑ Indice dell’esercitazione](README.md)
+- [Successiva: Pattern di Esportazione in Node.js →](02-pattern-esportazione.md)

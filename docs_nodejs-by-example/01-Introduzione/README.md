@@ -31,5 +31,6 @@ Questa prima esercitazione ti introdurrà a Node.js, spiegandone le caratteristi
 
 ## Navigazione
 
-- [Indice del Corso](../README.md)
-- Modulo Successivo: [Moduli Core](../02-Architettura_Event-Driven/README.md)
+- [← Precedente: Node.js by example](../README.md)
+- [↑ Indice del corso](../README.md)
+- [Successiva: Introduzione a Node.js →](01-storia.md)

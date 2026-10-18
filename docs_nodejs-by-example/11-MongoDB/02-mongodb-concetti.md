@@ -329,7 +329,6 @@ Nei prossimi capitoli, esploreremo in dettaglio come eseguire operazioni CRUD in
 
 ## Navigazione
 
-- [Indice del Corso Node.js](../../README.md)
-- [Modulo 11: MongoDB](../README.md)
-- [Precedente: Introduzione ai Database NoSQL](./01-introduzione-nosql.md)
-- [Successivo: Operazioni CRUD in MongoDB](./03-mongodb-crud.md)
+- [← Precedente: Introduzione ai Database NoSQL](01-introduzione-nosql.md)
+- [↑ Indice dell’esercitazione](README.md)
+- [Successiva: Operazioni CRUD in MongoDB →](03-mongodb-crud.md)

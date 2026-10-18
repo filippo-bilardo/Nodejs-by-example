@@ -886,3 +886,9 @@ console.log('Document signed at:', timestamp);
 ---
 
 **📝 Nota**: La crittografia è complessa. Per applicazioni production-critical, considera di usare librerie mature e **consulta esperti di sicurezza**.
+
+## Navigazione
+
+- [← Precedente: I moduli HTTP e per il Networking in Node.js](03-http-networking.md)
+- [↑ Indice dell’esercitazione](README.md)
+- [Successiva: Moduli di Sistema: Path, OS e Util →](05-path-os-util.md)

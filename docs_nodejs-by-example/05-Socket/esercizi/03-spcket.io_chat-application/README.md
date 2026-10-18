@@ -289,7 +289,7 @@ socket.on('disconnect', () => {
 
 ## 📚 Risorse
 
-- [Teoria Room](../../teoria/03-room-namespace.md)
+- [Teoria Room](../../08-socket.io_room-namespace.md)
 - [Esempio Chat Room](../../esempi/02-chat-room/)
 - [Socket.io Emit Cheatsheet](https://socket.io/docs/v4/emit-cheatsheet/)
 

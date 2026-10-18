@@ -691,3 +691,9 @@ console.log('Safe env vars:', Object.keys(sanitizedEnv));
 ---
 
 **💡 Tip**: Process monitoring è essenziale per **production reliability** e **debugging performance issues**.
+
+## Navigazione
+
+- [← Precedente: Modulo Buffer - Gestione Dati Binari](07-buffer.md)
+- [↑ Indice dell’esercitazione](README.md)
+- [Successiva: Modulo Zlib - Compressione e Decompressione →](09-zlib.md)

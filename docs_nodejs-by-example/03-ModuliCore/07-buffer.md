@@ -701,3 +701,9 @@ for (let i = 0; i < 1000; i++) {
 ---
 
 **💡 Tip**: Buffer è fondamentale per **I/O veloce** - networking, file system, crittografia.
+
+## Navigazione
+
+- [← Precedente: Modulo Readline di Node.js - Guida Completa](06-readline.md)
+- [↑ Indice dell’esercitazione](README.md)
+- [Successiva: Modulo Process - Monitoraggio e Controllo Processo →](08-process.md)

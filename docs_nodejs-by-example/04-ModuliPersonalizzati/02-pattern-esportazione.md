@@ -240,3 +240,9 @@ La scelta del pattern di esportazione dipende da diversi fattori:
 I pattern di esportazione in Node.js offrono diverse opzioni per strutturare il codice in base alle esigenze specifiche. Non esiste un pattern "migliore" in assoluto, ma piuttosto quello più adatto al contesto specifico. Sperimentare con diversi pattern può aiutare a trovare quello che meglio si adatta al proprio stile di programmazione e alle esigenze del progetto.
 
 Nel prossimo capitolo, esploreremo come gestire le dipendenze tra moduli e come evitare problemi comuni come le dipendenze circolari.
+
+## Navigazione
+
+- [← Precedente: Moduli personalizzati in Node.js](01-moduli-personalizzati.md)
+- [↑ Indice dell’esercitazione](README.md)
+- [Successiva: Gestione delle Dipendenze tra Moduli in Node.js →](03-gestione-dipendenze.md)

@@ -902,3 +902,9 @@ setTimeout(), setInterval(), setImmediate() e timer basati su Promise.
 Node.js – Don't Block the Event Loop 
 
 Prestazioni, operazioni bloccanti e utilizzo del Worker Pool.
+
+## Navigazione
+
+- [← Precedente: Worker Threads in Node.js](Worker_Threads.md)
+- [↑ Indice dell’esercitazione](README.md)
+- [Successiva: Esercitazione 2: Moduli Core di Node.js →](../03-ModuliCore/README.md)

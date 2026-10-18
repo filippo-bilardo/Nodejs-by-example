@@ -736,3 +736,9 @@ console.log(UtilHelpers.template(template, { name: 'Mario', age: 30 }));
 ---
 
 **💡 Tip**: Questi moduli sono **perfetti per tooling e utilities** - build scripts, CLI tools, system monitoring.
+
+## Navigazione
+
+- [← Precedente: Modulo Crypto - Crittografia in Node.js](04-crypto.md)
+- [↑ Indice dell’esercitazione](README.md)
+- [Successiva: Modulo Readline di Node.js - Guida Completa →](06-readline.md)

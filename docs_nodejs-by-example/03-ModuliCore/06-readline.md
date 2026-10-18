@@ -884,7 +884,7 @@ rl.on('close', () => {
 **Cause di chiusura:**
 
 1. **Chiamata esplicita**: `rl.close()`
-2. **EOF dall'input**: 
+2. **EOF dall'input**:
    - Ctrl+D su Unix/Linux/Mac
    - Ctrl+Z seguito da INVIO su Windows
    - Fine di un file stream
@@ -2121,5 +2121,10 @@ Arrivederci!
 4. Costruisci un mini-database in-memory con comandi SQL-like
 5. Crea un timer Pomodoro CLI con notifiche
 
-[Continua nella Parte 2: Autocompletamento, Cronologia e Pattern Avanzati →](06-readline-parte2.md)
+Parte 2: Autocompletamento, Cronologia e Pattern Avanzati (guida non ancora disponibile)
 
+## Navigazione
+
+- [← Precedente: Moduli di Sistema: Path, OS e Util](05-path-os-util.md)
+- [↑ Indice dell’esercitazione](README.md)
+- [Successiva: Modulo Buffer - Gestione Dati Binari →](07-buffer.md)

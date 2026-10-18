@@ -231,4 +231,4 @@ esempio/
 
 - [Documentazione Express](https://expressjs.com/)
 - [Guide Express](https://expressjs.com/en/guide/routing.html)
-- [Teoria del Corso](../teoria/)
+- [Teoria del Corso](../)

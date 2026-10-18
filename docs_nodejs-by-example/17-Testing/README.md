@@ -30,15 +30,15 @@ Un buon sistema di test permette di:
 
 ## Contenuti Teorici
 
-1. [Introduzione al Testing](./teoria/01-introduzione-testing.md)
-2. [Unit Testing con Jest](./teoria/02-unit-testing-jest.md)
-3. [Unit Testing con Mocha e Chai](./teoria/03-mocha-chai.md)
-4. [Test-Driven Development](./teoria/04-tdd.md)
-5. [Mocking e Stubbing](./teoria/05-mocking-stubbing.md)
-6. [Integration Testing](./teoria/06-integration-testing.md)
-7. [End-to-End Testing](./teoria/07-e2e-testing.md)
-8. [Code Coverage](./teoria/08-code-coverage.md)
-9. [Testing in CI/CD](./teoria/09-testing-ci-cd.md)
+1. [Introduzione al Testing](01-introduzione-testing.md)
+2. [Unit Testing con Jest](02-unit-testing-jest.md)
+3. Unit Testing con Mocha e Chai (guida non ancora disponibile)
+4. [Test-Driven Development](04-tdd.md)
+5. Mocking e Stubbing (guida non ancora disponibile)
+6. [Integration Testing](06-integration-testing.md)
+7. [End-to-End Testing](07-e2e-testing.md)
+8. Code Coverage (guida non ancora disponibile)
+9. Testing in CI/CD (guida non ancora disponibile)
 
 ## Esercitazioni Pratiche
 
@@ -73,3 +73,9 @@ Sviluppare un'applicazione completa con una suite di test comprensiva (unit, int
 ## Conclusione
 
 Al termine di questo modulo, avrai acquisito le competenze necessarie per implementare strategie di testing efficaci nelle tue applicazioni Node.js, migliorando la qualità del codice e riducendo il rischio di bug in produzione. Il testing non è solo una fase del processo di sviluppo, ma una mentalità che accompagna l'intero ciclo di vita del software.
+
+## Navigazione
+
+- [← Precedente: Monitoraggio delle Applicazioni Node.js](../16-GestioneErrori/04-monitoraggio.md)
+- [↑ Indice del corso](../README.md)
+- [Successiva: Introduzione al Testing in Node.js →](01-introduzione-testing.md)

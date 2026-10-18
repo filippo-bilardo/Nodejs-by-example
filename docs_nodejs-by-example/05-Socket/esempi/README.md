@@ -288,7 +288,7 @@ io.on('connection', (socket) => {
 
 ## 📚 Risorse
 
-- [Teoria Socket.io](../teoria/)
+- [Teoria Socket.io](../)
 - [Esercizi](../esercizi/)
 - [Socket.io Docs](https://socket.io/docs/)
 - [Socket.io GitHub](https://github.com/socketio/socket.io)

@@ -13,11 +13,16 @@ In questo modulo esploreremo la programmazione di rete a basso livello utilizzan
 - Applicare best practices per gestione errori, backpressure e sicurezza
 
 ## Argomenti Teorici Collegati
-- [Introduzione a Socket e Protocolli](./teoria/01-introduzione-socket-protocolli.md)
-- [Modulo Net - Comunicazione TCP](./teoria/02-modulo-net-tcp.md)
-- [Modulo Dgram - Comunicazione UDP](./teoria/03-modulo-dgram-udp.md)
-- [Pattern e Best Practices](./teoria/04-pattern-best-practices.md)
-- [Protocolli Applicativi Custom](./teoria/05-protocolli-applicativi.md)
+
+- [Teoria - Socket TCP/UDP in Node.js](indice-guide.md)
+- [Introduzione a Socket e Protocolli](01-introduzione-socket-protocolli.md)
+- [Modulo Net - Comunicazione TCP](02-modulo-net-tcp.md)
+- [Modulo Dgram - Comunicazione UDP](03-modulo-dgram-udp.md)
+- [Pattern e Best Practices](04-pattern-best-practices.md)
+- [Protocolli Applicativi Custom](05-protocolli-applicativi.md)
+- [Introduzione a Socket.io](06-socket.io_introduzione.md)
+- [Eventi e Comunicazione](07-socket.io_eventi-comunicazione.md)
+- [Room e Namespace](08-socket.io_room-namespace.md)
 
 ## Esercizi Pratici
 
@@ -157,7 +162,7 @@ async function sendFile(socket, filePath) {
 - Eliminazione automatica file corrotti
 - Gestione permissions e accesso file
 
-**🎯 Esercizio Pratico:** [File Transfer TCP](./esercizi/03-file-transfer/) - Costruisci un sistema di file sharing con resume capability e compressione.
+**🎯 Esercizio Pratico:** File Transfer TCP (esercizio non ancora disponibile) - Costruisci un sistema di file sharing con resume capability e compressione.
 
 ### Esercizio 4.4: Echo Server UDP - Datagram Protocol
 Comunicazione connectionless con UDP per applicazioni real-time.
@@ -198,7 +203,7 @@ server.bind(9999); // Porta UDP
 - Latenza minima
 - Ottimo per dati time-sensitive
 
-**🎯 Esercizio Pratico:** [Echo Server UDP](./esercizi/04-echo-server-udp/) - Implementa un echo server UDP con reliability layer custom.
+**🎯 Esercizio Pratico:** Echo Server UDP (esercizio non ancora disponibile) - Implementa un echo server UDP con reliability layer custom.
 
 ### Esercizio 4.5: UDP Broadcast - Service Discovery
 Broadcasting di annunci servizio sulla rete locale.
@@ -509,6 +514,6 @@ echo "test message" | nc -u localhost 9999
 
 ## Navigazione
 
-- [Indice del Corso](../README.md)
-- Modulo Precedente: [NPM e Gestione Pacchetti](../03-NPM/README.md)
-- Modulo Successivo: [Socket.io e WebSocket](../05-Socket/README.md)
+- [← Precedente: Sicurezza e Audit in NPM](../05-NPM/05-sicurezza-audit.md)
+- [↑ Indice del corso](../README.md)
+- [Successiva: Teoria - Socket TCP/UDP in Node.js →](indice-guide.md)

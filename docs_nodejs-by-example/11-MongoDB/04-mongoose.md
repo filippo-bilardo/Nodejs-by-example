@@ -1018,7 +1018,6 @@ console.log(JSON.stringify(spiegazione, null, 2));
 
 ## Navigazione
 
-- [Indice del Corso Node.js](../../README.md)
-- [Modulo 11: MongoDB](../README.md)
-- [Precedente: MongoDB CRUD](./03-mongodb-crud.md)
-- [Successivo: Modellazione dei Dati in MongoDB](./05-modellazione-dati.md)
+- [← Precedente: Operazioni CRUD in MongoDB](03-mongodb-crud.md)
+- [↑ Indice dell’esercitazione](README.md)
+- [Successiva: Modellazione dei Dati in MongoDB →](05-modellazione-dati.md)

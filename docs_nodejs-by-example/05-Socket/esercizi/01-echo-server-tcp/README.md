@@ -334,7 +334,7 @@ const uptime = Math.floor((Date.now() - stats.startTime) / 1000);
 
 ## 📚 Risorse
 
-- [Teoria Socket TCP](../../teoria/02-modulo-net-tcp.md)
+- [Teoria Socket TCP](../../02-modulo-net-tcp.md)
 - [Esempio Echo Server](../../esempi/01-tcp-echo-server/)
 - [Node.js net docs](https://nodejs.org/api/net.html)
 

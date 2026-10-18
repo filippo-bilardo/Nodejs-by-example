@@ -12,10 +12,16 @@ In questa esercitazione esploreremo i moduli core di Node.js, imparando come uti
 - Ottenere informazioni sul sistema operativo
 
 ## Argomenti Teorici Collegati
-- [Moduli in Node.js](./teoria/01-Moduli_in_Node.md)
-- [File System](./teoria/02-file-system.md)
-- [HTTP e Networking](./teoria/03-http-networking.md)
-- [Altri Moduli Core](./teoria/05-altri-moduli-core.md)
+
+- [Moduli in Node.js](01-moduli-core-in-node.md)
+- [File System](02-file-system.md)
+- [HTTP e Networking](03-http-networking.md)
+- [Modulo Crypto - Crittografia in Node.js](04-crypto.md)
+- [Altri Moduli Core](05-path-os-util.md)
+- [Modulo Readline di Node.js - Guida Completa](06-readline.md)
+- [Modulo Buffer - Gestione Dati Binari](07-buffer.md)
+- [Modulo Process - Monitoraggio e Controllo Processo](08-process.md)
+- [Modulo Zlib - Compressione e Decompressione](09-zlib.md)
 
 ## Esercizi Pratici
 
@@ -983,6 +989,6 @@ node chat-system.js
 
 ## Navigazione
 
-- [Indice del Corso](../README.md)
-- Modulo Precedente: [Introduzione a Node.js](../01-Introduzione/README.md)
-- Modulo Successivo: [NPM e Gestione Pacchetti](../03-NPM/README.md)
+- [← Precedente: L'Event Loop di Node.js: come funziona la programmazione asincrona](../02-Architettura_Event-Driven/eventloop.md)
+- [↑ Indice del corso](../README.md)
+- [Successiva: Moduli e moduli core in Node.js →](01-moduli-core-in-node.md)

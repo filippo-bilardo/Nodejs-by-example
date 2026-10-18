@@ -19,12 +19,12 @@ Questo modulo esplora i concetti e le pratiche di Continuous Integration (CI) e 
 ## Argomenti
 
 ### Teoria
-1. [Introduzione a CI/CD](./teoria/01-introduzione-ci-cd.md)
-2. [Strumenti per CI/CD](./teoria/02-strumenti-ci-cd.md)
-3. [Pipeline di CI/CD](./teoria/03-pipeline-ci-cd.md)
-4. [Testing nelle Pipeline CI/CD](./teoria/04-testing-pipeline.md)
-5. [Deployment Automatizzato](./teoria/05-deployment-automatizzato.md)
-6. [Sicurezza nelle Pipeline CI/CD](./teoria/06-sicurezza-pipeline-ci-cd.md)
+1. [Introduzione a CI/CD](01-introduzione-ci-cd.md)
+2. [Strumenti per CI/CD](02-strumenti-ci-cd.md)
+3. [Pipeline di CI/CD](03-pipeline-ci-cd.md)
+4. [Testing nelle Pipeline CI/CD](04-testing-pipeline.md)
+5. [Deployment Automatizzato](05-deployment-automatizzato.md)
+6. [Sicurezza nelle Pipeline CI/CD](06-sicurezza-pipeline-ci-cd.md)
 
 ### Esercizi Pratici
 1. **Configurazione di GitHub Actions**: Crea una pipeline CI base per un'applicazione Node.js
@@ -45,3 +45,9 @@ Questo modulo esplora i concetti e le pratiche di Continuous Integration (CI) e 
 ---
 
 Nel prossimo modulo, esploreremo tecniche avanzate di ottimizzazione delle prestazioni e scalabilità per applicazioni Node.js in produzione.
+
+## Navigazione
+
+- [← Precedente: Monitoraggio e Logging nei Microservizi](../18-Microservizi/09-monitoraggio-logging-microservizi.md)
+- [↑ Indice del corso](../README.md)
+- [Successiva: Introduzione a CI/CD →](01-introduzione-ci-cd.md)

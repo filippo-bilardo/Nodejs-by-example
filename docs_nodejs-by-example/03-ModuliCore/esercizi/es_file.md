@@ -361,11 +361,11 @@ showMenu();
 
 ## Argomenti Teorici Collegati
 
-- [1. Introduzione al File System in Node.js](./teoria/01-introduzione-fs.md)
-- [2. API Sincrone vs Asincrone](./teoria/02-sync-vs-async.md)
-- [3. Gestione dei Path](./teoria/03-gestione-path.md)
-- [4. Streaming di File](./teoria/04-streaming.md)
-- [5. File Watching e Eventi](./teoria/05-file-watching.md)
+- [1. Introduzione al File System in Node.js](../02-file-system.md#introduzione)
+- [2. API Sincrone vs Asincrone](../02-file-system.md#operazioni-sincrone-vs-asincrone)
+- [3. Gestione dei Path](../05-path-os-util.md#il-modulo-path)
+- [4. Streaming di File](../02-file-system.md#stream-di-file---elaborazione-efficiente)
+- [5. File Watching e Eventi](../02-file-system.md#monitoraggio-file-system-file-watcher)
 
 ## Risorse Aggiuntive
 
@@ -376,5 +376,5 @@ showMenu();
 ## Navigazione
 
 - [Indice del Corso](../README.md)
-- Modulo Precedente: [Moduli Core](../02-ModuliCore/README.md)
-- Modulo Successivo: [Moduli Personalizzati](../04-ModuliPersonalizzati/README.md)
+- Modulo Precedente: [Moduli Core](../README.md)
+- Modulo Successivo: [Moduli Personalizzati](../../04-ModuliPersonalizzati/README.md)

@@ -851,7 +851,6 @@ Nel prossimo capitolo, esploreremo Mongoose, un Object Document Mapper (ODM) per
 
 ## Navigazione
 
-- [Indice del Corso Node.js](../../README.md)
-- [Modulo 11: MongoDB](../README.md)
-- [Precedente: Concetti di MongoDB](./02-mongodb-concetti.md)
-- [Successivo: Mongoose](./04-mongoose.md)
+- [← Precedente: MongoDB: Concetti Fondamentali](02-mongodb-concetti.md)
+- [↑ Indice dell’esercitazione](README.md)
+- [Successiva: Mongoose: ODM per MongoDB →](04-mongoose.md)

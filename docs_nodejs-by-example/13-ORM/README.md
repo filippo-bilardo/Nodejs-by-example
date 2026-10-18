@@ -76,11 +76,11 @@ Implementa transazioni e ottimizza le query per migliorare le prestazioni.
 
 ## Risorse Teoriche
 
-- [Introduzione agli ORM](./teoria/01-introduzione-orm.md)
-- [Sequelize: Configurazione e Modelli](./teoria/02-sequelize-configurazione.md)
-- [Relazioni tra Modelli](./teoria/03-relazioni-modelli.md)
-- [Migrazioni e Seed](./teoria/04-migrazioni-seed.md)
-- [Query Avanzate e Ottimizzazione](./teoria/05-query-avanzate.md)
+- [Introduzione agli ORM](01-introduzione-orm.md)
+- [Sequelize: Configurazione e Modelli](02-sequelize-configurazione.md)
+- [Relazioni tra Modelli](03-relazioni-modelli.md)
+- [Migrazioni e Seed](04-migrazioni-seed.md)
+- [Query Avanzate e Ottimizzazione](05-query-avanzate.md)
 
 ## Progetti Pratici
 
@@ -105,3 +105,9 @@ Sviluppa un'applicazione e-commerce con gestione di prodotti, categorie, utenti 
 Gli ORM come Sequelize offrono un modo potente e flessibile per interagire con i database relazionali in Node.js. Padroneggiare questi strumenti ti permetterà di sviluppare applicazioni più robuste, manutenibili e scalabili, riducendo al contempo il tempo di sviluppo e la possibilità di errori.
 
 Ricorda che, sebbene gli ORM offrano molti vantaggi, è importante comprendere anche le query SQL sottostanti per ottimizzare le prestazioni quando necessario e per risolvere problemi complessi che potrebbero sorgere.
+
+## Navigazione
+
+- [← Precedente: Pattern di Gestione delle Connessioni](../12-MySQL/05-pattern-connessioni.md)
+- [↑ Indice del corso](../README.md)
+- [Successiva: Introduzione agli ORM →](01-introduzione-orm.md)
