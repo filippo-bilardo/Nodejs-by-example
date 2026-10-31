@@ -1,0 +1,67 @@
+/**
+ * Esempio di utilizzo di process.nextTick, setTimeout, setImmediate e Promise in Node.js
+ * Dimostra l'ordine di esecuzione tra vari tipi di callback e microtask.
+ * La microtask queue viene svuotata DOPO ogni fase dell'Event Loop.
+ * 
+ * Date: 04/11/2025
+ */
+console.log('1. Sync start');
+
+setTimeout(() => {
+    for(let i = 0; i < 1000000000; i++) {} // Simula un carico di lavoro pesante
+    console.log('6. Timer - lavoro pesante pesante');
+}, 0);
+setTimeout(() => {
+    for(let i = 0; i < 100000000; i++) {} // Simula un carico di lavoro pesante
+    console.log('6. Timer - lavoro pesante');
+}, 0);
+setTimeout(() => {
+    process.nextTick(() => {
+        console.log('7. NextTick in timer');
+    });    
+    
+    console.log('6. Timer');
+}, 0);
+
+setImmediate(() => {
+    for(let i = 0; i < 10000000; i++) {} // Simula un carico di lavoro pesante
+    console.log('8. Immediate - lavoro pesante pesante');
+});
+setImmediate(() => {
+    for(let i = 0; i < 1000000; i++) {} // Simula un carico di lavoro pesante
+    console.log('8. Immediate - lavoro pesante');
+});
+setImmediate(() => {
+    console.log('8. Immediate');
+});
+
+Promise.resolve()
+    .then(() => {
+        console.log('4. Promise 1');
+        return Promise.resolve();
+    })
+    .then(() => {
+        console.log('5. Promise 2');
+    });
+
+process.nextTick(() => {
+    console.log('2. NextTick 1');
+    
+    process.nextTick(() => {
+        console.log('3. Nested NextTick');
+    });
+});
+
+
+console.log('1. Sync end');
+
+// Output garantito:
+// 1. Sync start
+// 1. Sync end
+// 2. NextTick 1
+// 3. Nested NextTick
+// 4. Promise 1
+// 5. Promise 2
+// 6. Timer (o 8. Immediate)
+// 7. NextTick in timer
+// 8. Immediate (o 6. Timer)
