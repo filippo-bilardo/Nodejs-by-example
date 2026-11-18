@@ -21,6 +21,7 @@ Questa prima esercitazione ti introdurrà a Node.js, spiegandone le caratteristi
 ## Esercitazioni Pratiche
 
 - [ES01 - Introduzione a Node](https://docs.google.com/presentation/d/1ZB6qUwG6CxxarcsVaAvTSR7DyaWXR5slIHf0qLfA1Cw)
+- [ES06 - Git e GitHub: repository Node.js sincronizzato](./esercizi/01-git_e_github.md)
 
 
 ## Risorse Aggiuntive
