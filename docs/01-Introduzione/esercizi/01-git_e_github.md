@@ -1,4 +1,4 @@
-# ES06 — Git e GitHub: repository Node.js sincronizzato
+# Git e GitHub: repository Node.js sincronizzato
 
 ## Obiettivo
 
@@ -37,8 +37,8 @@ Se Git è installato, puoi aprire **Git Bash** dal menu Start oppure con il tast
 
 2. Scarica Git for Windows dalla [pagina ufficiale](https://git-scm.com/download/win), oppure usa il canale software approvato dalla scuola. Non scaricare installer da siti non ufficiali.
 3. Avvia l'installer.
-   - Se possiedi i **permessi amministrativi**, scegli l'installazione per tutti gli utenti, lascia attiva l'integrazione di Git Bash e completa la procedura con le opzioni predefinite, salvo indicazioni diverse del docente.
-   - Se **non possiedi permessi amministrativi**, chiedi prima alla scuola se puoi installare software. Nell'installer scegli l'installazione solo per l'utente corrente, se l'opzione viene proposta. Se l'installer richiede comunque l'amministratore, non aggirare il blocco: chiedi l'installazione al tecnico oppure usa una versione portabile di Git for Windows approvata dalla scuola.
+   - Se possiedi i **permessi amministrativi**, scegli l'installazione per tutti gli utenti, lascia attiva l'integrazione di Git Bash e completa la procedura con le opzioni predefinite.
+   - Se **non possiedi permessi amministrativi**, nell'installer scegli l'installazione solo per l'utente corrente e completa la procedura con le opzioni predefinite.
 4. Chiudi e riapri Git Bash o PowerShell, poi verifica:
 
    ```powershell
@@ -74,9 +74,11 @@ git config --global --get user.name
 git config --global --get user.email
 ```
 
-Annota nel documento Google il comando e l'output. Se Git non è installato, chiedi al docente o all'amministratore di installarlo; non usare privilegi elevati senza autorizzazione. `user.name` e `user.email` identificano l'autore del commit, non sono la password di GitHub.
+Annota nel documento Google il comando e l'output. `user.name` e `user.email` identificano l'autore del commit, non sono la password di GitHub.
 
 ### 2. Creare il progetto e `.gitignore`
+
+Se `nodejs` non esiste già, in Git Bash:
 
 ```bash
 mkdir nodejs
@@ -127,42 +129,32 @@ git status --short --ignored
 git check-ignore -v node_modules\prova.txt file-temporaneo\prova.tmp .env
 ```
 
-I tre percorsi devono risultare ignorati; `README.md` e `index.js` devono essere aggiungibili. Rimuovi i file di prova prima del commit:
-
-```bash
-rm -rf node_modules file-temporaneo
-rm -f .env
-```
-
-Su PowerShell:
-
-```powershell
-Remove-Item node_modules, file-temporaneo -Recurse -Force -ErrorAction SilentlyContinue
-Remove-Item .env -Force -ErrorAction SilentlyContinue
-```
+I tre percorsi devono risultare ignorati; `README.md` e `index.js` devono essere aggiungibili.
 
 ### 3. Creare il repository remoto su GitHub
 
 1. Accedi a GitHub e seleziona **New repository**.
-2. Inserisci esattamente `nodejs` come nome.
+2. Inserisci `nodejs` come nome.
 3. Scegli la visibilità indicata dal docente.
 4. Lascia disattivate le opzioni **Add a README**, `.gitignore` e licenza: il primo commit esiste già localmente.
 5. Crea il repository.
 
 Annota l'URL della pagina GitHub e il nome del proprietario. Non pubblicare token o altri dati riservati.
+GitHub suggerirà come proseguire: nella sezione per collegare un repository esistente, seleziona **SSH**.
 
 ### 4. Committare e collegare il remoto
 
 ```bash
 git status
 git add README.md index.js .gitignore
+git add . # Se nella cartella sono presenti altri file da aggiungere
 git commit -m "Inizializza repository Node.js"
 git remote add origin git@github.com:TUO_USERNAME/nodejs.git
 git remote -v
 git push -u origin main
 ```
 
-Su GitHub devono comparire `README.md`, `index.js` e `.gitignore`, ma non `node_modules/`, `.env` o file temporanei. Se il remote è errato:
+Su GitHub devono comparire `README.md`, `index.js`, `.gitignore` e gli eventuali altri file aggiunti, ma non `node_modules/`, `.env` o file temporanei. Se il remote è errato:
 
 ```bash
 git remote set-url origin git@github.com:TUO_USERNAME/nodejs.git
@@ -208,6 +200,8 @@ icacls (Join-Path $sshDir "id_ed25519_github_nodejs")
 Non rendere la chiave privata leggibile da `Users`, `Everyone` o da altri account del PC.
 
 ### 2. Creare `~/.ssh/config`
+
+Il file `~/.ssh/config` permette di specificare quale chiave usare per GitHub. Crea il file con:
 
 ```sshconfig
 Host github.com
@@ -295,9 +289,6 @@ Questo è il risultato atteso: GitHub autentica la chiave ma non offre una shell
 ```bash
 git config --global user.name "Nome Cognome"
 git config --global user.email "tuo.nome@example.com"
-git config --global --get-regexp '^user\.(name|email)$'
-mkdir -p ~/progetti
-cd ~/progetti
 git clone git@github.com:TUO_USERNAME/nodejs.git
 cd nodejs
 git remote -v
@@ -307,8 +298,6 @@ git log --oneline --decorate -5
 In PowerShell usa questi comandi equivalenti per la cartella di lavoro:
 
 ```powershell
-New-Item -ItemType Directory -Force "$HOME\progetti" | Out-Null
-Set-Location "$HOME\progetti"
 git clone git@github.com:TUO_USERNAME/nodejs.git
 Set-Location nodejs
 git remote -v
@@ -367,8 +356,6 @@ Usala solo se è consentito e puoi trasferire il file in modo sicuro. Copia la c
 Clona il repository:
 
 ```bash
-mkdir -p ~/progetti
-cd ~/progetti
 git clone git@github.com:TUO_USERNAME/nodejs.git
 cd nodejs
 git remote -v
@@ -377,8 +364,6 @@ git remote -v
 In PowerShell la preparazione della cartella è:
 
 ```powershell
-New-Item -ItemType Directory -Force "$HOME\progetti" | Out-Null
-Set-Location "$HOME\progetti"
 git clone git@github.com:TUO_USERNAME/nodejs.git
 Set-Location nodejs
 git remote -v
@@ -519,8 +504,6 @@ git status --short
 
 ## Documento Google: prove richieste
 
-Crea un documento intitolato `ES06 - Git e GitHub - nodejs - Nome Cognome`. Per ogni schermata indica host, comando e risultato.
-
 ### Verifiche iniziali
 
 Documenta sistema operativo e host, la shell scelta (Git Bash o PowerShell), `git --version`, eventuale installazione autorizzata con o senza privilegi amministrativi e:
@@ -543,13 +526,18 @@ Inserisci il contenuto di `.gitignore`, l'output di `git check-ignore -v` per `.
 
 ### Conclusione
 
-Rispondi in 5–10 righe:
+Rispondi in modo sintetico, con almeno una frase per domanda:
 
 1. Qual è la differenza tra repository locale e remoto?
 2. Perché `ssh -T git@github.com` non apre una shell GitHub?
 3. Qual è la differenza tra chiave privata e pubblica?
 4. Perché si esegue `git pull --rebase` prima di lavorare su un clone?
 5. Perché `node_modules/` e `.env` non devono essere versionati?
+6. Qual è la differenza tra l'area di lavoro, la staging area e il repository Git?
+7. A cosa serve `git remote -v` e quale URL dovrebbe mostrare in questa esercitazione?
+8. Perché `git push --force` non deve essere usato per risolvere una normale divergenza tra i repository?
+9. Qual è la funzione di `ssh-agent` e perché la passphrase della chiave non deve essere salvata nel repository?
+10. Quali passaggi esegui quando Git segnala un conflitto durante `git pull --rebase`?
 
 ## Checklist di consegna
 
@@ -568,7 +556,6 @@ Rispondi in 5–10 righe:
 
 ## Riferimenti
 
-- [Esercizio di riferimento — Git e GitHub](https://github.com/filippo-bilardo/Programmazione-concorrente/blob/main/02-Processi-Linux/01-dal_programma_al_processo/esercizi/03-Git_e_GitHub.md)
 - [Git — documentazione ufficiale](https://git-scm.com/doc)
 - [GitHub — connessione tramite SSH](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
 - [GitHub — aggiungere una chiave SSH](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)
