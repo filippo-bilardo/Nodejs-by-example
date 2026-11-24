@@ -1,4 +1,4 @@
-# Il modulo net di Node.js per la comunicazione socket
+# Modulo net di Node.js e socket TCP
 
 *Guida pratica ai socket TCP e IPC con Node.js: dal server echo alla chat multiutente, passando per framing dei messaggi, backpressure e gestione degli errori.*
 
