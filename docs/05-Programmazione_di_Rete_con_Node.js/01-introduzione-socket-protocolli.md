@@ -6,6 +6,7 @@
 - [TCP vs UDP](#tcp-vs-udp)
 - [Indirizzi IP e Porte](#indirizzi-ip-e-porte)
 - [Socket in Node.js](#socket-in-nodejs)
+- [Chiamate di sistema Unix e API socket di Node.js](#chiamate-di-sistema-unix-e-api-socket-di-nodejs)
 
 ---
 
@@ -506,6 +507,166 @@ const server = net.createServer((socket) => {
 
 server.listen(3000);
 ```
+
+---
+
+## Chiamate di sistema Unix e API socket di Node.js
+
+In C su Unix, `socket()` restituisce un **file descriptor**, un intero con cui il processo identifica il socket. Il programma passa quel descrittore a chiamate come `bind()`, `recv()` e `close()`. In Node.js si lavora con oggetti JavaScript. Un `net.Server` gestisce l'ascolto TCP, ogni `net.Socket` connesso rappresenta un flusso di byte bidirezionale e un `dgram.Socket` invia e riceve datagrammi UDP. Le implementazioni native di Node.js e libuv si occupano dell'I/O con il sistema operativo. La corrispondenza qui sotto riguarda il **compito** delle operazioni. Un metodo JavaScript può combinare più chiamate native o rimandarne l'esecuzione. [Socket su Linux](https://man7.org/linux/man-pages/man7/socket.7.html) · [Architettura di libuv](https://docs.libuv.org/en/v1.x/design.html)
+
+### TCP: dall'ascolto alla chiusura
+
+| Operazione | Unix in C | Node.js con `node:net` |
+| --- | --- | --- |
+| Preparare il socket | `socket(AF_INET, SOCK_STREAM, 0)` crea un descrittore TCP IPv4. | `net.createServer()` prepara l'oggetto server. `new net.Socket()` prepara un oggetto socket. La creazione dell'oggetto da sola non avvia l'I/O. |
+| Associare un indirizzo e iniziare l'ascolto | `bind(fd, ...)` associa IP e porta locali. `listen(fd, backlog)` abilita l'ascolto. Il backlog riguarda le connessioni in attesa, non quelle già accettate. | `server.listen({ port, host, backlog })` avvia entrambe le operazioni. L'evento `'listening'` indica che il server è pronto. |
+| Accettare un client | `accept(fd, ...)` restituisce un **nuovo** descrittore connesso. Quello originale può accettare altri client. | Il server emette `'connection'` e passa un **nuovo** `net.Socket` al listener. Il callback di `net.createServer(handler)` si registra per lo stesso evento. |
+| Collegarsi a un server | `connect(fd, ...)` avvia una connessione verso IP e porta remoti. | `net.createConnection({ host, port })` restituisce subito un socket. L'evento `'connect'` indica che la connessione è riuscita. |
+| Ricevere byte | `recv(fd, buf, len, 0)` o `read(fd, buf, len)` scrive nel buffer fornito e restituisce il numero di byte letti. | L'evento `'data'` consegna un chunk, normalmente un `Buffer`. In modalità di lettura esplicita si può usare `'readable'` con `socket.read()`. |
+| Inviare byte | `send(fd, buf, len, 0)` o `write(fd, buf, len)` restituisce quanti byte sono stati accettati per l'invio. Il programma deve gestire le scritture parziali. | `socket.write(chunk)` consegna il chunk allo stream e restituisce un booleano. Se restituisce `false`, sospendi le ulteriori scritture fino a `'drain'` oppure gestisci un'eventuale chiusura o errore. |
+| Chiudere il lato di scrittura | `shutdown(fd, SHUT_WR)` termina l'invio e lascia aperto il lato di lettura. | `socket.end()` termina la scrittura dopo i dati già accodati. Sul lato ricevente, `'end'` indica che il peer ha terminato l'invio e che i dati in ingresso sono stati consumati. |
+| Rilasciare le risorse | `close(fd)` rilascia il descrittore. La chiusura del descrittore di ascolto e quella dei descrittori connessi sono operazioni separate. | `socket.destroy()` termina l'I/O del socket senza attendere lo svuotamento delle scritture. `'close'` segnala che il socket è chiuso. `server.close()` interrompe l'ascolto e attende la fine delle connessioni esistenti senza chiuderle da sé. |
+
+Per conoscere gli indirizzi, in C si usano `getsockname()` e `getpeername()`. In Node.js puoi leggere `server.address()` dopo `'listening'` e, su un socket connesso, le proprietà `localAddress`, `localPort`, `remoteAddress` e `remotePort`. Anche alcune opzioni del socket hanno controparti dirette. Per esempio, `setsockopt()` con `TCP_NODELAY` corrisponde a `socket.setNoDelay(true)`. [API TCP di Node.js](https://nodejs.org/api/net.html) · [Manuale di `accept()`](https://man7.org/linux/man-pages/man2/accept.2.html) · [Manuale di `shutdown()`](https://man7.org/linux/man-pages/man2/shutdown.2.html)
+
+### Attese, errori e controllo del flusso
+
+- **Attesa dei dati.** Su un descrittore bloccante, `accept()` o `recv()` può sospendere il thread chiamante. In C puoi scegliere anche socket non bloccanti, impostando `O_NONBLOCK` con `fcntl()` e controllando quando i descrittori sono pronti con `poll()` o `select()`. Su Unix libuv gestisce i socket non bloccanti per Node.js. Usa i meccanismi della piattaforma, come `epoll` su Linux e `kqueue` su macOS, per permettere allo stesso event loop di seguire più connessioni. I listener JavaScript devono comunque terminare rapidamente, perché un calcolo lungo ritarda gli altri eventi. [Architettura di libuv](https://docs.libuv.org/en/v1.x/design.html)
+- **Esito delle operazioni.** In C si controlla il valore restituito. Per esempio, `recv()` su TCP con un buffer di lunghezza positiva restituisce `0` quando il peer ha chiuso il proprio lato di scrittura. Con `-1` si legge `errno`. `EAGAIN` o `EWOULDBLOCK` su un socket non bloccante indicano che in quel momento l'operazione dovrebbe attendere. In Node.js, un errore di rete viene normalmente comunicato con `'error'` sul server o sul socket interessato. Gli argomenti non validi possono invece produrre un'eccezione sincrona. [Manuale di `recv()`](https://man7.org/linux/man-pages/man2/recv.2.html) · [API TCP di Node.js](https://nodejs.org/api/net.html)
+- **Scrittura e consegna.** In C una scrittura parziale richiede di riprendere dal primo byte ancora da inviare. In Node.js, `write()` che restituisce `false` segnala *backpressure*. Il chunk è già stato accettato dallo stream e **non va inviato di nuovo**. `'drain'` segnala che si può riprendere a produrre dati. Se occorre sapere che il peer ha elaborato un messaggio, il protocollo applicativo deve prevedere una risposta. Il successo di `send()` o il callback di `write()` confermano un'operazione locale. [Manuale di `send()`](https://man7.org/linux/man-pages/man2/send.2.html) · [API degli stream di Node.js](https://nodejs.org/api/stream.html)
+- **Confini dei messaggi.** TCP trasporta un flusso ordinato di byte. Una `send()` in C o una `write()` in JavaScript può corrispondere a più letture e una sola lettura può riunire più scritture. Per riconoscere i messaggi serve una regola condivisa, come un delimitatore o un prefisso di lunghezza. [Guida al framing in Node.js](02-modulo_net_e_socket_tcp.md#8-il-problema-del-framing)
+
+### UDP: corrispondenza tra datagrammi
+
+| Operazione | Unix in C | Node.js con `node:dgram` |
+| --- | --- | --- |
+| Preparare un endpoint IPv4 | `socket(AF_INET, SOCK_DGRAM, 0)` | `dgram.createSocket('udp4')` |
+| Ricevere su una porta locale | `bind(fd, ...)` associa l'indirizzo e la porta. | `socket.bind(port, address)` associa l'endpoint e poi emette `'listening'`. |
+| Inviare a un destinatario | `sendto(fd, buf, len, 0, ...)` indica la destinazione del datagramma. | `socket.send(buffer, port, address, callback)` indica la destinazione. Se il socket non ha ancora una porta locale, il primo invio può provocare un bind implicito. |
+| Ricevere un datagramma e il mittente | `recvfrom(fd, ...)` riempie anche la struttura con l'indirizzo del mittente. | `'message'` consegna `(msg, rinfo)`, con il `Buffer` del datagramma e i dati del mittente, tra cui `rinfo.address` e `rinfo.port`. |
+| Impostare il peer predefinito | `connect(fd, ...)` associa l'endpoint remoto. | `socket.connect(port, address)` associa il peer e permette di usare `socket.send(buffer)` senza ripetere la destinazione. |
+| Chiudere il socket | `close(fd)` | `socket.close()`, seguito dall'evento `'close'`. |
+
+UDP conserva i **confini dei datagrammi**. Il ricevitore C deve fornire un buffer capace di contenere il datagramma per evitarne il troncamento. UDP può trasportare anche un datagramma vuoto. Il valore `0` restituito da `recvfrom()` può quindi indicare un messaggio di zero byte. Per ricevere datagrammi non servono `listen()` e `accept()` di Unix. Anche dopo `connect()`, UDP rimane senza handshake né conferma di consegna. L'associazione imposta la destinazione predefinita e filtra i datagrammi in ingresso per peer. [API UDP di Node.js](https://nodejs.org/api/dgram.html) · [Manuale di `connect()`](https://man7.org/linux/man-pages/man2/connect.2.html) · [Manuale di `recvfrom()`](https://man7.org/linux/man-pages/man2/recv.2.html)
+
+### Laboratorio TCP: stesso client, due server echo
+
+Entrambi i server ascoltano su `127.0.0.1:5300` e restituiscono i byte ricevuti. Il server C usa un descrittore per l'ascolto e un secondo descrittore per il client. In questo esempio serve una sola connessione e termina. Il server Node.js resta in ascolto e può servire altri client.
+
+**Server Unix in C** (`echo-unix.c`)
+
+```c
+#include <arpa/inet.h>
+#include <errno.h>
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/socket.h>
+#include <unistd.h>
+
+static void fail(const char *operation)
+{
+    perror(operation);
+    exit(EXIT_FAILURE);
+}
+
+int main(void)
+{
+    if (signal(SIGPIPE, SIG_IGN) == SIG_ERR) fail("signal");
+
+    int server_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_fd == -1) fail("socket");
+
+    struct sockaddr_in local = {0};
+    local.sin_family = AF_INET;
+    local.sin_port = htons(5300);
+    local.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+
+    if (bind(server_fd, (struct sockaddr *)&local, sizeof local) == -1) fail("bind");
+    if (listen(server_fd, 8) == -1) fail("listen");
+    puts("In ascolto su 127.0.0.1:5300");
+    fflush(stdout);
+
+    int client_fd;
+    do {
+        client_fd = accept(server_fd, NULL, NULL);
+    } while (client_fd == -1 && errno == EINTR);
+    if (client_fd == -1) fail("accept");
+    if (close(server_fd) == -1) fail("close server");
+
+    char buffer[4096];
+    for (;;) {
+        ssize_t received = recv(client_fd, buffer, sizeof buffer, 0);
+        if (received == 0) break;
+        if (received == -1) {
+            if (errno == EINTR) continue;
+            fail("recv");
+        }
+
+        size_t sent = 0;
+        while (sent < (size_t)received) {
+            ssize_t written = send(client_fd, buffer + sent, (size_t)received - sent, 0);
+            if (written == -1) {
+                if (errno == EINTR) continue;
+                fail("send");
+            }
+            if (written == 0) {
+                fputs("send: nessun byte inviato\n", stderr);
+                return EXIT_FAILURE;
+            }
+            sent += (size_t)written;
+        }
+    }
+
+    if (shutdown(client_fd, SHUT_WR) == -1) fail("shutdown");
+    if (close(client_fd) == -1) fail("close client");
+    return EXIT_SUCCESS;
+}
+```
+
+Il ciclo interno gestisce le scritture parziali. `EINTR` indica che una chiamata è stata interrotta da un segnale e qui viene ripetuta. Ignorare `SIGPIPE` in questa prova permette di gestire un'eventuale `EPIPE` tramite il valore restituito da `send()`. [Manuale di `send()`](https://man7.org/linux/man-pages/man2/send.2.html)
+
+**Server in Node.js** (`echo-node.cjs`)
+
+```javascript
+const net = require('node:net');
+
+const server = net.createServer({ allowHalfOpen: true }, (socket) => {
+    socket.on('error', (err) => console.error('Client', err.code));
+    socket.pipe(socket);
+});
+
+server.on('error', (err) => {
+    console.error('Server', err.code);
+    process.exitCode = 1;
+});
+
+server.listen(5300, '127.0.0.1', () => {
+    console.log('In ascolto su 127.0.0.1:5300');
+});
+```
+
+`socket.pipe(socket)` trasferisce i byte dal lato leggibile a quello scrivibile dello stesso socket e gestisce la backpressure. Con `allowHalfOpen: true`, il socket può ancora scrivere dopo la fine della lettura. `pipe()` chiude il lato scrivibile con `end()` quando il lato leggibile termina. [API degli stream di Node.js](https://nodejs.org/api/stream.html) · [API TCP di Node.js](https://nodejs.org/api/net.html)
+
+**Client comune** (`echo-client.cjs`)
+
+```javascript
+const net = require('node:net');
+
+const client = net.createConnection({ port: 5300, host: '127.0.0.1' });
+client.on('error', (err) => {
+    console.error(err.code);
+    process.exitCode = 1;
+});
+client.once('connect', () => client.end('Ciao, socket!\n'));
+client.pipe(process.stdout);
+```
+
+1. Su Linux, macOS o WSL, compila il server C con `cc -std=c11 -Wall -Wextra -Wpedantic echo-unix.c -o echo-unix` e avvialo con `./echo-unix`.
+2. Da un secondo terminale, esegui `node echo-client.cjs`. Il client stampa `Ciao, socket!` e il server C termina.
+3. Avvia `node echo-node.cjs` al posto del server C e ripeti il comando del client. Ottieni lo stesso risultato. Puoi eseguire di nuovo il client finché il server resta attivo. Termina il server con `Ctrl+C`.
+
+Il client chiama `end()` per segnalare che ha finito di inviare la richiesta, ma rimane in lettura per ricevere l'echo. Individua nel server C il punto che corrisponde all'evento `'end'` del lato leggibile in Node.js. Che cosa succede a entrambi i server se il client usa `write()` e lascia aperto il proprio lato di scrittura?
 
 ---
 
