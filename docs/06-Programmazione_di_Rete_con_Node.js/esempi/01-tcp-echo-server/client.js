@@ -6,6 +6,7 @@
 const net = require('net');
 const readline = require('readline');
 
+// Se le variabili d'ambiente sono impostate, le usiamo; altrimenti usiamo i valori di default
 const HOST = process.env.HOST || 'localhost';
 const PORT = process.env.PORT || 3000;
 
